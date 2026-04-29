@@ -16,9 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.http import HttpResponse
-from django.urls import path
+from django.urls import path, include
+from domain.apoio import views
+
+def home(request):
+    return HttpResponse("Ambiente antigo")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', lambda X: HttpResponse('Ambiente novo'))
+    path('', home),
+    path('apoio/', include("domain.apoio.urls")),
 ]

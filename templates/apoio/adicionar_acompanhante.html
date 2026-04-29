@@ -1,0 +1,31 @@
+{% if messages %}
+    {% for message in messages %}
+        <div style="color:red;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Adicionar acompanhante</title>
+</head>
+<body>
+
+    <h1>Adicionar acompanhante</h1>
+    <h2>Paciente: {{apoio}}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">Salvar</button>
+    </form>
+    <a href="{% url 'apoio:detalhe' apoio.id %}">
+        Cancelar
+    </a>
+
+</body>
+</html>

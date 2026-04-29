@@ -1,0 +1,96 @@
+{% if messages %}
+    {% for message in messages %}
+        <div style="color:red;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<h1>Detalhe do Apoio</h1>
+
+<p><strong>Paciente:</strong> {{ apoio.paciente }}</p>
+<p><strong>Motivo do apoio:</strong> {{ apoio.motivo }}</p>
+<p><strong>Solicitante:</strong>
+    {% if apoio.solicitante %}
+    {{apoio.solicitante}}
+    {% else %}Sem solicitante{% endif %}
+</p>
+<p><strong>Data de início:</strong> {{ apoio.dataInicio }}</p>
+<p><strong>Previsão para encerramento do apoio:</strong> {{ apoio.previsaoFim_tipo }}</p>
+<p><strong>Data de previsão do fim do apoio:</strong>
+    {% if apoio.previsaoFim %}
+    {{ apoio.previsaoFim }}
+    {% else %}-{% endif %}
+</p>
+<p><strong>Status:</strong>{% if apoio.status %}Ativo{% else %}Finalizado{% endif %}</p>
+<p><strong>Data do check-in:</strong>
+    {% if apoio.checkIn %}
+    {{ apoio.checkIn }}
+    {% else %}Aguardando{% endif %}
+</p>
+<p><strong>Data do check-out:</strong>
+    {% if apoio.checkOut %}
+    {{ apoio.checkOut }}
+    {% else %}Aguardando{% endif %}
+</p>
+<form method="post" action="{% url 'apoio:checkin_paciente' apoio.id %}">
+    {% csrf_token %}
+    <button type="submit">Check-in do paciente</button>
+</form>
+<form method="post" action="{% url 'apoio:checkout_paciente' apoio.id %}">
+    {% csrf_token %}
+    <button type="submit">Check-out do paciente</button>
+</form>
+<hr>
+<h3>Hospedagem</h3>
+{% if hospedagem %}
+    <p><strong>Observação:</strong>{{ hospedagem.observacao|default:"Sem observação" }}</p>
+    {% for alocacao in hospedagem.hospedagem_alocacao.all %}
+        {% if not alocacao.dataFim %}
+            <p><strong>Quarto atual:</strong>{{ alocacao.quarto.identificacao }}</p>
+            <p><strong>Data entrada no quarto:</strong>{{ alocacao.inicioLocacao }}</p>
+            <p><strong>Data saída do quarto:</strong>
+                {% if alocacao.fimLocacao %}
+                {{ alocacao.fimLocacao }}
+                {% else %}Aguardando{% endif %}</p>
+        {% endif %}
+    {% empty %}
+        <p><strong>Status:</strong> Sem quarto alocado</p>
+    {% endfor %}
+{% else %}
+    <p>Este apoio não possui hospedagem.</p>
+{% endif %}
+<hr>
+<h3>Acompanhante atual</h3>
+{% if apoio.acompanhante_atual %}
+    <p><strong>Nome:</strong>{{ apoio.acompanhante_atual.nomeAcompanhante }}</p>
+    <p><strong>Vínculo:</strong>{{ apoio.acompanhante_atual.vinculo }}</p>
+    <p><strong>Check-in:</strong>{{ apoio.acompanhante_atual.checkIn }}</p>
+    <p><strong>Status:</strong>Aguardando</p>
+{% else %}
+    <p>Sem acompanhante ativo</p>
+{% endif %}
+
+<form method="post" action="{% url 'apoio:checkout_acompanhante' apoio.id %}">
+    {% csrf_token %}
+    <button type="submit">Checkout acompanhante</button>
+</form>
+<form method="post" action="{% url 'apoio:adicionar_acompanhante' apoio.id %}">
+    {% csrf_token %}
+    <button type="submit">Adicionar acompanhante</button>
+</form>
+<hr>
+<h2>Histórico acompanhantes</h2>
+
+{% if apoio.acompanhantes.all %}
+    {% for acomp in apoio.acompanhantes.all %}
+    <p><strong>Nome:</strong>{{ acomp.nomeAcompanhante }}</p>
+    <p><strong>Vinculo:</strong>{{ acomp.vinculo }}</p>
+    <p><strong>Check-in:</strong>{{ acomp.checkIn }}</p>
+    <p><strong>Check-out:</strong>
+        {% if acomp.checkOut %}
+        {{ acomp.checkOut }}
+        {% else %}Aguardando{% endif %}</p>
+        {% endfor %}
+{% else %}
+    <p>Sem acompanhante</p>
+{% endif %}
