@@ -12,8 +12,11 @@ class Quarto(models.Model):
 
     def clean(self):
         if self.quantidadeVagas:
-            if not self.vagasLivres:
+            if self.vagasLivres is None:
                 self.vagasLivres = self.quantidadeVagas
+
+        if self.vagasLivres > self.quantidadeVagas:
+            raise ValidationError("Erro: vagas livres maior que  quantidade de vagas do quarto")
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -23,15 +26,15 @@ class Quarto(models.Model):
         return self.identificacao
     
     def preenche_vaga(self):
-        if self.vagasLivres == 0:
+        if self.vagasLivres <= 0:
             raise ValidationError("sem vagas disponivel")
         
         self.vagasLivres -= 1
         self.save()
     
     def liberar_vaga(self):
-        if self.vagasLivres == self.quantidadeVagas:
-            raise ValidationError("O quarto ja possui todas as vagas livres")
+        if self.vagasLivres >= self.quantidadeVagas:
+            raise ValidationError("Erro: vagas livres maior que vagas qtd de vagas do quarto")
         
         self.vagasLivres += 1
         self.save()

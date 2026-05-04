@@ -103,6 +103,7 @@ class Acompanhante(models.Model):
         self.checkOut = agora
         self.save()
 
+#hospedagem controla o tempo que
 class Hospedagem(models.Model):
     observacao = models.CharField(max_length=500, null=True, blank=True)
     apoio = models.OneToOneField(Apoio, on_delete=models.CASCADE, related_name="hospedagem")
@@ -110,13 +111,15 @@ class Hospedagem(models.Model):
     def __str__(self):
         return self.apoio.paciente.nome_pessoa
 
+#alocação controla a hospedagem e todos os quartos que ela passou,
+#visto que uma hospedagem pode mudar de quarto 1 ou mais vezes
 class AlocacaoQuarto(models.Model):
     hospedagem = models.ForeignKey(Hospedagem, on_delete=models.PROTECT, related_name="hospedagem_alocacao")
     quarto = models.ForeignKey(Quarto, on_delete=models.PROTECT, related_name="quarto_alocacao")
     inicioLocacao = models.DateField()
     fimLocacao = models.DateField(null=True, blank=True)
     
-    def liberar_quarto(self):
+    def encerra_alocacao(self):
         agora = timezone.now()
         self.fimLocacao = agora
         self.save()

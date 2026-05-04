@@ -70,7 +70,7 @@ class IniciarApoioForm(forms.Form):
         help_text="Obrigatório se o apoio precisar de hospedagem"
     )
 
-    obs_hospedagem = forms.CharField(
+    descHospedagem = forms.CharField(
         max_length=500,
         required=False,
         label="Observações para hopedagem",
@@ -81,7 +81,7 @@ class IniciarApoioForm(forms.Form):
         queryset=Quarto.objects.filter(status=True),
         required=False,
         label="Quarto",
-        help_text="Obrigatório se tempo do apoio for maior que hoje"
+        widget=forms.HiddenInput()
     )
 
     inicio_alocacao = forms.DateField(
@@ -123,4 +123,34 @@ class AdicionarAcompanhante(forms.Form):
         required=False,
         label="Descrição de vinculo",
         help_text="Obrigatório para outros tipos de vinculo"
+    )
+
+class EditarApoioForm(forms.Form):
+
+    motivo_apoio = forms.CharField(max_length=500)
+
+    previsaoFim_tipo = forms.ChoiceField(
+        choices=[("", "---------")] + Apoio.DATAFIM_CHOICES
+    )
+
+    previsao_fim = forms.DateField(required=False)
+
+    solicitante = forms.ModelChoiceField(
+        queryset=Pessoa.objects.filter(aptaSolicitante_pessoa=True),
+        required=False,
+        label="Solicitante do apoio",
+        help_text="Obrigatório se o apoio precisar de hospedagem"
+    )
+
+    descHospedagem = forms.CharField(
+        max_length=500,
+        required=False,
+        label="Observações para hopedagem",
+        help_text="Apenas em caso de hospedagem"
+    )
+
+    quarto = forms.ModelChoiceField(
+        queryset=Quarto.objects.filter(status=True),
+        required=False,
+        widget=forms.HiddenInput()
     )

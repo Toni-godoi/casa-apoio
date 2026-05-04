@@ -2,14 +2,31 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ValidationError
 
-from domain.apoio.forms import IniciarApoioForm, AdicionarAcompanhante
+from domain.apoio.forms import IniciarApoioForm, AdicionarAcompanhante, EditarApoioForm
 from domain.apoio.models import Apoio
-from domain.apoio.services import iniciar_apoio, vincular_acompanhante, checkout_acompanhante, checkIn_apoio, checkOut_apoio
+from domain.quarto.models import Quarto
+from domain.apoio.services import iniciar_apoio, editar_apoio, vincular_acompanhante, checkout_acompanhante, checkIn_apoio, checkOut_apoio
 
 # Create your views here.
 def iniciar_apoio_view(request):
-    
+
+    quarto_id = request.GET.get("quarto_id")
+    quarto_obj = None
+
     form = IniciarApoioForm(request.POST or None)
+
+    if quarto_id and request.method != "POST":
+        form.initial["quarto"] = quarto_id
+        quarto_obj = Quarto.objects.filter(pk=quarto_id).first()
+
+    tipo = None
+
+    if request.method == "POST":
+        tipo = request.POST.get("previsaoFim_tipo")
+    else:
+        tipo = request.GET.get("previsaoFim_tipo")
+
+    precisa_hospedagem = tipo in ["INDETERMINADO", "DATA"]
 
     if request.method == "POST" and form.is_valid():
         cd = form.cleaned_data
@@ -26,7 +43,7 @@ def iniciar_apoio_view(request):
                 tipoVinculo_acompanhante=cd.get("tipoVinculo_acompanhante", ""),
                 descricao_vinculo=cd.get("descricao_vinculo", ""),
                 solicitante_id=cd["solicitante"].pk if cd.get("solicitante") else None,
-                obs_hospedagem=cd.get("obs_hospedagem", ""),
+                descHospedagem=cd.get("descHospedagem", ""),
                 quarto_id=cd["quarto"].pk if cd.get("quarto") else None,
                 inicio_alocacao=cd["data_inicio"]
             )
@@ -50,7 +67,10 @@ def iniciar_apoio_view(request):
             for msg in exc.messages:
                 messages.error(request, msg)
 
-    return render(request, "apoio/iniciar_apoio.html", {"form": form})
+    return render(request, "apoio/iniciar_apoio.html", {
+        "form": form,
+        "quarto_selecionado": quarto_obj,
+        "precisa_hospedagem": precisa_hospedagem})
 
 def detalhe_apoio_view(request, pk):
     apoio = get_object_or_404(Apoio, pk=pk)
@@ -120,3 +140,49 @@ def checkout_acompanhante_view(request, pk):
             messages.error(request, msg)
 
     return redirect("apoio:detalhe", pk=pk)
+
+def selecionar_quarto_view(request):
+    quartos = Quarto.objects.filter(status=True)
+
+    return render(request, "apoio/selecionar_quarto.html", {
+        "quartos": quartos
+    })
+
+def editar_apoio_view(request, pk):
+    apoio = get_object_or_404(Apoio, pk=pk)
+
+    initial = {
+        "motivo_apoio": apoio.motivo,
+        "previsaoFim_tipo": apoio.previsaoFim_tipo,
+        "previsao_fim": apoio.previsaoFim,
+        "solicitante": apoio.solicitante,
+        "descHospedagem": getattr(apoio, "hospedagem", None) and apoio.hospedagem.observacao,
+    }
+
+    form = EditarApoioForm(request.POST or None, initial=initial)
+
+    if request.method == "POST" and form.is_valid():
+        cd = form.cleaned_data
+
+        try:
+            editar_apoio(
+                apoio_id=apoio.pk,
+                motivo_apoio=cd["motivo_apoio"],
+                previsaoFim_tipo=cd["previsaoFim_tipo"],
+                previsao_fim=cd.get("previsao_fim"),
+                solicitante_id=cd["solicitante"].pk if cd.get("solicitante") else None,
+                descHospedagem=cd.get("descHospedagem"),
+                quarto_id=cd["quarto"].pk if cd.get("quarto") else None,
+            )
+
+            messages.success(request, "Apoio atualizado com sucesso")
+            return redirect("apoio:detalhe", pk=apoio.pk)
+
+        except ValidationError as exc:
+            for msg in exc.messages:
+                messages.error(request, msg)
+
+    return render(request, "apoio/editar_apoio.html", {
+        "form": form,
+        "apoio": apoio
+    })

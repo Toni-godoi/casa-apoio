@@ -21,7 +21,7 @@ def iniciar_apoio(
     tipoVinculo_acompanhante:str,
     descricao_vinculo:str,
     solicitante_id:Optional[int]=None,
-    obs_hospedagem:Optional[str]=None,
+    descHospedagem:Optional[str]=None,
     quarto_id:Optional[int]=None,
     inicio_alocacao:Optional[date]=None,
 )->Apoio:
@@ -70,7 +70,7 @@ def iniciar_apoio(
         _validar_quarto_ativo(quarto_id)
         iniciar_hospedagem(
             apoio=apoio,
-            obs_hospedagem=obs_hospedagem,
+            descHospedagem=descHospedagem,
             quarto_id=quarto_id,
             inicio_alocacao=inicio_alocacao
         )
@@ -104,31 +104,124 @@ def vincular_acompanhante(
     return acompanhante
 
 @transaction.atomic
+def editar_apoio(
+    *,
+    apoio_id: int,
+    motivo_apoio: str,
+    previsaoFim_tipo: str,
+    previsao_fim,
+    solicitante_id: int = None,
+    descHospedagem: str = "",
+    quarto_id: int = None,
+):
+
+    apoio = Apoio.objects.get(pk=apoio_id)
+
+    # estado antes/depois
+    era_hospedagem = apoio.previsaoFim_tipo != "HOJE"
+    agora_hospedagem = previsaoFim_tipo != "HOJE"
+
+    #atualiza dados simples
+    apoio.motivo = motivo_apoio
+    apoio.previsaoFim_tipo = previsaoFim_tipo
+    apoio.previsaoFim = previsao_fim
+    apoio.solicitante_id = solicitante_id
+
+    # NÃO ERA e agora VIROU HOSPEDAGEM
+    if not era_hospedagem and agora_hospedagem:
+
+        if not quarto_id:
+            raise ValidationError("Selecione um quarto para hospedagem")
+
+        hospedagem = Hospedagem.objects.create(
+            apoio=apoio,
+            observacao=descHospedagem
+        )
+
+        fazer_alocacao(
+            hospedagem=hospedagem,
+            quarto_id=quarto_id
+        )
+
+    # ERA e agora DEIXOU DE SER HOSPEDAGEM
+    elif era_hospedagem and not agora_hospedagem:
+
+        hospedagem = getattr(apoio, "hospedagem", None)
+
+        if hospedagem:
+            alocacao = hospedagem.hospedagem_alocacao.filter(
+                fimLocacao__isnull=True
+            ).first()
+
+            if alocacao:
+                alocacao.fimLocacao = timezone.now()
+                alocacao.save()
+
+                alocacao.quarto.liberar_vaga()
+
+            hospedagem.delete()
+
+    # CONTINUA SENDO HOSPEDAGEM
+    elif era_hospedagem and agora_hospedagem:
+
+        hospedagem = getattr(apoio, "hospedagem", None)
+
+        if not hospedagem:
+            raise ValidationError("Hospedagem não encontrada")
+
+        # atualiza observação
+        hospedagem.observacao = descHospedagem
+        hospedagem.save()
+
+        # troca de quarto (se informado)
+        if quarto_id:
+
+            atual = hospedagem.hospedagem_alocacao.filter(
+                fimLocacao__isnull=True
+            ).first()
+
+            # só troca se mudou mesmo
+            if atual and atual.quarto_id != quarto_id:
+
+                atual.fimLocacao = timezone.now()
+                atual.save()
+
+                atual.quarto.liberar_vaga()
+
+                fazer_alocacao(
+                    hospedagem=hospedagem,
+                    quarto_id=quarto_id
+                )
+    apoio.save()
+    return apoio
+    
+@transaction.atomic
 def iniciar_hospedagem(
     *,
     apoio:Apoio,
-    obs_hospedagem:str,
+    descHospedagem:str,
     quarto_id:int,
     inicio_alocacao:date,
 )->Hospedagem:
     
     quarto = _existe_quarto(quarto_id)
     vagas = quarto.verifica_vagasLivres()
-    if vagas == 0:
+    if vagas <= 0:
         raise ValidationError("sem vagas para o quarto")
     if vagas >= 1:
         hospedagem = Hospedagem(
             apoio=apoio,
-            observacao=obs_hospedagem,
-        )
-        
+            observacao=descHospedagem,
+        )    
     hospedagem.save()
+
     fazer_alocacao(
         hospedagem=hospedagem,
         quarto_id=quarto_id,
         inicio_alocacao=inicio_alocacao,
     )
     return hospedagem
+
 @transaction.atomic
 def fazer_alocacao(
         *,
@@ -138,13 +231,18 @@ def fazer_alocacao(
     )->AlocacaoQuarto:
 
     quarto = _existe_quarto(quarto_id)
-    alocacao = AlocacaoQuarto(
-        hospedagem = hospedagem,
-        quarto = quarto,
-        inicioLocacao=inicio_alocacao
-    )
-    quarto.preenche_vaga()
-    alocacao.save()
+    vagas = quarto.verifica_vagasLivres()
+    if vagas <= 0:
+        raise ValidationError("sem vagas para o quarto")
+    if vagas >= 1:
+        alocacao = AlocacaoQuarto(
+            hospedagem = hospedagem,
+            quarto = quarto,
+            inicioLocacao=inicio_alocacao
+        )
+        quarto.preenche_vaga()
+        alocacao.save()
+    
     return alocacao
     
 @transaction.atomic
@@ -179,7 +277,7 @@ def checkOut_apoio(apoio_id:int):
             fimLocacao__isnull=True
         ).first()
         if alocacao:
-            alocacao.liberar_quarto()
+            alocacao.encerra_alocacao()
             alocacao.quarto.liberar_vaga()
     
 @transaction.atomic
