@@ -86,7 +86,7 @@ class IniciarApoioForm(forms.Form):
 
     inicio_alocacao = forms.DateField(
         initial=timezone.localdate,
-        label="Data de início hospedagem",
+        label="Data de início para hospedagem de quarto",
         disabled=True
     )
 
@@ -127,13 +127,23 @@ class AdicionarAcompanhante(forms.Form):
 
 class EditarApoioForm(forms.Form):
 
-    motivo_apoio = forms.CharField(max_length=500)
-
-    previsaoFim_tipo = forms.ChoiceField(
-        choices=[("", "---------")] + Apoio.DATAFIM_CHOICES
+    motivo_apoio = forms.CharField(
+        max_length=500,
+        widget=forms.Textarea(attrs={"rows": 3}),
+        label="Motivo do Apoio",
     )
 
-    previsao_fim = forms.DateField(required=False)
+    previsaoFim_tipo = forms.ChoiceField(
+        choices=[("","----------------")] + Apoio.DATAFIM_CHOICES,
+        label="Previsão de encerramento do apoio"
+    )
+
+    previsao_fim = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={"type":"date"}),
+        label="Data prevista para fim do apoio",
+        help_text="Obrigatório quando existe uma data previsa diferente do mesmo dia"
+    )
 
     solicitante = forms.ModelChoiceField(
         queryset=Pessoa.objects.filter(aptaSolicitante_pessoa=True),
@@ -153,4 +163,10 @@ class EditarApoioForm(forms.Form):
         queryset=Quarto.objects.filter(status=True),
         required=False,
         widget=forms.HiddenInput()
+    )
+
+    inicio_alocacao = forms.DateField(
+        initial=timezone.localdate,
+        label="Data de início para hospedagem de quarto",
+        disabled=True
     )

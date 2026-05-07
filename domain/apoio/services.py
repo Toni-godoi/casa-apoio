@@ -91,8 +91,15 @@ def vincular_acompanhante(
         _validar_paciente_com_apoio(acompanhante_id, "Acompanhante")
         _validar_acompanhante_livre(acompanhante_id)
         _validar_apoioTem_acompanhante(apoio)
-    if tipoVinculo_acompanhante != 'OUTROS':
-        descricao_vinculo = tipoVinculo_acompanhante
+        
+    if not tipoVinculo_acompanhante:
+        raise ValidationError("Informe o vinculo do acompanhante")
+    if tipoVinculo_acompanhante: 
+        if tipoVinculo_acompanhante != 'OUTROS':
+            descricao_vinculo = tipoVinculo_acompanhante
+        if tipoVinculo_acompanhante == 'OUTROS' and not descricao_vinculo:
+            raise ValidationError("Descreva o vinculo do acompanhante")
+
     acompanhante = Acompanhante(
         apoio = apoio,
         nomeAcompanhante = acompanhante_pessoa,
@@ -113,13 +120,25 @@ def editar_apoio(
     solicitante_id: int = None,
     descHospedagem: str = "",
     quarto_id: int = None,
+    inicio_alocacao:Optional[date]=None
 ):
 
     apoio = Apoio.objects.get(pk=apoio_id)
+    if not apoio.status:
+        raise ValidationError("Apoio já finalizado não pode ser editado")
+    
+    hoje = timezone.localdate()
+    if previsaoFim_tipo == 'HOJE' and apoio.dataInicio != hoje:
+        raise ValidationError("Apoio ja recebeu HOSPEDAGEM. Defina tipo DATA e selecione a data para encerramento")
+    
+    _previsao_fim_data(previsaoFim_tipo, previsao_fim)
 
     # estado antes/depois
     era_hospedagem = apoio.previsaoFim_tipo != "HOJE"
     agora_hospedagem = previsaoFim_tipo != "HOJE"
+
+    if not era_hospedagem and previsaoFim_tipo == "HOJE" and quarto_id:
+        raise ValidationError("Apoio que finaliza hoje não pode ter quarto")
 
     #atualiza dados simples
     apoio.motivo = motivo_apoio
@@ -140,7 +159,8 @@ def editar_apoio(
 
         fazer_alocacao(
             hospedagem=hospedagem,
-            quarto_id=quarto_id
+            quarto_id=quarto_id,
+            inicio_alocacao=inicio_alocacao
         )
 
     # ERA e agora DEIXOU DE SER HOSPEDAGEM
@@ -190,7 +210,8 @@ def editar_apoio(
 
                 fazer_alocacao(
                     hospedagem=hospedagem,
-                    quarto_id=quarto_id
+                    quarto_id=quarto_id,
+                    inicio_alocacao=inicio_alocacao
                 )
     apoio.save()
     return apoio
@@ -316,10 +337,10 @@ def _previsao_fim_data(tipo:str, fim_previsto:date)->None:
     
     hoje = timezone.now()
     if fim_previsto:
-        if tipo == 'IDETERMINADO':
-            raise ValidationError("fim de apoio indeterminado não tem data previsao fim")
+        if tipo == 'INDETERMINADO':
+            raise ValidationError("apoio INDETERMINADO não se aplica data para fim")
         if tipo == 'HOJE':
-            raise ValidationError("fim de apoio hoje não tem data previsao fim")
+            raise ValidationError("NÃO é necessário definir uma data para o apoio que encerra hoje")
 
     #tipo data precisa de uma data fornecida.
     if tipo == 'DATA': 

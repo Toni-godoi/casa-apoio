@@ -1,9 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
+
     <title>Detalhe do Apoio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 </head>
 
 <body class="bg-light">
@@ -19,151 +27,249 @@
         {% endfor %}
     {% endif %}
 
-    <!-- CARD PRINCIPAL -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
+    <!-- TOPO -->
+    <div class="row g-3 mb-4">
 
-            <h3 class="mb-4">Detalhe do Apoio</h3>
+        <!-- APOIO -->
+        <div class="col-md-6">
+            <div class="card shadow h-100">
+                <div class="card-body">
 
-            <div class="row">
+                    <h3 class="mb-4">Detalhe do Apoio</h3>
 
-                <div class="col-md-6">
                     <p><strong>Paciente:</strong> {{ apoio.paciente }}</p>
+
                     <p><strong>Motivo:</strong> {{ apoio.motivo }}</p>
-                    <p><strong>Solicitante:</strong>
+
+                    <p>
+                        <strong>Solicitante:</strong>
                         {{ apoio.solicitante|default:"Sem solicitante" }}
                     </p>
-                </div>
 
-                <div class="col-md-6">
+                    <hr>
+
                     <p><strong>Data início:</strong> {{ apoio.dataInicio }}</p>
+
                     <p><strong>Previsão:</strong> {{ apoio.previsaoFim_tipo }}</p>
-                    <p><strong>Fim previsto:</strong> {{ apoio.previsaoFim|default:"-" }}</p>
-                    <p><strong>Check-in:</strong>{{ apoio.checkIn|default:"Aguardando" }}</p>
-                    <p><strong>Check-out:</strong>{{ apoio.checkOut|default:"Aguardando" }}</p>
+
+                    <p>
+                        <strong>Fim previsto:</strong>
+                        {{ apoio.previsaoFim|default:"-" }}
+                    </p>
+
+                    <p>
+                        <strong>Check-in:</strong>
+                        {{ apoio.checkIn|default:"Aguardando" }}
+                    </p>
+
+                    <p>
+                        <strong>Check-out:</strong>
+                        {{ apoio.checkOut|default:"Aguardando" }}
+                    </p>
 
                     <p>
                         <strong>Status:</strong>
+
                         {% if apoio.status %}
                             <span class="badge bg-success">Ativo</span>
                         {% else %}
                             <span class="badge bg-secondary">Finalizado</span>
                         {% endif %}
                     </p>
+
+                    <div class="mt-4 d-flex gap-2 flex-wrap">
+
+                        <a href="{% url 'apoio:editar_apoio' apoio.id %}"
+                           class="btn btn-outline-primary btn-sm">
+                            Editar apoio
+                        </a>
+
+                        <form method="post"
+                              action="{% url 'apoio:checkin_paciente' apoio.id %}">
+                            {% csrf_token %}
+
+                            <button class="btn btn-success btn-sm">
+                                Fazer Check-in paciente
+                            </button>
+                        </form>
+
+                        <form method="post"
+                              action="{% url 'apoio:checkout_paciente' apoio.id %}">
+                            {% csrf_token %}
+
+                            <button class="btn btn-danger btn-sm">
+                                Encerrar apoio
+                            </button>
+                        </form>
+
+                    </div>
+
                 </div>
-
             </div>
-            <a href="{% url 'apoio:editar_apoio' apoio.id %}" class="btn btn-sm btn-outline-primary">
-                Editar
-            </a>
-
-            <hr>
-
-            <!-- CHECK-IN / CHECK-OUT -->
-            <div class="d-flex gap-2">
-                <form method="post" action="{% url 'apoio:checkin_paciente' apoio.id %}">
-                    {% csrf_token %}
-                    <button class="btn btn-success btn-sm">Check-in</button>
-                </form>
-
-                <form method="post" action="{% url 'apoio:checkout_paciente' apoio.id %}">
-                    {% csrf_token %}
-                    <button class="btn btn-danger btn-sm">Check-out</button>
-                </form>
-            </div>
-
         </div>
-    </div>
 
-    <!-- HOSPEDAGEM -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
+        <!-- HOSPEDAGEM -->
+        <div class="col-md-6">
+            <div class="card shadow h-100">
+                <div class="card-body">
 
-            <h5 class="mb-3">Hospedagem</h5>
+                    <h3 class="mb-4">Hospedagem</h3>
 
-            {% if hospedagem %}
+                    {% if hospedagem %}
 
-                <p><strong>Observação:</strong> {{ hospedagem.observacao|default:"Sem observação" }}</p>
+                        <p>
+                            <strong>Observação:</strong>
+                            {{ hospedagem.observacao|default:"Sem observação" }}
+                        </p>
 
-                {% for alocacao in hospedagem.hospedagem_alocacao.all %}
-                    {% if not alocacao.fimLocacao %}
+                        {% for alocacao in hospedagem.hospedagem_alocacao.all %}
+                            {% if not alocacao.fimLocacao %}
 
-                        <div class="border p-3 rounded mb-2">
-                            <p><strong>Quarto:</strong> {{ alocacao.quarto.identificacao }}</p>
-                            <p><strong>Entrada:</strong> {{ alocacao.inicioLocacao }}</p>
-                            <p><strong>Saída:</strong> {{ alocacao.fimLocacao|default:"Aguardando" }}</p>
-                        </div>
+                                <div class="border rounded p-3 mb-3">
 
+                                    <p>
+                                        <strong>Quarto atual:</strong>
+                                        {{ alocacao.quarto.identificacao }}
+                                    </p>
+
+                                    <p>
+                                        <strong>Entrada:</strong>
+                                        {{ alocacao.inicioLocacao }}
+                                    </p>
+
+                                    <p>
+                                        <strong>Encerramento:</strong>
+                                        {{ alocacao.fimLocacao|default:"Aguardando" }}
+                                    </p>
+
+                                </div>
+
+                            {% endif %}
+                        {% empty %}
+                            <p class="text-muted">Sem quarto alocado</p>
+                        {% endfor %}
+
+                        <hr>
+
+                        <h6 class="mb-3">Histórico de Quartos</h6>
+
+                        <table class="table table-sm">
+
+                            <thead>
+                                <tr>
+                                    <th>Quarto</th>
+                                    <th>Entrada</th>
+                                    <th>Saída</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for alocacao in hospedagem.hospedagem_alocacao.all %}
+                                    <tr>
+                                        <td>{{ alocacao.quarto.identificacao }}</td>
+                                        <td>{{ alocacao.inicioLocacao }}</td>
+                                        <td>{{ alocacao.fimLocacao|default:"Atual" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+
+                        </table>
+
+                    {% else %}
+                        <p class="text-muted">Sem hospedagem</p>
                     {% endif %}
-                {% empty %}
-                    <p class="text-muted">Sem quarto alocado</p>
-                {% endfor %}
 
-            {% else %}
-                <p class="text-muted">Sem hospedagem</p>
-            {% endif %}
-
+                </div>
+            </div>
         </div>
+
     </div>
 
-    <!-- ACOMPANHANTE ATUAL -->
+    <!-- ACOMPANHANTES -->
     <div class="card shadow mb-4">
         <div class="card-body">
 
-            <h5 class="mb-3">Acompanhante Atual</h5>
+            <h3 class="mb-4">Acompanhantes</h3>
+
+            <h6 class="mb-3">Acompanhante Atual</h6>
 
             {% if apoio.acompanhante_atual %}
-                <p><strong>Nome:</strong> {{ apoio.acompanhante_atual.nomeAcompanhante }}</p>
-                <p><strong>Vínculo:</strong> {{ apoio.acompanhante_atual.vinculo }}</p>
-                <p><strong>Check-in:</strong> {{ apoio.acompanhante_atual.checkIn }}</p>
+
+                <p>
+                    <strong>Nome:</strong>
+                    {{ apoio.acompanhante_atual.nomeAcompanhante }}
+                </p>
+
+                <p>
+                    <strong>Vínculo:</strong>
+                    {{ apoio.acompanhante_atual.vinculo }}
+                </p>
+
+                <p>
+                    <strong>Check-in:</strong>
+                    {{ apoio.acompanhante_atual.checkIn }}
+                </p>
 
                 <span class="badge bg-info">Ativo</span>
+
             {% else %}
                 <p class="text-muted">Sem acompanhante ativo</p>
             {% endif %}
 
             <div class="mt-3 d-flex gap-2">
-                <form method="post" action="{% url 'apoio:checkout_acompanhante' apoio.id %}">
+
+                <form method="post"
+                      action="{% url 'apoio:checkout_acompanhante' apoio.id %}">
                     {% csrf_token %}
-                    <button class="btn btn-warning btn-sm">Checkout</button>
+
+                    <button class="btn btn-warning btn-sm">
+                        Fazer Check-out acompanhante
+                    </button>
                 </form>
 
-                <form method="post" action="{% url 'apoio:adicionar_acompanhante' apoio.id %}">
+                <form method="post"
+                      action="{% url 'apoio:adicionar_acompanhante' apoio.id %}">
                     {% csrf_token %}
-                    <button class="btn btn-primary btn-sm">Adicionar</button>
+
+                    <button class="btn btn-primary btn-sm">
+                        Adicionar acompanhante
+                    </button>
                 </form>
+
             </div>
 
-        </div>
-    </div>
+            <hr>
 
-    <!-- HISTÓRICO -->
-    <div class="card shadow">
-        <div class="card-body">
-
-            <h5 class="mb-3">Histórico de Acompanhantes</h5>
+            <h6 class="mt-3">Histórico de Acompanhantes</h6>
 
             {% if apoio.acompanhantes.all %}
+
                 <table class="table table-sm">
+
                     <thead>
                         <tr>
                             <th>Nome</th>
                             <th>Vínculo</th>
+                            <th>Descrição</th>
                             <th>Check-in</th>
                             <th>Check-out</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         {% for acomp in apoio.acompanhantes.all %}
                             <tr>
                                 <td>{{ acomp.nomeAcompanhante }}</td>
                                 <td>{{ acomp.vinculo }}</td>
+                                <td>{{ acomp.descricaoVinculo }}</td>
                                 <td>{{ acomp.checkIn }}</td>
                                 <td>{{ acomp.checkOut|default:"Aguardando" }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
+
                 </table>
+
             {% else %}
                 <p class="text-muted">Sem histórico</p>
             {% endif %}
@@ -175,3 +281,5 @@
 
 </body>
 </html>
+
+{% endblock %}

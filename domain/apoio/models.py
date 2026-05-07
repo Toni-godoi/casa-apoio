@@ -114,7 +114,7 @@ class Hospedagem(models.Model):
 #alocação controla a hospedagem e todos os quartos que ela passou,
 #visto que uma hospedagem pode mudar de quarto 1 ou mais vezes
 class AlocacaoQuarto(models.Model):
-    hospedagem = models.ForeignKey(Hospedagem, on_delete=models.PROTECT, related_name="hospedagem_alocacao")
+    hospedagem = models.ForeignKey(Hospedagem, on_delete=models.CASCADE, related_name="hospedagem_alocacao")
     quarto = models.ForeignKey(Quarto, on_delete=models.PROTECT, related_name="quarto_alocacao")
     inicioLocacao = models.DateField()
     fimLocacao = models.DateField(null=True, blank=True)
@@ -126,6 +126,10 @@ class AlocacaoQuarto(models.Model):
 
     def __str__(self):
         return f"Paciente:{self.hospedagem}-Quarto:{self.quarto}"
+    
+    @property
+    def alocacao_atual(self):
+        return self.quarto_alocacao.filter(checkOut__isnull=True).first()
     
 class AnexoAcompanhante(models.Model):
     EXTENSAO_CHOICES = [('PDF', 'Pdf'), ('FOTO', 'Foto')]

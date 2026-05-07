@@ -1,5 +1,7 @@
+{% extends "base.html" %}
 <!DOCTYPE html>
 <html lang="pt-br">
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <title>Selecionar Quarto</title>
@@ -36,8 +38,14 @@
 
                         <div class="mt-auto">
                             {% if quarto.vagasLivres > 0 %}
-                                <a href="{% url 'apoio:iniciar' %}?quarto_id={{ quarto.id }}"
-                                   class="btn btn-primary w-100">
+                                {% if request.GET.origem == "editar" %}
+                                <a href="{% url 'apoio:editar_apoio' request.GET.apoio_id %}?quarto_id={{ quarto.id }}"
+                                class="btn btn-primary w-100">
+                                {% else %}
+                                <a href="{% url 'apoio:iniciar' %}?quarto_id={{ quarto.id }}" 
+                                class="btn btn-primary w-100">
+                                {% endif %}
+                                  
                                     Selecionar
                                 </a>
                             {% else %}
@@ -59,4 +67,5 @@
 </div>
 
 </body>
+{% endblock %}
 </html>

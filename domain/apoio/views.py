@@ -151,12 +151,28 @@ def selecionar_quarto_view(request):
 def editar_apoio_view(request, pk):
     apoio = get_object_or_404(Apoio, pk=pk)
 
+    quarto_id = request.GET.get("quarto_id")
+    quarto_obj = None
+
+    if quarto_id:
+        quarto_obj = Quarto.objects.filter(pk=quarto_id).first()
+
+    if not quarto_obj:
+        hospedagem = getattr(apoio, "hospedagem", None)
+        if hospedagem:
+            atual = hospedagem.hospedagem_alocacao.filter(
+                fimLocacao__isnull=True
+            ).first()
+            if atual:
+                quarto_obj = atual.quarto
+
     initial = {
         "motivo_apoio": apoio.motivo,
         "previsaoFim_tipo": apoio.previsaoFim_tipo,
         "previsao_fim": apoio.previsaoFim,
         "solicitante": apoio.solicitante,
         "descHospedagem": getattr(apoio, "hospedagem", None) and apoio.hospedagem.observacao,
+        "quarto": quarto_obj,
     }
 
     form = EditarApoioForm(request.POST or None, initial=initial)
@@ -173,6 +189,7 @@ def editar_apoio_view(request, pk):
                 solicitante_id=cd["solicitante"].pk if cd.get("solicitante") else None,
                 descHospedagem=cd.get("descHospedagem"),
                 quarto_id=cd["quarto"].pk if cd.get("quarto") else None,
+                inicio_alocacao=cd["inicio_alocacao"]
             )
 
             messages.success(request, "Apoio atualizado com sucesso")
@@ -184,5 +201,18 @@ def editar_apoio_view(request, pk):
 
     return render(request, "apoio/editar_apoio.html", {
         "form": form,
-        "apoio": apoio
+        "apoio": apoio,
+        "quarto_selecionado": quarto_obj
     })
+
+def listar_apoios_view(request):
+
+    apoios = Apoio.objects.all().order_by("-dataInicio")
+
+    return render(
+        request,
+        "apoio/listar_apoios.html",
+        {
+            "apoios": apoios
+        }
+    )

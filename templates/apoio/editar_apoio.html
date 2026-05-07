@@ -1,5 +1,7 @@
+{% extends "base.html" %}
 <!DOCTYPE html>
 <html lang="pt-br">
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <title>Editar Apoio</title>
@@ -71,12 +73,16 @@
                     {{ form.quarto }} <!-- hidden -->
 
                     <div class="d-flex align-items-center gap-2 mt-2">
-
-                        <a href="{% url 'apoio:selecionar_quarto' %}" class="btn btn-outline-secondary btn-sm">
+                        <a href="{% url 'apoio:selecionar_quarto' %}?origem=editar&apoio_id={{ apoio.id }}"
+                        class="btn btn-outline-secondary btn-sm">
                             Selecionar quarto
                         </a>
-
                         {% if quarto_selecionado %}
+                            <a href="{% url 'apoio:editar_apoio' apoio.id %}"
+                            class="btn btn-outline-danger btn-sm">
+                                Limpar
+                            </a>
+             
                             <span class="badge bg-success">
                                 {{ quarto_selecionado.identificacao }}
                                 • {{ quarto_selecionado.vagasLivres }} vagas
@@ -85,10 +91,15 @@
 
                     </div>
                 </div>
+                
+                <div class="mb-4">
+                    {{ form.inicio_alocacao.label_tag }}
+                    {{ form.inicio_alocacao }}
+                </div>
 
                 <hr>
 
-                <!-- 🔹 AÇÕES -->
+                <!-- AÇÕES -->
                 <div class="d-flex justify-content-between">
 
                     <a href="{% url 'apoio:detalhe' apoio.id %}" class="btn btn-outline-secondary">
@@ -109,4 +120,5 @@
 </div>
 
 </body>
+{% endblock %}
 </html>

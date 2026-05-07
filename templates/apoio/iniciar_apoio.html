@@ -1,5 +1,7 @@
+{% extends "base.html" %}
 <!DOCTYPE html>
 <html lang="pt-br">
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <title>Iniciar Apoio</title>
@@ -114,6 +116,11 @@
                         </a>
 
                         {% if quarto_selecionado %}
+                            <a href="{% url 'apoio:iniciar' %}"
+                            class="btn btn-outline-danger btn-sm">
+                                Limpar
+                            </a>
+
                             <span class="badge bg-success">
                                 {{ quarto_selecionado.identificacao }} 
                                 • {{ quarto_selecionado.vagasLivres }} vagas livres
@@ -142,4 +149,5 @@
 </div>
 
 </body>
+{% endblock %}
 </html>

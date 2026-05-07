@@ -18,12 +18,18 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.urls import path, include
 from domain.apoio import views
-
-def home(request):
-    return HttpResponse("Ambiente antigo")
+from django.conf.urls.static import static
+from django.conf import settings
+from projetoApoio.views import home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home),
+    path('', home, name='home'),
     path('apoio/', include("domain.apoio.urls")),
+    path('quarto/', include("domain.quarto.urls")),
 ]
+
+urlpatterns += static(
+    settings.STATIC_URL,
+    document_root=settings.BASE_DIR / "static"
+)

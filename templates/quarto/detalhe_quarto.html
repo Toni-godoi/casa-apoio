@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- TOPO -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <h2 class="mb-1">
+                        Quarto {{ quarto.identificacao }}
+                    </h2>
+
+                    <p class="text-muted mb-0">
+                        Detalhes e histórico de ocupação
+                    </p>
+                </div>
+
+                {% if quarto.status %}
+                    <span class="badge bg-success">
+                        Ativo
+                    </span>
+                {% else %}
+                    <span class="badge bg-secondary">
+                        Inativo
+                    </span>
+                {% endif %}
+
+            </div>
+
+            <hr>
+
+            <div class="row">
+
+                <div class="col-md-4">
+                    <strong>Total de vagas:</strong><br>
+                    {{ quarto.quantidadeVagas }}
+                </div>
+
+                <div class="col-md-4">
+                    <strong>Vagas livres:</strong><br>
+
+                    {% if quarto.vagasLivres > 0 %}
+                        <span class="text-success fw-bold">
+                            {{ quarto.vagasLivres }}
+                        </span>
+                    {% else %}
+                        <span class="text-danger fw-bold">
+                            Lotado
+                        </span>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- OCUPAÇÃO ATUAL -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+
+            <h4 class="mb-4">
+                Ocupações Atuais
+            </h4>
+
+            {% if alocacoes_ativas %}
+
+                <table class="table">
+
+                    <thead>
+                        <tr>
+                            <th>Apoio</th>
+                            <th>Paciente</th>
+                            <th>Entrada</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for alocacao in alocacoes_ativas %}
+                            <tr>
+
+                                <td>
+                                    <a href="{% url 'apoio:detalhe' alocacao.hospedagem.apoio.id %}">
+                                        #{{ alocacao.hospedagem.apoio.id }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ alocacao.hospedagem.apoio.paciente }}
+                                </td>
+
+                                <td>
+                                    {{ alocacao.inicioLocacao }}
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            {% else %}
+
+                <p class="text-muted">
+                    Nenhuma ocupação ativa
+                </p>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- HISTÓRICO -->
+    <div class="card shadow">
+        <div class="card-body">
+
+            <h4 class="mb-4">
+                Histórico do Quarto
+            </h4>
+
+            {% if historico %}
+
+                <table class="table">
+
+                    <thead>
+                        <tr>
+                            <th>Apoio</th>
+                            <th>Paciente</th>
+                            <th>Incio</th>
+                            <th>Fim</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for alocacao in historico %}
+                            <tr>
+
+                                <td>
+                                    <a href="{% url 'apoio:detalhe' alocacao.hospedagem.apoio.id %}">
+                                        #{{ alocacao.hospedagem.apoio.id }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ alocacao.hospedagem.apoio.paciente }}
+                                </td>
+
+                                <td>
+                                    {{ alocacao.inicioLocacao }}
+                                </td>
+
+                                <td>
+                                    {{ alocacao.fimLocacao|default:"Atual" }}
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            {% else %}
+
+                <p class="text-muted">
+                    Sem histórico
+                </p>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
