@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <small class="text-muted">Pessoa > Dados pessoa</small>
+        <h1 class="fw-bold mt-2">{{pessoa.nome_pessoa}}</h1>
+    </div>
+    <div class="card border-primary shadow-sm">
+        <div class="card-header bg-primary-subtle">
+            <strong>Dados pessoais</strong>
+        </div>
+        <div class="card-body bg-body-tertiary">
+            <div class="row">
+                <!-- FOTO -->
+                <div class="col-md-2 text-center border-end">
+                    <img src="#" class="rounded-circle border shadow-sm mb-3"
+                        style="width:140px;height:140px;object-fit:cover;">
+                </div>
+
+                <!-- DADOS -->
+                <div class="col-md-10">
+                    <div class="row mb-4">
+
+                        <div class="col-md-8">
+                            <small class="text-muted d-block">Nome</small>
+                            <div class="border-bottom pb-1 fw-semibold">
+                                {{ pessoa.nome_pessoa }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <small class="text-muted d-block">CPF</small>
+                            <div class="border-bottom pb-1 fw-semibold">
+                                {{ pessoa.cpf_pessoa }}
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <small class="text-muted d-block">Data cadastro</small>
+                            <div class="border-bottom pb-1 fw-semibold">
+                                {{ pessoa.dataCadastro }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row mb-4">
+
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Data nascimento</small>
+                            <div class="border-bottom pb-1 fw-semibold">
+                                {{ pessoa.dataNasc_pessoa }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <small class="text-muted d-block">Idade</small>
+                            <div class="border-bottom pb-1 fw-semibold">
+                                {{ pessoa.idade }} anos
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">Sexo</small>
+                            <div class="border-bottom pb-1 fw-semibold">
+                                {{ pessoa.get_sexo_pessoa_display }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">Nacionalidade</small>
+                            <div class="border-bottom pb-1 fw-semibold">
+                                {{ pessoa.nacionalidade_pessoa }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Telefone</small>
+                            <div class="border-bottom pb-1 fw-semibold">
+                                {{ pessoa.telefone_pessoa }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <small class="text-muted d-block">Email</small>
+                            <div class="border-bottom pb-1 fw-semibold">
+                                {{ pessoa.email_pessoa|default:"-" }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <small class="text-muted d-block">Outras informações</small>
+
+                            <div class="border rounded bg-light p-3">
+                                {{ pessoa.descricao_pessoa|default:"Sem observações" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <div class="d-flex gap-3">
+            <a href="{% url 'pessoa:editar_pessoa' pessoa.id %}" class="btn btn-primary">
+                Editar dados
+            </a>
+            <a href="#" class="btn btn-dark">
+                Ver edições
+            </a>
+        </div>
+    </div><hr>
+    <!-- APOIOS -->
+    <div class="mb-4">
+        <h2 class="fw-bold mt-2">Histórico de apoios</h2>
+    </div>
+    <div class="card border-primary shadow-sm">
+        <div class="card-header bg-primary-subtle">
+            <strong>Apoios de {{pessoa.nome_pessoa}}</strong>
+        </div>
+        <div class="card-body bg-body-tertiary">
+        </div>
+    </div>
+</div>
+{% endblock %}

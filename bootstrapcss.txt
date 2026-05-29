@@ -1,0 +1,64 @@
+botoes 
+Classe	Visual
+btn-outline-primary	borda azul
+btn-outline-success	borda verde
+btn-outline-danger	borda vermelha
+btn-outline-secondary	borda cinza
+
+Classe	Visual
+btn-primary	azul
+btn-secondary	cinza
+btn-success	verde
+btn-danger	vermelho
+btn-warning	amarelo
+btn-info	azul claro
+btn-light	branco/cinza claro
+btn-dark	preto/cinza escuro
+
+cards
+Bootstrap cards têm:
+
+Parte	Classe
+card inteira	card
+cabeçalho	card-header
+conteúdo	card-body
+rodapé	card-footer
+
+Classe	Resultado
+border	borda padrão
+border-0	sem borda
+border-primary	azul
+border-success	verde
+border-danger	vermelho
+border-secondary	cinza
+border-light	clara
+border-dark	escura
+border-primary-subtle	azul suave
+border-success-subtle	verde suave
+border-secondary-subtle	cinza suave
+
+Classe	Cor
+bg-primary	azul
+bg-success	verde
+bg-danger	vermelho
+bg-warning	amarelo
+bg-info	azul claro
+bg-light	cinza claro
+bg-dark	escuro
+bg-white	branco
+bg-primary-subtle	azul suave
+bg-success-subtle	verde suave
+bg-warning-subtle	amarelo suave
+bg-body-tertiary	corporativo moderno
+
+Classe	sombra Resultado
+shadow-sm	leve
+shadow	média
+shadow-lg	forte
+
+Cantos arredondados
+Classe	Resultado
+rounded	padrão
+rounded-0	reto
+rounded-1 até 5	níveis
+rounded-pill	cápsula

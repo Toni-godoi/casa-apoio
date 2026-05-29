@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <small class="text-muted">Solicitação > Solicitantes</small>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold m-0">Solicitantes</h1>
+            <a href="{% url 'solicitacao:cadastrar_solicitante' %}" class="btn btn-primary">Cadastrar solicitante</a>
+        </div>
+    </div>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="card border-primary shadow-sm">
+        <div class="card-header bg-primary-subtle">
+            <strong>Solicitantes</strong>
+        </div>
+        <div class="card-body bg-light">
+            <table class="table align-middle">
+                <thead>
+                    <tr class="border-primary">
+                        <th width="200"></th>
+                        <th>
+                            Pessoa
+                        </th>
+                        <th>
+                            Função
+                        </th>
+                        <th width="200">
+                            Descrição
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for solicitante in solicitantes %}
+                    <tr class="border-primary">
+                        <td>
+                            <a href="{% url 'solicitacao:editar_solicitante' solicitante.id %}"
+                                class="btn btn-info btn-sm text-white fw-semibold px-4 rounded-2">
+                                Editar
+                            </a>
+                        </td>
+                        <td class="fw-semibold">
+                            {{ solicitante.pessoa }}
+                        </td>
+                        <td class="fw-semibold">
+                            {{ solicitante.funcao }}
+                        </td>
+                        <td class="fw-semibold">
+                            {{ solicitante.descricao }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

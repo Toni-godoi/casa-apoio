@@ -4,14 +4,15 @@ from datetime import date, time, datetime, timedelta
 from domain.pessoa.models import Pessoa
 from domain.apoio.models import Apoio, Acompanhante
 from domain.quarto.models import Quarto
+from domain.solicitacao.models import SolicitantePessoa
 
 class IniciarApoioForm(forms.Form):
 
     #casa_apoio
     motivo_apoio = forms.CharField(
-        max_length=500,
-        widget=forms.Textarea(attrs={"rows": 3}),
-        label="Motivo do Apoio",
+        max_length=20,
+        label="Adicione uma descrição",
+        widget=forms.TextInput(attrs={"class": "form-control"})
     )
 
     data_inicio = forms.DateField(
@@ -21,60 +22,59 @@ class IniciarApoioForm(forms.Form):
     )
 
     previsaoFim_tipo = forms.ChoiceField(
-        choices=[("","----------------")] + Apoio.DATAFIM_CHOICES,
-        label="Previsão de encerramento do apoio"
+        choices=[('HOJE', 'Hoje'),('DATA','Data'),('INDETERMINADO','Indeterminado')],
+        label = "Previsão de encerramento",
+        widget=forms.RadioSelect
     )
 
     previsao_fim = forms.DateField(
         required=False,
-        widget=forms.DateInput(attrs={"type":"date"}),
-        label="Data prevista para fim do apoio",
-        help_text="Obrigatório quando existe uma data previsa diferente do mesmo dia"
+        widget=forms.DateInput(attrs={"type":"date", "class": "form-control"}),
+        label="Data de Nascimento"
     )
 
-    paciente = forms.ModelChoiceField(
-        queryset=Pessoa.objects.all(),
-        label="Paciente",
-        help_text="Selecione"
+    paciente = forms.ChoiceField(
+        choices=[],
+        widget=forms.Select()
     )
 
     checkIn = forms.BooleanField(
     required=False,
     label="Selecione se o paciente for fazer check-in agora",
+    widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
 
-    acompanhante = forms.ModelChoiceField(
-        queryset=Pessoa.objects.all(),
+    acompanhante = forms.ChoiceField(
         required=False,
-        label="Acompanhante",
-        help_text="Selecione"
+        choices=[],
+        widget=forms.Select()
     )
 
     tipoVinculo_acompanhante = forms.ChoiceField(
-        choices=[("","---------")] + Acompanhante.VINCULO_CHOICES,
+        choices=[('PAI_MAE', 'Pai ou Mãe'),('CONJUGUE', 'Conjugue'), ('OUTROS', 'Outros')],
+        label = "Previsão de encerramento",
         required=False,
-        label="Vinculo do acompanhante com paciente"
+        widget=forms.RadioSelect
     )
 
     descricao_vinculo = forms.CharField(
         max_length=300,
         required=False,
-        label="Descrição de vinculo",
-        help_text="Obrigatório para vinculos de tipo 'Outros'"
+        label="Descrição do vínculo com paciente",
+        widget=forms.TextInput(attrs={"class": "form-control"})
     )
 
-    solicitante = forms.ModelChoiceField(
-        queryset=Pessoa.objects.filter(aptaSolicitante_pessoa=True),
+    solicitante = forms.ChoiceField(
         required=False,
-        label="Solicitante do apoio",
-        help_text="Obrigatório se o apoio precisar de hospedagem"
+        choices=[],
+        widget=forms.Select()
     )
 
     descHospedagem = forms.CharField(
         max_length=500,
         required=False,
-        label="Observações para hopedagem",
-        help_text="Apenas em caso de hospedagem"
+        label="Descrição do vínculo com paciente",
+        widget=forms.TextInput(attrs={"class": "form-control"})
     )
 
     quarto = forms.ModelChoiceField(
@@ -86,7 +86,7 @@ class IniciarApoioForm(forms.Form):
 
     inicio_alocacao = forms.DateField(
         initial=timezone.localdate,
-        label="Data de início para hospedagem de quarto",
+        label="Data de início da alocação do quarto",
         disabled=True
     )
 
@@ -128,40 +128,40 @@ class AdicionarAcompanhante(forms.Form):
 class EditarApoioForm(forms.Form):
 
     motivo_apoio = forms.CharField(
-        max_length=500,
-        widget=forms.Textarea(attrs={"rows": 3}),
-        label="Motivo do Apoio",
+        max_length=20,
+        label="Adicione uma descrição",
+        widget=forms.TextInput(attrs={"class": "form-control"})
     )
 
     previsaoFim_tipo = forms.ChoiceField(
-        choices=[("","----------------")] + Apoio.DATAFIM_CHOICES,
-        label="Previsão de encerramento do apoio"
+        choices=[('HOJE', 'Hoje'),('DATA','Data'),('INDETERMINADO','Indeterminado')],
+        label = "Previsão de encerramento",
+        widget=forms.RadioSelect
     )
 
     previsao_fim = forms.DateField(
         required=False,
-        widget=forms.DateInput(attrs={"type":"date"}),
-        label="Data prevista para fim do apoio",
-        help_text="Obrigatório quando existe uma data previsa diferente do mesmo dia"
+        widget=forms.DateInput(attrs={"type":"date", "class": "form-control"}),
+        label="Data de Nascimento"
     )
 
-    solicitante = forms.ModelChoiceField(
-        queryset=Pessoa.objects.filter(aptaSolicitante_pessoa=True),
+    solicitante = forms.ChoiceField(
         required=False,
-        label="Solicitante do apoio",
-        help_text="Obrigatório se o apoio precisar de hospedagem"
+        choices=[],
+        widget=forms.Select()
     )
 
     descHospedagem = forms.CharField(
         max_length=500,
         required=False,
-        label="Observações para hopedagem",
-        help_text="Apenas em caso de hospedagem"
+        label="Descrição do vínculo com paciente",
+        widget=forms.TextInput(attrs={"class": "form-control"})
     )
 
     quarto = forms.ModelChoiceField(
         queryset=Quarto.objects.filter(status=True),
         required=False,
+        label="Quarto",
         widget=forms.HiddenInput()
     )
 

@@ -4,12 +4,44 @@ services:
   web:
     build: .
     container_name: django_casaApoio
-
     ports:
       - "8000:8000"
-
     volumes:
       - .:/app
-
+    networks:
+      - casapoio
     stdin_open: true
     tty: true
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: casa_apoio
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: senha
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - casapoio
+    ports:
+      - "5432:5432"
+    restart: always
+  
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+    - "6379:6379"
+    networks:
+      - casapoio
+
+volumes:
+  db_data:
+
+networks:
+  casapoio:
+    external: true

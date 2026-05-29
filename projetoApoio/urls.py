@@ -23,10 +23,14 @@ from django.conf import settings
 from projetoApoio.views import home
 
 urlpatterns = [
+    path("oidc/", include("mozilla_django_oidc.urls")),
     path('admin/', admin.site.urls),
     path('', home, name='home'),
     path('apoio/', include("domain.apoio.urls")),
+    path('usuario/', include("autenticacao.urls")),
     path('quarto/', include("domain.quarto.urls")),
+    path('pessoa/', include("domain.pessoa.urls")),
+    path('solicitacao/', include("domain.solicitacao.urls")),
 ]
 
 urlpatterns += static(

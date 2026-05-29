@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <small class="text-muted">Solicitação > dados função</small>
+        <h1 class="fw-bold mt-2">{{funcao.funcao}}</h1>
+    </div>
+    <div class="card border-primary shadow-sm">
+        <div class="card-header bg-primary-subtle">
+            <strong>Cadastro</strong>
+        </div>
+        <div class="card-body bg-body-tertiary">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Nome</small>
+                            <div class="border-bottom pb-1 fw-semibold">
+                                {{ funcao.funcao }}
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <small class="text-muted d-block">Descrição</small>
+                            <div class="border-bottom pb-1 fw-semibold">
+                                {{ funcao.descricao| default:"Sem observações" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <div class="d-flex gap-3">
+            <a href="{% url 'solicitacao:editar_funcao' funcao.id %}" class="btn btn-primary">
+                Editar função
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

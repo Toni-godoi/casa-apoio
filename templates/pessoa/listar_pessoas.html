@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <small class="text-muted">Pessoa > Pessoas</small>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold m-0">Pessoas cadastradas</h1>
+            <a href="{% url 'pessoa:cadastrar_pessoa' %}" class="btn btn-primary">Cadastrar pessoa</a>
+        </div>
+    </div>
+    <div class="card border-primary shadow-sm mb-4">
+        <div class="card-header bg-primary-subtle d-flex justify-content-between align-items-center">
+            <strong>Filtros</strong>
+        </button>
+        </div>
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-danger md-4">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        <div class="card-body bg-light">
+            <form method="get">
+                <div class="row g-3">
+                    <!-- DATA INICIAL -->
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Data de cadastro (inicial)
+                                </label>
+                                <input type="date" name="data_inicio" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Data de cadastro (final)
+                                </label>
+                                <input type="date" name="data_fim" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- EMAIL -->
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            Email da pessoa
+                        </label>
+                        <div class="input-group">
+                            <input type="text" name="email" class="form-control">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- CPF -->
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            CPF
+                        </label>
+                        <div class="input-group">
+                            <input type="text" name="cpf" class="form-control">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- TELEFONE -->
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            Telefone
+                        </label>
+                        <div class="input-group">
+                            <input type="text" name="telefone" class="form-control">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- NOME -->
+                    <div class="col-md-5">
+                        <label class="form-label">
+                            Nome da pessoa
+                        </label>
+                        <div class="input-group">
+                            <input type="text" name="nome" class="form-control">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- BOTÕES -->
+                <div class="mt-4 d-flex gap-3">
+                    <button type="submit" class="btn btn-info text-white px-4">
+                        Buscar
+                    </button>
+                    <a href="{% url 'pessoa:listar_pessoas' %}" class="btn btn-dark px-4">
+                        Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card border-primary shadow-sm">
+        <div class="card-header bg-primary-subtle">
+            <strong>Cadastros</strong>
+        </div>
+        <div class="card-body bg-light">
+            <table class="table align-middle">
+                <thead>
+                    <tr class="border-primary">
+                        <th width="120"></th>
+                        <th>
+                            Nome
+                        </th>
+                        <th>
+                            CPF
+                        </th>
+                        <th>
+                            Data cadastro
+                        </th>
+                        <th>
+                            Telefone
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pessoa in pessoas %}
+                    <tr class="border-primary">
+                        <!-- BOTÃO -->
+                        <td>
+                            <a href="{% url 'pessoa:dados_pessoa' pessoa.id %}"
+                                class="btn btn-info btn-sm text-white fw-semibold px-4 rounded-2">
+                                Ver
+                            </a>
+                        </td>
+                        <!-- NOME -->
+                        <td class="fw-semibold">
+                            {{ pessoa.nome_pessoa }}
+                        </td>
+                        <!-- CPF -->
+                        <td class="fw-semibold">
+                            {{ pessoa.cpf_pessoa }}
+                        </td>
+                        <!-- DATA -->
+                        <td class="fw-semibold">
+                            {{ pessoa.dataCadastro|date:"d M. Y" }}
+                        </td>
+                        <!-- TELEFONE -->
+                        <td class="fw-semibold">
+                            {{ pessoa.telefone_pessoa }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

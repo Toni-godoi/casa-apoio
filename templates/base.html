@@ -6,74 +6,213 @@
     <title>Sistema</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
     <style>
+        .ts-wrapper {
+            width: 100%;
+        }
+
+        .ts-control {
+            min-height: 38px !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 6px !important;
+            padding: 6px 12px !important;
+            background: #fff !important;
+            box-shadow: none !important;
+        }
+
+        .ts-control input {
+            font-size: 14px !important;
+        }
+
+        .ts-wrapper.single .ts-control {
+            height: 38px !important;
+        }
+
+        .ts-dropdown {
+            border-radius: 6px !important;
+            border: 1px solid #ced4da !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .1);
+        }
+
+        .ts-dropdown .active {
+            background: #0d6efd !important;
+            color: #fff !important;
+        }
+
+        .ts-control:focus-within {
+            border-color: #86b7fe !important;
+            box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25) !important;
+        }
+
         body {
-            overflow-x: hidden;
+            margin: 0;
+            background: #f4f4f4;
+            font-family: Arial, sans-serif;
         }
 
         .sidebar {
-            width: 250px;
+            width: 270px;
             height: 100vh;
             position: fixed;
-            top: 0;
             left: 0;
-            background-color: #1f2937;
-            padding-top: 20px;
+            top: 0;
+            background: linear-gradient(180deg,
+                    #00152d,
+                    #001122);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
         }
 
-        .sidebar a {
-            color: #d1d5db;
+        .logo-box {
+            height: 70px;
+            background: #999;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .system-name {
+            margin-bottom: 20px;
+        }
+
+        .user-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+        }
+
+        .menu-search input {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-bottom: 1px solid #999;
+            background: transparent;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .menu-title {
             display: block;
-            padding: 12px 20px;
-            text-decoration: none;
+            color: #67e8f9;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
         }
 
-        .sidebar a:hover {
-            background-color: #374151;
-            color: #fff;
+        .submenu {
+            margin-left: 20px;
+        }
+
+        .submenu a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .submenu a:hover {
+            color: #67e8f9;
         }
 
         .content {
-            margin-left: 250px;
+            margin-left: 270px;
             padding: 30px;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
         }
     </style>
 </head>
 
 <body>
-    <!-- SIDEBAR -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
     <div class="sidebar">
-        <h5 class="text-white text-center mb-4">Casa de Apoio</h5>
-        <a href="#">Dashboard</a>
-        <a class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#menuApoios"
-            role="button" aria-expanded="false">
-            Apoios
-            <span>▾</span>
-        </a>
-        <div class="collapse" id="menuApoios">
-            <a href="{% url 'apoio:listar_apoios' %}" class="ps-4">Ver apoios</a>
+        <!-- TOPO -->
+        <div class="sidebar-top">
+            <div class="logo-box">
+                LOGO
+            </div>
+            <h5 class="system-name">
+                Nome casa de apoio
+            </h5>
         </div>
-        <div class="collapse" id="menuApoios">
-            <a href="{% url 'apoio:iniciar' %}" class="ps-4">Novo Apoio</a>
+        <!-- BUSCA -->
+        <div class="menu-search">
+            <input type="text" placeholder="Buscar menu">
         </div>
-        <a href="#">Pessoas</a>
-        <a class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#menuApoios"
-            role="button" aria-expanded="false">
-            Quartos
-            <span>▾</span>
-        </a>
-        <div class="collapse" id="menuApoios">
-            <a href="{% url 'quarto:listar_quartos' %}" class="ps-4">Ver quartos</a>
+        <!-- MENU -->
+        <div class="menu-section mb-4">
+            <a href="{% url 'home' %}">
+                🏠 Início
+            </a>
+            <div class="menu-group">
+                <span class="menu-title">🆘 Apoio</span>
+                <div class="submenu">
+                    <a href="{% url 'apoio:listar_apoios' %}">Apoios ativos</a>
+                    <a href="{% url 'apoio:iniciar' %}">Iniciar apoio</a>
+                    <a href="{% url 'apoio:consultar_apoios' %}">Buscar apoio</a>
+                </div>
+            </div>
+            <div class="menu-group">
+                <span class="menu-title">🛏️ Quarto</span>
+                <div class="submenu">
+                    <a href="{% url 'quarto:quartos_ativos' %}">Painel</a>
+                </div>
+            </div>
+            <div class="menu-group">
+                <span class="menu-title">👤 Pessoa</span>
+                <div class="submenu">
+                    <a href="{% url 'pessoa:listar_pessoas' %}">Pessoas cadastradas</a>
+                    <a href="{% url 'pessoa:cadastrar_pessoa' %}">Cadastrar pessoa</a>
+                </div>
+            </div>
+            <div class="menu-group mb-3">
+                <span class="menu-title">👤 Solicitante</span>
+                <div class="submenu">
+                    <a href="{% url 'solicitacao:listar_solicitantes' %}">Solicitantes</a>
+                    <a href="{% url 'solicitacao:cadastrar_solicitante' %}">Cadastrar solicitante</a>
+                    <a href="{% url 'solicitacao:listar_funcoes' %}">Funções solicitante</a>
+                </div>
+            </div>
+            <a href="{% url 'autenticacao:logout' %}">
+                Sair
+            </a>
         </div>
-        <a href="#">Relatórios</a>
+        <!-- RODAPÉ -->
+        <div class="sidebar-footer">
+            <div class="logo-box">
+                LOGO APLICAÇÃO
+            </div>
+            <small>
+                Sistema Casa de Apoio
+            </small>
+        </div>
     </div>
     <div class="content">
         {% block content %}
         {% endblock %}
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

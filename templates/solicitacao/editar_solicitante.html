@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <small class="text-muted">Solicitação > Editar solicitante</small>
+        <h1 class="fw-bold mt-2">(Solicitante){{solicitante.pessoa}}</h1>
+    </div>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="card border-primary shadow-sm">
+            <div class="card-header bg-primary-subtle">
+                <strong>Editar informações</strong>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-4">
+                        <label class="form-label">* Nome pessoa:</label>
+                        {{ form.pessoa }}
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label">Função:</label>
+                        {{ form.funcao }}
+                    </div>
+                </div>
+                <div class="row g-3 align-items-start">
+                    <div class="col">
+                        <label class="form-label">Descrição:</label>
+                        {{ form.descricao }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4">
+            <div class="d-flex gap-3">
+                <button type="submit" class="btn btn-primary">
+                    Salvar alterações
+                </button>
+                <a href="{% url 'solicitacao:listar_solicitantes' %}" class="btn btn-outline-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    new TomSelect(
+        "#id_pessoa",
+        {
+            create: false,
+            maxOptions: 10,
+            hideSelected: true,
+            openOnFocus: false,
+        });
+</script>
+{% endblock %}

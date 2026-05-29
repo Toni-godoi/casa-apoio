@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +28,12 @@ SECRET_KEY = 'django-insecure-*-pf^13iz8qwpz2uac7zck$lr6pk-3*j(szrb+!ptdv-l7#@3s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['casadeapoio.local']
+LOGIN_URL = "autenticacao:login"
+
+ALLOWED_HOSTS = ['casadeapoio.local',
+                 'localhost',
+                 '127.0.0.1',
+                 'auth.local']
 
 
 # Application definition
@@ -37,10 +45,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'mozilla_django_oidc', #APP para usar OIDC
     'domain.apoio',
     'domain.pessoa',
     'domain.casadeapoio',
     'domain.quarto',
+    'domain.endereco',
+    'domain.solicitacao',
+    'autenticacao'
 ]
 
 MIDDLEWARE = [
@@ -82,10 +94,64 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# no postgres:  psql -U postgres -d : CREATE DATABASE casa_apoio;
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'casa_apoio',
+#        'USER': 'postgres',
+#        'PASSWORD': 'senha',
+#        'HOST': 'postgres',
+#       'PORT': '5432',
+#    }
+#}
+
+#ntegração com redis
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
 
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+
+AUTH_USER_MODEL = 'autenticacao.Usuario'
+
+###########
+#OIDC AUTH#
+###########
+load_dotenv(BASE_DIR/".env")
+
+TIPO_AUTENTICACAO = os.getenv(
+    "TIPO_AUTENTICACAO",
+    "LOCAL"
+)
+if TIPO_AUTENTICACAO == "OIDC":
+    AUTHENTICATION_BACKENDS = ("autenticacao.backends.AuthentikBackend",)
+    OIDC_RP_CLIENT_ID = os.getenv("OIDC_CLIENT_ID")
+    OIDC_RP_CLIENT_SECRET = os.getenv("OIDC_CLIENT_SECRET")
+    OIDC_RP_SIGN_ALGO = "RS256"
+    #OIDC_OP_DISCOVERY_ENDPOINT = (f"{os.getenv('OIDC_ISSUER')}.well-known/openid-configuration")
+    OIDC_OP_AUTHORIZATION_ENDPOINT = os.getenv("OIDC_OP_AUTHORIZATION_ENDPOINT")
+    OIDC_OP_TOKEN_ENDPOINT = os.getenv("OIDC_OP_TOKEN_ENDPOINT")
+    OIDC_OP_USER_ENDPOINT = os.getenv("OIDC_OP_USER_ENDPOINT")
+    OIDC_OP_JWKS_ENDPOINT = os.getenv("OIDC_OP_JWKS_ENDPOINT")
+    OIDC_RP_SCOPES = None
+
+if TIPO_AUTENTICACAO == "LOCAL":
+    AUTHENTICATION_BACKENDS = (
+        "django.contrib.auth.backends.ModelBackend",
+    )
+###########
+#OIDC AUTH#
+###########
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -106,7 +172,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
 #TIME_ZONE = 'UTC'
 TIME_ZONE = "America/Cuiaba"

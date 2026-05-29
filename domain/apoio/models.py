@@ -3,14 +3,14 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from domain.pessoa.models import Pessoa
 from domain.quarto.models import Quarto
+from domain.solicitacao.models import SolicitantePessoa
 
 class Apoio(models.Model):
     DATAFIM_CHOICES=[('HOJE', 'Hoje'),('DATA','Data'),('INDETERMINADO','Indeterminado')]
     motivo = models.CharField(max_length=500)
     paciente = models.ForeignKey(Pessoa, on_delete=models.CASCADE, related_name="pacientes")
-    solicitante = models.ForeignKey(Pessoa, on_delete=models.CASCADE, null=True, blank=True, related_name="solicitantes")
+    solicitante = models.ForeignKey(SolicitantePessoa, on_delete=models.CASCADE, null=True, blank=True, related_name="solicitantes")
 #-- casaApoio = models.ForeignKey(CasaApoio,)
-#-- usuario = models.ForeignKey(ContasUser,)
     dataInicio = models.DateField()
     previsaoFim_tipo = models.CharField(max_length=50, choices=DATAFIM_CHOICES)
     previsaoFim = models.DateField(null=True, blank=True)

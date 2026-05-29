@@ -6,6 +6,7 @@ app_name = "apoio"
 urlpatterns = [
     path("iniciar-apoio/", views.iniciar_apoio_view, name="iniciar"),
     path("apoios/", views.listar_apoios_view, name="listar_apoios"),
+    path("consultar-apoios/", views.consultar_apoios_view, name="consultar_apoios"),
     path("<int:pk>/", views.detalhe_apoio_view, name="detalhe"),
     path("<int:pk>/novo-acompanhante/", views.adicionar_acompanhante_view, name="adicionar_acompanhante"),
     path("<int:pk>/checkout-acompanhante/", views.checkout_acompanhante_view, name="checkout_acompanhante"),

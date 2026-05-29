@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <small class="text-muted">Quarto > Cadastrar quarto</small>
+        <h1 class="fw-bold mt-2">Cadastrar quarto</h1>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="card border-primary shadow-sm">
+            <div class="card-header bg-primary-subtle">
+                <strong>Dados da pessoa</strong>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-8">
+                        <label class="form-label">* Identificação do quarto:</label>
+                        {{ form.identificacao }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">* Quantidade de vagas:</label>
+                        {{ form.quantidadeVagas }}
+                    </div>
+                </div>
+            </div>    
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-primary">Salvar</button>
+            <a href="{% url 'quarto:quartos_ativos' %}"class="btn btn-light border">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

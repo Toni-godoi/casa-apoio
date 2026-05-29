@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <small class="text-muted">Pessoa > Cadastrar pessoa</small>
+        <h1 class="fw-bold mt-2">Cadastrar pessoa</h1>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="card border-primary shadow-sm">
+            <div class="card-header bg-primary-subtle">
+                <strong>Dados da pessoa</strong>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-start">
+                    <!-- NOME -->
+                    <div class="col-md-4">
+                        <label class="form-label">* Nome completo:</label>
+                        {{ form.nome_pessoa }}
+                    </div>
+                    <!-- CPF -->
+                    <div class="col-md-2">
+                        <label class="form-label">* CPF:
+                        </label>{{ form.cpf_pessoa }}</div>
+                    <!-- EMAIL -->
+                    <div class="col-md-3">
+                        <label class="form-label">Email:</label>
+                        {{ form.email_pessoa }}
+                    </div>
+                    <!-- OBS -->
+                    <div class="col-md-3">
+                        <label class="form-label">Outras informações:</label>
+                        {{ form.descricao_pessoa }}
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <!-- SEXO -->
+                    <div class="col-md-1">
+                        <label class="form-label">* Sexo:</label>
+                        {{ form.sexo_pessoa }}
+                    </div>
+                    <!-- NACIONALIDADE -->
+                    <div class="col-md-2">
+                        <label class="form-label">* Nacionalidade:</label>
+                        {{ form.nacionalidade_pessoa }}
+                    </div>
+                    <!-- DATA -->
+                    <div class="col-md-2">
+                        <label class="form-label">* Data de nascimento:</label>
+                        {{ form.dataNasc_pessoa }}
+                    </div>
+                    <!-- IDADE -->
+                    <div class="col-md-1">
+                        <label class="form-label">* Idade</label>
+                        <input type="text" class="form-control" value="{{ idade|default:'' }}" readonly>
+                    </div>
+                    <!-- TELEFONE -->
+                    <div class="col-md-2">
+                        <label class="form-label">* Telefone:</label>
+                        {{ form.telefone_pessoa }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-primary">Salvar</button>
+            <a href="{% url 'pessoa:listar_pessoas' %}"class="btn btn-light border">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

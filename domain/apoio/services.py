@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from datetime import date, time, datetime, timedelta
 from domain.apoio.models import Apoio, Acompanhante, Hospedagem, AlocacaoQuarto, AnexoAcompanhante, AnexoApoio
 from domain.pessoa.models import Pessoa
+from domain.solicitacao.models import SolicitantePessoa
 from domain.quarto.models import Quarto
 from typing import Optional
     
@@ -37,8 +38,7 @@ def iniciar_apoio(
 
     solicitante_pessoa = None
     if solicitante_id:
-        _valida_solicitante_apto(solicitante_id)
-        solicitante_pessoa = _existe_pessoa(solicitante_id, "Solicitante")
+        solicitante_pessoa = _valida_solicitante_existe(solicitante_id)
         
     apoio = Apoio(
         motivo=motivo_apoio,
@@ -446,15 +446,14 @@ def _valida_solicitante_hospedagem(solicitante_id:int, tipo:str)->bool:
             raise ValidationError("Um apoio que precisa de hospedagem requer solicitante")
     return True
     
-def _valida_solicitante_apto(solicitante_pk:int)->None:
-    solicitante = Pessoa.objects.filter(
+def _valida_solicitante_existe(solicitante_pk:int)->SolicitantePessoa:
+    solicitante = SolicitantePessoa.objects.filter(
         pk=solicitante_pk,
-        aptaSolicitante_pessoa=True,
-        papelSolicitante_pessoa__isnull=False
     ).first()
     if not solicitante:
-        raise ValidationError("A pessoa selecionada para solicitação não é apta para solicitante")
-
+        raise ValidationError("Solicitante não existe")
+    
+    return solicitante
 ###
 #-- funções da regra de nogocio - HOSPEDAGENS
 ###

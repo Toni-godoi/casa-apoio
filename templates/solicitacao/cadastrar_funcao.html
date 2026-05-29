@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <small class="text-muted">Solicitação > Cadastrar função</small>
+        <h1 class="fw-bold mt-2">Cadastrar função de solicitante</h1>
+    </div>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="card border-primary shadow-sm">
+            <div class="card-header bg-primary-subtle">
+                <strong>Dados da função</strong>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-4">
+                        <label class="form-label">* Nome da função:</label>
+                        {{ form.funcao }}
+                    </div>
+                    <!-- CPF -->
+                    <div class="col-md-8">
+                        <label class="form-label">Descrição:</label>
+                        {{ form.descricao }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-primary">Salvar</button>
+            <a href="{% url 'solicitacao:listar_funcoes' %}" class="btn btn-light border">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

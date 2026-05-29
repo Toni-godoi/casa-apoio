@@ -1,31 +1,39 @@
 from django.contrib import messages
+from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ValidationError
-
+from django.contrib.auth.decorators import login_required
 from domain.apoio.forms import IniciarApoioForm, AdicionarAcompanhante, EditarApoioForm
 from domain.apoio.models import Apoio
 from domain.quarto.models import Quarto
+from domain.pessoa.models import Pessoa
+from domain.solicitacao.models import SolicitantePessoa
 from domain.apoio.services import iniciar_apoio, editar_apoio, vincular_acompanhante, checkout_acompanhante, checkIn_apoio, checkOut_apoio
 
-# Create your views here.
+# Create your views here. #Entoni
+@login_required
 def iniciar_apoio_view(request):
 
     quarto_id = request.GET.get("quarto_id")
     quarto_obj = None
+    pacientes = Pessoa.objects.all()
+    acompanhantes = Pessoa.objects.all()
+    solicitantes = SolicitantePessoa.objects.all()
 
     form = IniciarApoioForm(request.POST or None)
+    form.fields["paciente"].choices = [("", "Digite um nome")]+[(p.id, p.nome_pessoa)for p in pacientes]
+    form.fields["solicitante"].choices = [("", "Digite um nome")]+[(p.id, p.pessoa)for p in solicitantes]
+    form.fields["acompanhante"].choices = [("", "Digite um nome")]+[(p.id, p.nome_pessoa)for p in acompanhantes]
 
     if quarto_id and request.method != "POST":
         form.initial["quarto"] = quarto_id
         quarto_obj = Quarto.objects.filter(pk=quarto_id).first()
-
+    
     tipo = None
-
     if request.method == "POST":
         tipo = request.POST.get("previsaoFim_tipo")
     else:
         tipo = request.GET.get("previsaoFim_tipo")
-
     precisa_hospedagem = tipo in ["INDETERMINADO", "DATA"]
 
     if request.method == "POST" and form.is_valid():
@@ -37,45 +45,33 @@ def iniciar_apoio_view(request):
                 data_inicio=cd["data_inicio"],
                 previsaoFim_tipo=cd["previsaoFim_tipo"],
                 previsao_fim=cd.get("previsao_fim"),
-                paciente_id=cd["paciente"].pk,
+                paciente_id=cd["paciente"],
                 checkIn=cd.get("checkIn"),
-                acompanhante_id=cd["acompanhante"].pk if cd.get("acompanhante") else None,
+                acompanhante_id=cd["acompanhante"] if cd.get("acompanhante") else None,
                 tipoVinculo_acompanhante=cd.get("tipoVinculo_acompanhante", ""),
                 descricao_vinculo=cd.get("descricao_vinculo", ""),
-                solicitante_id=cd["solicitante"].pk if cd.get("solicitante") else None,
+                solicitante_id=cd["solicitante"] if cd.get("solicitante") else None,
                 descHospedagem=cd.get("descHospedagem", ""),
                 quarto_id=cd["quarto"].pk if cd.get("quarto") else None,
                 inicio_alocacao=cd["data_inicio"]
             )
-            messages.success(request, f"Apoio #{apoio.pk} registrado com sucesso.")
             return redirect("apoio:detalhe", pk=apoio.pk)
-
-        #except ApoioComHospedagemNecessario as exc:
-            # alt02: redireciona para UC22
-           # messages.info(
-             #   request,
-             #   "O apoio possui duração superior a um dia. "
-              #  "Prossiga com o cadastro de hospedagem.",
-            #)
-            # Preserva os dados no formulário e redireciona para o fluxo de hospedagem
-            #return redirect(
-             #   f"/apoio/iniciar-com-hospedagem/?data_inicio={exc.data_inicio}"
-              #  f"&previsao_fim={exc.previsao_fim}"
-            #)
-
+        
         except ValidationError as exc:
             for msg in exc.messages:
                 messages.error(request, msg)
 
     return render(request, "apoio/iniciar_apoio.html", {
-        "form": form,
+        "form":form,
         "quarto_selecionado": quarto_obj,
         "precisa_hospedagem": precisa_hospedagem})
 
+@login_required
 def detalhe_apoio_view(request, pk):
     apoio = get_object_or_404(Apoio, pk=pk)
     return render(request, "apoio/detalhe_apoio.html", {"apoio": apoio, "hospedagem": getattr(apoio, "hospedagem", None)})
 
+@login_required
 def checkin_apoio_view(request, pk):
     apoio = get_object_or_404(Apoio, pk=pk, status=True)
     try:
@@ -86,6 +82,7 @@ def checkin_apoio_view(request, pk):
             messages.error(request, msg)
     return redirect("apoio:detalhe", pk=pk)
 
+@login_required
 def checkout_apoio_view(request, pk):
     apoio = get_object_or_404(Apoio, pk=pk, status=True)
     try:
@@ -96,6 +93,7 @@ def checkout_apoio_view(request, pk):
             messages.error(request, msg)
     return redirect("apoio:detalhe", pk=pk)
 
+@login_required
 def adicionar_acompanhante_view(request, pk):
     apoio = get_object_or_404(Apoio, pk=pk, status=True)
     form = AdicionarAcompanhante(request.POST or None)
@@ -127,6 +125,7 @@ def adicionar_acompanhante_view(request, pk):
         "apoio": apoio
     })
 
+@login_required
 def checkout_acompanhante_view(request, pk):
     apoio = get_object_or_404(Apoio, pk=pk, status=True)
     try:
@@ -141,6 +140,7 @@ def checkout_acompanhante_view(request, pk):
 
     return redirect("apoio:detalhe", pk=pk)
 
+@login_required
 def selecionar_quarto_view(request):
     quartos = Quarto.objects.filter(status=True)
 
@@ -148,6 +148,7 @@ def selecionar_quarto_view(request):
         "quartos": quartos
     })
 
+@login_required
 def editar_apoio_view(request, pk):
     apoio = get_object_or_404(Apoio, pk=pk)
 
@@ -170,12 +171,16 @@ def editar_apoio_view(request, pk):
         "motivo_apoio": apoio.motivo,
         "previsaoFim_tipo": apoio.previsaoFim_tipo,
         "previsao_fim": apoio.previsaoFim,
-        "solicitante": apoio.solicitante,
+        "solicitante": apoio.solicitante.pk if apoio.solicitante else None,
         "descHospedagem": getattr(apoio, "hospedagem", None) and apoio.hospedagem.observacao,
         "quarto": quarto_obj,
     }
 
+    solicitantes = SolicitantePessoa.objects.all()
+
     form = EditarApoioForm(request.POST or None, initial=initial)
+
+    form.fields["solicitante"].choices = [("", "Digite um nome")]+[(p.id, p.pessoa)for p in solicitantes]
 
     if request.method == "POST" and form.is_valid():
         cd = form.cleaned_data
@@ -186,7 +191,7 @@ def editar_apoio_view(request, pk):
                 motivo_apoio=cd["motivo_apoio"],
                 previsaoFim_tipo=cd["previsaoFim_tipo"],
                 previsao_fim=cd.get("previsao_fim"),
-                solicitante_id=cd["solicitante"].pk if cd.get("solicitante") else None,
+                solicitante_id=cd["solicitante"] if cd.get("solicitante") else None,
                 descHospedagem=cd.get("descHospedagem"),
                 quarto_id=cd["quarto"].pk if cd.get("quarto") else None,
                 inicio_alocacao=cd["inicio_alocacao"]
@@ -205,14 +210,73 @@ def editar_apoio_view(request, pk):
         "quarto_selecionado": quarto_obj
     })
 
+@login_required
 def listar_apoios_view(request):
 
-    apoios = Apoio.objects.all().order_by("-dataInicio")
+    apoios = Apoio.objects.filter(
+        status=True).order_by("-dataInicio")
+    return render(request,"apoio/listar_apoios.html",{"apoios": apoios})
 
-    return render(
-        request,
-        "apoio/listar_apoios.html",
-        {
-            "apoios": apoios
-        }
-    )
+@login_required
+def consultar_apoios_view(request):
+
+    paciente = request.GET.get("paciente")
+    solicitante = request.GET.get("solicitante")
+    data_inicio = request.GET.get("data_inicio")
+    data_fim = request.GET.get("data_fim")
+    previsaoFim_tipo = request.GET.get("previsaoFim_tipo")
+    checkIn_inicio = request.GET.get("data_inicio_checkIn")
+    checkIn_fim = request.GET.get("data_fim_checkIn")
+    checkOut_inicio = request.GET.get("data_inicio_checkOut")
+    checkOut_fim = request.GET.get("data_fim_checkOut")
+
+    apoios = Apoio.objects.none()
+    if any([paciente, solicitante, data_inicio, data_fim, previsaoFim_tipo, checkIn_inicio, checkIn_fim, checkOut_inicio, checkOut_fim]):
+        
+        apoios = Apoio.objects.all()
+        if paciente:
+            apoios = apoios.filter(paciente__nome_pessoa__icontains=paciente)
+        if solicitante:
+            apoios = apoios.filter(solicitante__pessoa__nome_pessoa__icontains=solicitante)
+        if previsaoFim_tipo:
+            apoios = apoios.filter(previsaoFim_tipo__icontains=previsaoFim_tipo)
+        if checkIn_inicio and checkIn_fim:
+            checkIn_inicio_dt = datetime.strptime(checkIn_inicio, "%Y-%m-%d").date()
+            checkIn_fim_dt = datetime.strptime(checkIn_fim, "%Y-%m-%d").date()
+            diferenca = (checkIn_fim_dt - checkIn_inicio_dt).days
+            try:
+                if diferenca>90:
+                    raise ValidationError("Escolha um periodo menor que 90 dias")
+                if diferenca <0:
+                    raise ValidationError("Periodo de check-in invalido")
+                apoios = apoios.filter(checkIn__range=[checkIn_inicio,checkIn_fim])
+            except ValidationError as exc:
+                messages.error(request, exc.messages[0])
+
+        if checkOut_inicio and checkOut_fim:
+            checkOut_inicio_dt = datetime.strptime(checkOut_inicio, "%Y-%m-%d").date()
+            checkOut_fim_dt = datetime.strptime(checkOut_fim, "%Y-%m-%d").date()
+            diferenca = (checkOut_fim_dt - checkOut_inicio_dt).days
+            try:
+                if diferenca>90:
+                    raise ValidationError("Escolha um periodo menor que 90 dias")
+                if diferenca <0:
+                    raise ValidationError("Periodo de check-out invalido")
+                apoios = apoios.filter(checkOut__range=[checkOut_inicio,checkOut_fim])
+            except ValidationError as exc:
+                messages.error(request, exc.messages[0])
+
+        if data_inicio and data_fim:
+            data_inicio_dt = datetime.strptime(data_inicio, "%Y-%m-%d").date()
+            data_fim_dt = datetime.strptime(data_fim, "%Y-%m-%d").date()
+            diferenca = (data_fim_dt - data_inicio_dt).days
+            try:
+                if diferenca>90:
+                    raise ValidationError("Escolha um periodo menor que 90 dias")
+                if diferenca <0:
+                    raise ValidationError("Periodo de cadastro invalido")
+                apoios = apoios.filter(dataInicio__range=[data_inicio,data_fim])
+            except ValidationError as exc:
+                messages.error(request, exc.messages[0])
+
+    return render(request,"apoio/consultar_apoios.html",{"apoios": apoios})
