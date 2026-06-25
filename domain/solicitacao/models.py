@@ -11,7 +11,7 @@ class FuncaoSolicitantePessoa(models.Model):
 
 class SolicitantePessoa(models.Model):
     pessoa = models.OneToOneField(Pessoa, on_delete=models.PROTECT)
-    funcao = models.OneToOneField(FuncaoSolicitantePessoa, on_delete=models.PROTECT)
+    funcao = models.ForeignKey(FuncaoSolicitantePessoa, on_delete=models.PROTECT)
     descricao = models.CharField(max_length=20, blank=True)
 
     def __str__(self):

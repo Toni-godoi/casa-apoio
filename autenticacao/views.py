@@ -38,5 +38,10 @@ def login_view(request):
     return render(request, "autenticacao/login.html", {'form':form})
 
 def logout_view(request):
+
     logout(request)
+
+    if settings.TIPO_AUTENTICACAO == "OIDC":
+        return redirect(settings.OIDC_LOGIN_URL)
+    
     return redirect("autenticacao:login")

@@ -6,3 +6,4 @@ validate-docbr==1.11.1
 psycopg2-binary==2.9.9
 django-redis==5.4.0
 mozilla-django-oidc==4.0.1
+reportlab==5.0.0

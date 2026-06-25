@@ -1,8 +1,12 @@
 from django.contrib import messages
 from datetime import datetime
+from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table
+from reportlab.lib.styles import getSampleStyleSheet
 from domain.apoio.forms import IniciarApoioForm, AdicionarAcompanhante, EditarApoioForm
 from domain.apoio.models import Apoio
 from domain.quarto.models import Quarto
@@ -280,3 +284,102 @@ def consultar_apoios_view(request):
                 messages.error(request, exc.messages[0])
 
     return render(request,"apoio/consultar_apoios.html",{"apoios": apoios})
+
+@login_required
+def relatorio_apoio_pdf(request, pk):
+
+    apoio = Apoio.objects.get(pk=pk)
+
+    if not apoio.checkOut:
+        messages.error(request,"Relatório disponível apenas após o encerramento do apoio.")
+        return redirect("apoio:detalhe",pk=apoio.id)
+    
+    historico = apoio.historico_apoio
+    acompanhantes = apoio.acompanhantes.all()
+    quartos = []
+
+    if hasattr(apoio, "hospedagem"):
+        quartos = apoio.hospedagem.hospedagem_alocacao.all()
+
+    response = HttpResponse(
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = f'attachment; filename="apoio_{apoio.id}.pdf"'
+
+    doc = SimpleDocTemplate(response)
+    styles = getSampleStyleSheet()
+    
+    elementos = []
+
+    elementos.append(Paragraph(f"Relatório gerado em: {timezone.now().strftime('%d/%m/%Y')}",styles["Italic"]))
+    
+    elementos.append(Spacer(1, 30))
+    elementos.append(Paragraph(f"Relatório do Apoio #{apoio.id}", styles["Title"]))
+
+    elementos.append(Spacer(1, 20))
+    elementos.append(Paragraph(f"Data início: {apoio.dataInicio}", styles["Normal"]))
+    elementos.append(Paragraph(f"Data encerramento: {apoio.checkOut.strftime('%d/%m/%Y %H:%M')}",styles["Normal"]))
+    elementos.append(Paragraph(f"Descrição do apoio: {apoio.motivo}", styles["Normal"]))
+    
+    elementos.append(Spacer(1, 20))
+    elementos.append(Paragraph("Dados do Paciente",styles["Heading2"]))
+    elementos.append(Paragraph(f"Nome: {historico.nome_pessoa}",styles["Normal"]))
+    elementos.append(Paragraph(f"CPF: {historico.cpf_pessoa}",styles["Normal"]))
+    elementos.append(Paragraph(f"Telefone: {apoio.paciente.telefone_pessoa or '-'}",styles["Normal"]))
+    elementos.append(Paragraph(f"Email: {apoio.paciente.email_pessoa or '-'}",styles["Normal"]))
+    
+    elementos.append(Spacer(1, 10))
+    elementos.append(Paragraph("Endereço do paciente na data do apoio",styles["Heading4"]))
+    elementos.append(Paragraph(f"País: {historico.pais or '-'}",styles["Normal"]))
+    elementos.append(Paragraph(f"Logradouro: {historico.logradouro or '-'}, "
+                               f"{historico.numero or '-'}",styles["Normal"]))
+    elementos.append(Paragraph(f"Bairro: {historico.bairro or '-'}, "
+                               f"Cidade: {historico.cidade or '-'}, " 
+                               f"Estado: {historico.estado or '-'}, " ,styles["Normal"]))
+    elementos.append(Paragraph(f"Cep: {historico.cep or '-'}, "
+                               f"Complemento: {historico.complemento or '-'}",styles["Normal"]))
+    elementos.append(Paragraph(f"Descrição: {historico.descricao or '-'}",styles["Normal"]))
+    elementos.append(Spacer(1, 20))
+
+    elementos.append(Paragraph("Histórico de Acompanhantes",styles["Heading2"]))
+    dados = [
+        [
+            "Nome",
+            "Vínculo",
+            "Descrição",
+            "Check-in",
+            "Check-out"
+        ]
+    ]
+    for acomp in acompanhantes:
+        dados.append([
+            acomp.nomeAcompanhante,
+            acomp.vinculo,
+            acomp.descricaoVinculo,
+            acomp.checkIn.strftime("%d/%m/%Y %H:%M"),
+            acomp.checkOut.strftime("%d/%m/%Y %H:%M")
+        ])
+    elementos.append(Table(dados))
+
+    elementos.append(Spacer(1, 20))
+    elementos.append(Paragraph("Histórico de Quartos", styles["Heading2"]))
+    dados = [
+        [
+            "Quarto",
+            "Entrada",
+            "Saída"
+        ]
+    ]
+    for alocacao in quartos:
+        dados.append([
+            alocacao.quarto.identificacao,
+            (alocacao.inicioLocacao.strftime("%d/%m/%Y")),
+            (alocacao.fimLocacao.strftime("%d/%m/%Y"))
+        ])
+    elementos.append(Table(dados))
+
+    doc.build(elementos)
+
+    return response
+

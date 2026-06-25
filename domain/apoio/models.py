@@ -8,8 +8,8 @@ from domain.solicitacao.models import SolicitantePessoa
 class Apoio(models.Model):
     DATAFIM_CHOICES=[('HOJE', 'Hoje'),('DATA','Data'),('INDETERMINADO','Indeterminado')]
     motivo = models.CharField(max_length=500)
-    paciente = models.ForeignKey(Pessoa, on_delete=models.CASCADE, related_name="pacientes")
-    solicitante = models.ForeignKey(SolicitantePessoa, on_delete=models.CASCADE, null=True, blank=True, related_name="solicitantes")
+    paciente = models.ForeignKey(Pessoa, on_delete=models.PROTECT, related_name="pacientes")
+    solicitante = models.ForeignKey(SolicitantePessoa, on_delete=models.PROTECT, null=True, blank=True, related_name="solicitantes")
 #-- casaApoio = models.ForeignKey(CasaApoio,)
     dataInicio = models.DateField()
     previsaoFim_tipo = models.CharField(max_length=50, choices=DATAFIM_CHOICES)
@@ -75,6 +75,23 @@ class Apoio(models.Model):
     def __str__(self):
         return self.paciente.nome_pessoa
 
+class HistoricoPacienteApoio(models.Model):
+    apoio = models.OneToOneField(Apoio, on_delete=models.PROTECT, related_name="historico_apoio")
+    pessoa = models.ForeignKey(Pessoa, on_delete=models.PROTECT, related_name="historico_pessoa")
+    nome_pessoa = models.CharField(max_length=30)
+    cpf_pessoa = models.CharField(max_length=11)
+    inicio_apoio = models.DateField()
+    checkIn_paciente = models.DateTimeField()
+    encerramento_apoio = models.DateTimeField()
+    pais = models.CharField(max_length=15, null=False, blank=False)
+    cep = models.CharField(max_length=9)
+    estado = models.CharField(max_length=2, null=False, blank=False)
+    cidade = models.CharField(max_length=100, null=False, blank=False)
+    bairro = models.CharField(max_length=100, null=False, blank=False)
+    logradouro = models.CharField(max_length=200, null=False, blank=False)
+    numero = models.CharField(max_length=20)
+    complemento = models.CharField(max_length=50, blank=True)
+    descricao = models.CharField(max_length=200, blank=True)
 
 class Acompanhante(models.Model):
     VINCULO_CHOICES = [('PAI_MAE', 'Pai ou Mãe'),('CONJUGUE', 'Conjugue'), ('OUTROS', 'Outros')]
@@ -130,7 +147,7 @@ class AlocacaoQuarto(models.Model):
     @property
     def alocacao_atual(self):
         return self.quarto_alocacao.filter(checkOut__isnull=True).first()
-    
+
 class AnexoAcompanhante(models.Model):
     EXTENSAO_CHOICES = [('PDF', 'Pdf'), ('FOTO', 'Foto')]
     acompanhante = models.OneToOneField(Acompanhante, on_delete=models.SET_NULL, null=True, blank=True, related_name="anexos")

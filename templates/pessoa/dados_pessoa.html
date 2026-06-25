@@ -6,7 +6,7 @@
         <small class="text-muted">Pessoa > Dados pessoa</small>
         <h1 class="fw-bold mt-2">{{pessoa.nome_pessoa}}</h1>
     </div>
-    <div class="card border-primary shadow-sm">
+    <div class="card border-primary shadow-sm mb-3">
         <div class="card-header bg-primary-subtle">
             <strong>Dados pessoais</strong>
         </div>
@@ -17,18 +17,15 @@
                     <img src="#" class="rounded-circle border shadow-sm mb-3"
                         style="width:140px;height:140px;object-fit:cover;">
                 </div>
-
                 <!-- DADOS -->
                 <div class="col-md-10">
                     <div class="row mb-4">
-
                         <div class="col-md-8">
                             <small class="text-muted d-block">Nome</small>
                             <div class="border-bottom pb-1 fw-semibold">
                                 {{ pessoa.nome_pessoa }}
                             </div>
                         </div>
-
                         <div class="col-md-2">
                             <small class="text-muted d-block">CPF</small>
                             <div class="border-bottom pb-1 fw-semibold">
@@ -41,9 +38,7 @@
                                 {{ pessoa.dataCadastro }}
                             </div>
                         </div>
-
                     </div>
-
                     <div class="row mb-4">
 
                         <div class="col-md-4">
@@ -52,21 +47,18 @@
                                 {{ pessoa.dataNasc_pessoa }}
                             </div>
                         </div>
-
                         <div class="col-md-2">
                             <small class="text-muted d-block">Idade</small>
                             <div class="border-bottom pb-1 fw-semibold">
                                 {{ pessoa.idade }} anos
                             </div>
                         </div>
-
                         <div class="col-md-3">
                             <small class="text-muted d-block">Sexo</small>
                             <div class="border-bottom pb-1 fw-semibold">
                                 {{ pessoa.get_sexo_pessoa_display }}
                             </div>
                         </div>
-
                         <div class="col-md-3">
                             <small class="text-muted d-block">Nacionalidade</small>
                             <div class="border-bottom pb-1 fw-semibold">
@@ -74,34 +66,98 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="row mb-4">
-
                         <div class="col-md-4">
                             <small class="text-muted d-block">Telefone</small>
                             <div class="border-bottom pb-1 fw-semibold">
                                 {{ pessoa.telefone_pessoa }}
                             </div>
                         </div>
-
                         <div class="col-md-8">
                             <small class="text-muted d-block">Email</small>
                             <div class="border-bottom pb-1 fw-semibold">
                                 {{ pessoa.email_pessoa|default:"-" }}
                             </div>
                         </div>
-
                     </div>
-
                     <div class="row">
-
                         <div class="col-md-12">
                             <small class="text-muted d-block">Outras informações</small>
-
                             <div class="border rounded bg-light p-3">
                                 {{ pessoa.descricao_pessoa|default:"Sem observações" }}
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card border-primary shadow-sm mb-3">
+        <div class="card-header bg-primary-subtle">
+            <strong>Endereço atual de {{pessoa.nome_pessoa}} </strong>
+        </div>
+        <div class="card-body bg-body-tertiary">
+            <div class="row g-3 align-items-start mb-2">
+                <div class="col-md-1">
+                    <small class="text-muted d-block">Pais</small>
+                    <div class="border-bottom pb-1 fw-semibold">
+                        {{ pessoa.endereco.pais }}
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <small class="text-muted d-block">CEP</small>
+                    <div class="border-bottom pb-1 fw-semibold">
+                        {{ pessoa.endereco.cep }}
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <small class="text-muted d-block">Estado</small>
+                    <div class="border-bottom pb-1 fw-semibold">
+                        {{ pessoa.endereco.estado }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <small class="text-muted d-block">Cidade</small>
+                    <div class="border-bottom pb-1 fw-semibold">
+                        {{ pessoa.endereco.cidade }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <small class="text-muted d-block">Bairro</small>
+                    <div class="border-bottom pb-1 fw-semibold">
+                        {{ pessoa.endereco.bairro }}
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3 align-items-start mb-2">
+                <div class="col-md-6">
+                    <small class="text-muted d-block">Logradouro</small>
+                    <div class="border-bottom pb-1 fw-semibold">
+                        {{ pessoa.endereco.logradouro }}
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <small class="text-muted d-block">Número</small>
+                    <div class="border-bottom pb-1 fw-semibold">
+                        {{ pessoa.endereco.numero }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <small class="text-muted d-block">Complemento</small>
+                    <div class="border-bottom pb-1 fw-semibold">
+                        {{ pessoa.endereco.complemento }}
+                    </div>
+                </div>
+            </div>
+            <div class="row g-3 align-items-start mb-2">
+                <div class="col-md-12">
+                    <small class="text-muted d-block">Descrição</small>
+                    <div class="border-bottom pb-1 fw-semibold">
+                        {% if pessoa.endereco.descricao %}
+                        {{ pessoa.endereco.descricao }}
+                        {% else %}
+                        Sem descrição adicional
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -116,7 +172,8 @@
                 Ver edições
             </a>
         </div>
-    </div><hr>
+    </div>
+    <hr>
     <!-- APOIOS -->
     <div class="mb-4">
         <h2 class="fw-bold mt-2">Histórico de apoios</h2>
@@ -125,7 +182,61 @@
         <div class="card-header bg-primary-subtle">
             <strong>Apoios de {{pessoa.nome_pessoa}}</strong>
         </div>
-        <div class="card-body bg-body-tertiary">
+        <div class="card-body bg-light">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome paciente</th>
+                            <th>Participação</th>
+                            <th>Início apoio</th>
+                            <th>Fim apoio</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    {% if apoios %}
+                    <tbody>
+                        {% for item in apoios %}
+                        <tr>
+                            <td><strong>{{ item.apoio.id }}</strong></td>
+                            <td>{{ item.apoio.paciente }}</td>
+                            <td>{{ item.participacao }}</td>
+                            <td>{{ item.apoio.dataInicio|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if item.apoio.checkOut %}
+                                {{ item.apoio.checkOut|date:"d/m/Y" }}
+                                {% else %}
+                                -
+                                {% endif %}</td>
+                            <td>{{ item.checkin|date:"d/m/Y H:i"|default:"-" }}</td>
+                            <td>{{ item.checkout|date:"d/m/Y H:i"|default:"-" }}</td>
+                            <td><strong>{% if item.apoio.status %}
+                                    <span class="badge bg-success">
+                                        Ativo
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">
+                                        Encerrado
+                                    </span>
+                                    {% endif %}
+                                </strong>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'apoio:detalhe' item.apoio.id %}" class="btn btn-outline-primary btn-sm">
+                                        Abrir</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% endif %}
+                </table>
+            </div>
         </div>
     </div>
 </div>

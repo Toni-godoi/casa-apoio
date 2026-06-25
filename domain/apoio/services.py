@@ -2,7 +2,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from datetime import date, time, datetime, timedelta
-from domain.apoio.models import Apoio, Acompanhante, Hospedagem, AlocacaoQuarto, AnexoAcompanhante, AnexoApoio
+from domain.apoio.models import Apoio, Acompanhante, Hospedagem, AlocacaoQuarto, HistoricoPacienteApoio, AnexoAcompanhante, AnexoApoio
 from domain.pessoa.models import Pessoa
 from domain.solicitacao.models import SolicitantePessoa
 from domain.quarto.models import Quarto
@@ -301,6 +301,25 @@ def checkOut_apoio(apoio_id:int):
             alocacao.encerra_alocacao()
             alocacao.quarto.liberar_vaga()
     
+    HistoricoPacienteApoio.objects.create(
+        apoio=apoio,
+        pessoa=apoio.paciente,
+        nome_pessoa=apoio.paciente.nome_pessoa,
+        cpf_pessoa=apoio.paciente.cpf_pessoa,
+        inicio_apoio=apoio.dataInicio,
+        checkIn_paciente=apoio.checkIn,
+        encerramento_apoio=apoio.checkOut,
+        pais=apoio.paciente.endereco.pais,
+        cep=apoio.paciente.endereco.cep,
+        estado=apoio.paciente.endereco.estado,
+        cidade=apoio.paciente.endereco.cidade,
+        bairro=apoio.paciente.endereco.bairro,
+        logradouro=apoio.paciente.endereco.logradouro,
+        numero=apoio.paciente.endereco.numero,
+        complemento=apoio.paciente.endereco.complemento,
+        descricao=apoio.paciente.endereco.descricao
+    )
+    
 @transaction.atomic
 def checkout_acompanhante(acompanhante_id:int):
     acomp = Acompanhante.objects.filter(
@@ -320,7 +339,6 @@ def encerrar_apoio_automatico(apoio: Apoio) -> None:
         encerramento = datetime.combine(apoio.dataInicio, time(23,59,59))
         encerramento = timezone.make_aware(encerramento)
         apoio.fazer_checkout(momento=encerramento)
-
 
 ###
 #-- funções da regra de nogocio

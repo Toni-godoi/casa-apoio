@@ -12,6 +12,7 @@ class GerenciarUsuario(BaseUserManager):
             raise ValueError("Login para usuário obrigatório")
         
         usuario = self.model(
+            username=loginUsuario,
             email = self.normalize_email(email),
             nome = nome,
             loginUsuario = loginUsuario,

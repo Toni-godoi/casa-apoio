@@ -17,7 +17,7 @@ class Pessoa(models.Model):
     email_pessoa = models.EmailField(max_length=80)
     dataCadastro = models.DateField()
     descricao_pessoa = models.CharField(max_length=50, blank=True)
-    #endereco = models.ForeignKey(Endereco, on_delete=models.CASCADE)
+    endereco = models.ForeignKey(Endereco, on_delete=models.CASCADE, blank=False, null=False)
 
     #def clean(self):
     #def save(self, *args, **kwargs):

@@ -6,6 +6,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from datetime import date, time, datetime, timedelta
 from domain.pessoa.models import Pessoa, PessoaEditada
+from domain.endereco.models import Endereco
 
 @transaction.atomic
 def cadastrar_pessoa(
@@ -18,7 +19,7 @@ def cadastrar_pessoa(
     telefone_pessoa:str,
     email_pessoa:Optional[str]=None,
     descricao_pessoa:Optional[str]=None,
-    #endereco=str,
+    endereco_pessoa=Endereco,
 )->Pessoa:
     
     nome_pessoa = _valida_nome(nome_pessoa)
@@ -28,6 +29,10 @@ def cadastrar_pessoa(
     if email_pessoa:
         email_pessoa = _valida_email(email_pessoa)
     cadastro = timezone.localdate()
+    
+    if endereco_pessoa is None:
+        raise ValidationError("Endereço não informado")
+    endereco = _valida_endereco(endereco_pessoa)
 
     pessoa = Pessoa(
         nome_pessoa = nome_pessoa,
@@ -39,7 +44,7 @@ def cadastrar_pessoa(
         dataCadastro = cadastro,
         email_pessoa = email_pessoa,
         descricao_pessoa = descricao_pessoa,
-        #endereco = endereco
+        endereco = endereco
     )
     pessoa.save()
     return pessoa
@@ -56,7 +61,6 @@ def editar_pessoa(
     ed_telefone_pessoa:str,
     ed_email_pessoa:Optional[str]=None,
     ed_descricao_pessoa:Optional[str]=None,
-    #endereco=str,
     ):
 
     #valida se a pessoa informada existe
@@ -108,7 +112,7 @@ def editar_pessoa(
 
     pessoa.save()
 
-    #registra os campos modificados
+    #registra os campos modificados na tabela de dados do usuário modificados
     if campos_alterados:
         edicao = timezone.localdate()
         PessoaEditada.objects.create(
@@ -117,6 +121,11 @@ def editar_pessoa(
             dataEdicao = edicao
         )
     return pessoa
+
+def _valida_endereco(endereco:Endereco)->Endereco:
+    if not isinstance(endereco, Endereco):
+        raise ValidationError("Endereço inválido ou nao cadastrado")
+    return endereco
 
 def _existe_pessoa(pessoa_pk:int)->Pessoa:
     try:

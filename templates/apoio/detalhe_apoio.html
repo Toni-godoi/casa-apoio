@@ -6,6 +6,11 @@
         <small class="text-muted">Apoio > Detalhes do apoio</small>
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="fw-bold m-0">Detalhes do apoio nº{{apoio.id}}</h1>
+            {% if apoio.checkOut %}
+            <a href="{% url 'apoio:relatorio_apoio' apoio.id %}" class="btn btn-dark px-4">
+                Gerar relatório
+            </a>
+            {% endif %}
         </div>
         {% if messages %}
         {% for message in messages %}
@@ -22,8 +27,12 @@
                 <div class="row mb-3">
                     <div class="col-md-3">
                         <small class="text-muted d-block">Paciente</small>
-                        <div class="border-bottom pb-1 fw-semibold">
-                            {{ apoio.paciente }}
+                        <div class="border-bottom pb-1 d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold">{{ apoio.paciente }}</span>
+                            <a href="{% url 'pessoa:dados_pessoa' apoio.paciente.id %}"
+                                class="btn btn-outline-primary btn-sm">
+                                Ver
+                            </a>
                         </div>
                     </div>
                     <div class="col-md-3">

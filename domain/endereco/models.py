@@ -2,6 +2,9 @@ from django.db import models
 
 # Create your models here.
 class Endereco(models.Model):
+    PAIS_CHOICES = [
+        ("BR", "Brasil"),
+        ("PY", "Paraguay"),]
     ESTADO_CHOICES = [
         ("AC", "Acre"),
         ("AL", "Alagoas"),
@@ -29,15 +32,17 @@ class Endereco(models.Model):
         ("SC", "Santa Catarina"),
         ("SP", "São Paulo"),
         ("SE", "Sergipe"),
-        ("TO", "Tocantins"),
-    ]
+        ("TO", "Tocantins"),]
+    pais = models.CharField(max_length=15, null=False, blank=False)
     cep = models.CharField(max_length=9)
-    estado = models.CharField(max_length=2, choices=ESTADO_CHOICES, null=False, blank=False)
+    estado = models.CharField(max_length=2, null=False, blank=False)
     cidade = models.CharField(max_length=100, null=False, blank=False)
     bairro = models.CharField(max_length=100, null=False, blank=False)
     logradouro = models.CharField(max_length=200, null=False, blank=False)
     numero = models.CharField(max_length=20)
     complemento = models.CharField(max_length=50, blank=True)
+    descricao = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
-        return f"{self.logradouro}, {self.numero}"
+        return (f"{self.logradouro}, {self.numero}")
+

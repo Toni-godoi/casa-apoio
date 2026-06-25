@@ -29,12 +29,17 @@ SECRET_KEY = 'django-insecure-*-pf^13iz8qwpz2uac7zck$lr6pk-3*j(szrb+!ptdv-l7#@3s
 DEBUG = True
 
 LOGIN_URL = "autenticacao:login"
+LOGIN_REDIRECT_URL = "home"
 
 ALLOWED_HOSTS = ['casadeapoio.local',
                  'localhost',
                  '127.0.0.1',
                  'auth.local']
 
+#descomente e adicione a url
+#CSRF_TRUSTED_ORIGINS = [
+#    "url",
+#]
 
 # Application definition
 
@@ -143,7 +148,9 @@ if TIPO_AUTENTICACAO == "OIDC":
     OIDC_OP_TOKEN_ENDPOINT = os.getenv("OIDC_OP_TOKEN_ENDPOINT")
     OIDC_OP_USER_ENDPOINT = os.getenv("OIDC_OP_USER_ENDPOINT")
     OIDC_OP_JWKS_ENDPOINT = os.getenv("OIDC_OP_JWKS_ENDPOINT")
-    OIDC_RP_SCOPES = None
+    OIDC_RP_SCOPES = "openid profile email"
+    OIDC_OP_ISSUER = os.getenv("OIDC_ISSUER")
+    OIDC_LOGIN_URL = os.getenv("OIDC_LOGIN_URL")
 
 if TIPO_AUTENTICACAO == "LOCAL":
     AUTHENTICATION_BACKENDS = (

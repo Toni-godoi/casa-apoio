@@ -53,7 +53,5 @@ class CadastrarEditarPessoaForm(forms.Form):
         widget=forms.Textarea(attrs={"class": "form-control","rows": 2})
     )
 
-    #endereco
-
     def clean(self):
         return super().clean()

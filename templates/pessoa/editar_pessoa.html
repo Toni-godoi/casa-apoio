@@ -14,7 +14,7 @@
     {% endif %}
     <form method="post">
         {% csrf_token %}
-        <div class="card border-primary shadow-sm">
+        <div class="card border-primary shadow-sm mb-3">
             <div class="card-header bg-primary-subtle">
                 <strong>Editar informações</strong>
             </div>
@@ -66,6 +66,55 @@
                     <div class="col-md-2">
                         <label class="form-label">* Telefone:</label>
                         {{ form.telefone_pessoa }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card border-primary shadow-sm">
+            <div class="card-header bg-primary-subtle">
+                <strong>Endereço</strong>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-start mb-2">
+                    <div class="col-md-3">
+                        <label class="form-label">Pais:</label>
+                        {{ form_end.pais }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">CEP:</label>
+                        {{ form_end.cep }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Estado:</label>
+                        {{ form_end.estado }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Cidade:</label>
+                        {{ form_end.cidade }}
+                    </div>
+                </div>
+                <div class="row g-3 align-items-start mb-2">
+                    <div class="col-md-4">
+                        <label class="form-label">Bairro:</label>
+                        {{ form_end.bairro }}
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label">Logradouro:</label>
+                        {{ form_end.logradouro }}
+                    </div>
+                </div>
+                <div class="row g-3 align-items-start mb-2">
+                    <div class="col-md-2">
+                        <label class="form-label">Número:</label>
+                        {{ form_end.numero }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Coplemento:</label>
+                        {{ form_end.complemento }}
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label">Descrição: (Obrigatório para país estrangeiro)</label>
+                        {{ form_end.descricao }}
                     </div>
                 </div>
             </div>
