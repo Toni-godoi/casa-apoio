@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <small class="text-muted">Apoio > Consultar apoios</small>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold m-0">Consultar apoios</h1>
+        </div>
+    </div>
+    <div class="card border-primary shadow-sm mb-4">
+        <div class="card-header bg-primary-subtle d-flex justify-content-between align-items-center">
+            <strong>Filtros de busca</strong>
+            </button>
+        </div>
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-danger md-4">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        <div class="card-body bg-light">
+            <form method="get">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            Nome do paciente
+                        </label>
+                        <div class="input-group">
+                            <input type="text" name="paciente" class="form-control">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            Nome do solicitante
+                        </label>
+                        <div class="input-group">
+                            <input type="text" name="solicitante" class="form-control">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Data de cadastro (inicial)
+                                </label>
+                                <input type="date" name="data_inicio" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Data de cadastro (final)
+                                </label>
+                                <input type="date" name="data_fim" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo de duração do apoio</label>
+                        <div class="d-flex gap-4 mt-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="previsaoFim_tipo" value="HOJE">
+                                <label class="form-check-label">Hoje</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="previsaoFim_tipo" value="DATA">
+                                <label class="form-check-label">Data</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="previsaoFim_tipo" value="INDETERMINADO">
+                                <label class="form-check-label">Indeterminado</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Data de Check-In (inicial)
+                                </label>
+                                <input type="date" name="data_inicio_checkIn" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Data de Check-In (final)
+                                </label>
+                                <input type="date" name="data_fim_checkIn" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Data de Check-Out (inicial)
+                                </label>
+                                <input type="date" name="data_inicio_checkOut" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Data de Check-Out (final)
+                                </label>
+                                <input type="date" name="data_fim_checkOut" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-3">
+                        <button type="submit" class="btn btn-info text-white px-4">Buscar</button>
+                        <a href="{% url 'apoio:consultar_apoios' %}" class="btn btn-dark px-4">
+                            Limpar
+                        </a>
+                    </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="card border-primary shadow-sm">
+    <div class="card-header bg-primary-subtle">
+        <strong>Resultados</strong>
+    </div>
+    <div class="card-body bg-light">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Paciente</th>
+                    <th>Solicitante</th>
+                    <th>Tipo duração</th>
+                    <th>Início</th>
+                    <th>Data check-In</th>
+                    <th>Data check-Out</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            {% if apoios %}
+            <tbody>
+                {% for apoio in apoios %}
+                <tr>
+                    <!-- PACIENTE -->
+                    <td>{{ apoio.paciente }}</td>
+                    <!-- SOLICITANTE -->
+                    <td>{{ apoio.solicitante|default:"-" }}</td>
+                    <!-- PREVISÃO -->
+                    <td>{% if apoio.previsaoFim_tipo == "HOJE" %}
+                        <span class="badge bg-secondary">Hoje</span>
+                        {% elif apoio.previsaoFim_tipo == "DATA" %}
+                        <span class="badge bg-info">Até {{ apoio.previsaoFim }}</span>
+                        {% else %}
+                        <span class="badge bg-dark">Indeterminado</span>
+                        {% endif %}
+                    </td>
+                    <!-- INÍCIO -->
+                    <td>{{ apoio.dataInicio | date:"d/m/Y" }}</td>
+                    <td>{{ apoio.checkIn |date:"d/m/Y H:i" }}</td>
+                    <td>{{ apoio.checkOut |date:"d/m/Y H:i" }}</td>
+                    <!-- STATUS -->
+                    <td>{% if apoio.status %}
+                        <span class="badge bg-success">Ativo</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Finalizado</span>
+                        {% endif %}
+                    </td>
+                    <!-- AÇÕES -->
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'apoio:detalhe' apoio.id %}" class="btn btn-outline-primary btn-sm">
+                                Abrir</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+</div>
+{% endblock %}

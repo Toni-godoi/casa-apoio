@@ -53,5 +53,15 @@ class CadastrarEditarPessoaForm(forms.Form):
         widget=forms.Textarea(attrs={"class": "form-control","rows": 2})
     )
 
+    foto = forms.FileField(
+        required=False,
+        widget=forms.ClearableFileInput(attrs={
+            "id": "id_foto",
+            "accept": "image/*",
+            "capture": "environment",
+            "class": "d-none",})
+    )
+
     def clean(self):
         return super().clean()
+    

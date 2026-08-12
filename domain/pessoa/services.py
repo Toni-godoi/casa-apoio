@@ -5,7 +5,7 @@ from validate_docbr import CPF
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from datetime import date, time, datetime, timedelta
-from domain.pessoa.models import Pessoa, PessoaEditada
+from domain.pessoa.models import Pessoa, PessoaEditada, FotoPerfilPessoa
 from domain.endereco.models import Endereco
 
 @transaction.atomic
@@ -20,6 +20,7 @@ def cadastrar_pessoa(
     email_pessoa:Optional[str]=None,
     descricao_pessoa:Optional[str]=None,
     endereco_pessoa=Endereco,
+    foto_perfil=None
 )->Pessoa:
     
     nome_pessoa = _valida_nome(nome_pessoa)
@@ -47,6 +48,13 @@ def cadastrar_pessoa(
         endereco = endereco
     )
     pessoa.save()
+
+    if foto_perfil:
+        foto = FotoPerfilPessoa(
+            pessoa = pessoa,
+            arquivo = foto_perfil
+        )
+        foto.save()
     return pessoa
 
 @transaction.atomic

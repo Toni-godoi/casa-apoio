@@ -1,0 +1,13 @@
+.container-fluid lateral {
+  width: 20%;
+}
+
+.lateral {
+  width: 20%;
+}
+
+.lateral {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+

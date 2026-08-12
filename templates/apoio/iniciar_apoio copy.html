@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+
+<body class="d-flex flex-row m-0 p-0">
+    <form class="d-flex flex-column w-100" method="post">
+    {% csrf_token %}
+    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+        <div class="row m-0 p-0">
+            <div class="col m-0 p-2"><small class="m-0 p-0">Apoios &gt; Novo apoio</small>
+                <h2 class="fw-bold">Iniciar apoio</h2>
+            </div>
+            <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
+                <button class="btn btn-primary bg-success border-0" type="submit">Salvar apoio</button>
+                <a href="{% url 'apoio:listar_apoios' %}" class="btn btn-primary bg-dark border-0" type="submit">Cancelar</a></div>
+        </div>
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+            <div class="col border rounded-2 m-0 p-0">
+                <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                    <div class="col">
+                        <div class="fs-5 fw-bold"><span class="m-0 p-0">Dados do apoio</span></div>
+                    </div>
+                </div>
+                <div
+                    class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-danger m-0 p-0">Paciente *</small>
+                            {{ form.paciente }}
+                    </div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-dark-emphasis m-0 p-0">Solicitante apoio</small>
+                        {{ form.solicitante }}
+                    </div>
+                    <div class="col-2 d-flex flex-column m-0 p-1">
+                        <small class="text-dark-emphasis m-0 p-0">Data início</small>
+                            <span class="fw-medium">{{ form.data_inicio }}</span>
+                    </div>
+                </div>
+                <div
+                    class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-danger m-0 p-0">Previ. Encerramento *</small>
+                        <span class="fw-medium">{{ form.previsaoFim_tipo }}</span></div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-dark-emphasis m-0 p-0">
+                            Data prev. encerramento
+                            <span class="ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Obrigatório preenchimento quando há data para previsão de encerramento" style="cursor: help;">
+                            ⓘ
+                            </span>
+                        </small>
+                        <span class="fw-medium">{{ form.previsao_fim }}</span>
+                    </div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-dark-emphasis m-0 p-0">Iniciar apoio com check-In</small>
+                        <span class="fw-medium">{{ form.checkIn }}</span>
+                    </div>
+                </div>
+                <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-danger m-0 p-0">Descrição do apoio *</small>
+                        {{ form.motivo_apoio }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+            <div class="col border rounded-2 m-0 p-0">
+                <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                    <div class="col">
+                        <div class="fs-5 fw-bold"><span class="m-0 p-0">Informar acompanhante</span></div>
+                    </div>
+                </div>
+                <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-2">
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-dark-emphasis m-0 p-0">Nome</small>
+                            {{ form.acompanhante }}
+                    </div>
+                    <div class="col-2 d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-dark-emphasis m-0 p-0">Tipo vínculo</small>
+                        <span class="fw-medium">{{ form.tipoVinculo_acompanhante }}</span>
+                    </div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
+                        class="text-dark-emphasis m-0 p-0">Descrição de vínculo com paciente</small>
+                        {{ form.descricao_vinculo }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    </form>
+</body>
+<script>
+    new TomSelect(
+        "#id_paciente",
+        {
+            create: false,
+            maxOptions: 10,
+            hideSelected: true,
+            openOnFocus: false,
+        });
+</script>
+<script>
+    new TomSelect(
+        "#id_solicitante",
+        {
+            create: false,
+            maxOptions: 10,
+            hideSelected: true,
+            openOnFocus: false,
+        });
+</script>
+<script>
+    new TomSelect(
+        "#id_acompanhante",
+        {
+            create: false,
+            maxOptions: 10,
+            hideSelected: true,
+            openOnFocus: false,
+        });
+</script>
+{% endblock %}

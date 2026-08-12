@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from domain.pessoa.forms import CadastrarEditarPessoaForm
 from domain.pessoa.utils import calcular_idade
-from domain.pessoa.models import Pessoa, PessoaEditada
+from domain.pessoa.models import Pessoa, FotoPerfilPessoa, PessoaEditada
 from domain.pessoa.services import cadastrar_pessoa, editar_pessoa
 from domain.endereco.forms import BrasilEndercoForm
 from domain.endereco.services import cadastrar_endereco, buscar_endereco_cep, editar_endereco
@@ -16,7 +16,7 @@ from domain.apoio.models import Apoio
 @login_required
 def cadastrar_pessoa_view(request):
     
-    form = CadastrarEditarPessoaForm(request.POST or None)
+    form = CadastrarEditarPessoaForm(request.POST or None, request.FILES or None)
     form_end = BrasilEndercoForm(request.POST or None)
     idade = None
 
@@ -24,6 +24,7 @@ def cadastrar_pessoa_view(request):
     
         data_nascimento = form.cleaned_data['dataNasc_pessoa']
         idade = calcular_idade(data_nascimento)
+        foto_pessoa = form.cleaned_data.get("foto")
         
         cd = form.cleaned_data
         cd_end = form_end.cleaned_data
@@ -48,6 +49,7 @@ def cadastrar_pessoa_view(request):
                 telefone_pessoa=cd['telefone_pessoa'],
                 email_pessoa=cd['email_pessoa'],
                 descricao_pessoa=cd['descricao_pessoa'],
+                foto_perfil = foto_pessoa,
                 endereco_pessoa = endereco
             )
             return redirect ("pessoa:dados_pessoa", pessoa.pk)

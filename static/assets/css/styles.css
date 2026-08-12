@@ -1,0 +1,152 @@
+.container-fluid lateral {
+  width: 20%;
+}
+
+.lateral {
+  width: 20%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+
+dialog {
+  border: 2px solid #0d6efd;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 600px;
+  width: 100%;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+}
+
+.ts-wrapper {
+  width: 100%;
+}
+
+.ts-control {
+  min-height: 38px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.ts-control input {
+  font-size: 14px !important;
+}
+
+.ts-wrapper.single .ts-control {
+  height: 38px !important;
+}
+
+.ts-dropdown {
+  border-radius: 6px !important;
+  border: 1px solid #ced4da !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .1);
+}
+
+.ts-dropdown .active {
+  background: #0d6efd !important;
+  color: #fff !important;
+}
+
+.ts-control:focus-within {
+  border-color: #86b7fe !important;
+  box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25) !important;
+}
+
+body {
+  margin: 0;
+  background: #f4f4f4;
+  font-family: Arial, sans-serif;
+}
+
+.sidebar {
+  width: 270px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: linear-gradient(180deg,
+      #00152d,
+      #001122);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.logo-box {
+  height: 70px;
+  background: #999;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.system-name {
+  margin-bottom: 20px;
+}
+
+.user-box {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
+.menu-search input {
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-bottom: 1px solid #999;
+  background: transparent;
+  color: white;
+  margin-bottom: 25px;
+}
+
+.menu-title {
+  display: block;
+  color: #67e8f9;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.submenu {
+  margin-left: 20px;
+}
+
+.submenu a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.submenu a:hover {
+  color: #67e8f9;
+}
+
+.content {
+  margin-left: 270px;
+  padding: 30px;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+}

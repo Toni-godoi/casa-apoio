@@ -34,7 +34,8 @@ LOGIN_REDIRECT_URL = "home"
 ALLOWED_HOSTS = ['casadeapoio.local',
                  'localhost',
                  '127.0.0.1',
-                 'auth.local']
+                 'auth.local',
+                 '192.168.0.4']
 
 #descomente e adicione a url
 #CSRF_TRUSTED_ORIGINS = [
@@ -197,3 +198,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = BASE_DIR / 'media'

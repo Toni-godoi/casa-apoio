@@ -1,128 +1,294 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-<div class="container-fluid">
-    <div class="mb-4">
-        <small class="text-muted">Pessoa > Cadastrar pessoa</small>
-        <h1 class="fw-bold mt-2">Cadastrar pessoa</h1>
-    </div>
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-danger">
-        {{ message }}
-    </div>
-    {% endfor %}
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        <div class="card border-primary shadow-sm mb-3">
-            <div class="card-header bg-primary-subtle">
-                <strong>Dados da pessoa</strong>
-            </div>
-            <div class="card-body">
-                <div class="row g-3 align-items-start">
-                    <!-- NOME -->
-                    <div class="col-md-4">
-                        <label class="form-label">* Nome completo:</label>
-                        {{ form.nome_pessoa }}
-                    </div>
-                    <!-- CPF -->
-                    <div class="col-md-2">
-                        <label class="form-label">* CPF:
-                        </label>{{ form.cpf_pessoa }}</div>
-                    <!-- EMAIL -->
-                    <div class="col-md-3">
-                        <label class="form-label">Email:</label>
-                        {{ form.email_pessoa }}
-                    </div>
-                    <!-- OBS -->
-                    <div class="col-md-3">
-                        <label class="form-label">Outras informações:</label>
-                        {{ form.descricao_pessoa }}
-                    </div>
-                </div>
-                <div class="row g-3">
-                    <!-- SEXO -->
-                    <div class="col-md-1">
-                        <label class="form-label">* Sexo:</label>
-                        {{ form.sexo_pessoa }}
-                    </div>
-                    <!-- NACIONALIDADE -->
-                    <div class="col-md-2">
-                        <label class="form-label">* Nacionalidade:</label>
-                        {{ form.nacionalidade_pessoa }}
-                    </div>
-                    <!-- DATA -->
-                    <div class="col-md-2">
-                        <label class="form-label">* Data de nascimento:</label>
-                        {{ form.dataNasc_pessoa }}
-                    </div>
-                    <!-- IDADE -->
-                    <div class="col-md-1">
-                        <label class="form-label">* Idade</label>
-                        <input type="text" class="form-control" value="{{ idade|default:'' }}" readonly>
-                    </div>
-                    <!-- TELEFONE -->
-                    <div class="col-md-2">
-                        <label class="form-label">* Telefone:</label>
-                        {{ form.telefone_pessoa }}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card border-primary shadow-sm">
-            <div class="card-header bg-primary-subtle">
-                <strong>Endereço</strong>
-            </div>
-            <div class="card-body">
-                <div class="row g-3 align-items-start mb-2">
-                    <div class="col-md-3">
-                        <label class="form-label">Pais:</label>
-                        {{ form_end.pais }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">CEP:</label>
-                        {{ form_end.cep }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Estado:</label>
-                        {{ form_end.estado }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Cidade:</label>
-                        {{ form_end.cidade }}
-                    </div>
-                </div>
-                <div class="row g-3 align-items-start mb-2">
-                    <div class="col-md-4">
-                        <label class="form-label">Bairro:</label>
-                        {{ form_end.bairro }}
-                    </div>
-                    <div class="col-md-8">
-                        <label class="form-label">Logradouro:</label>
-                        {{ form_end.logradouro }}
-                    </div>
-                </div>
-                <div class="row g-3 align-items-start mb-2">
-                    <div class="col-md-2">
-                        <label class="form-label">Número:</label>
-                        {{ form_end.numero }}
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Coplemento:</label>
-                        {{ form_end.complemento }}
-                    </div>
-                    <div class="col-md-8">
-                        <label class="form-label">Descrição: (Obrigatório para país estrangeiro)</label>
-                        {{ form_end.descricao }}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="mt-4 d-flex gap-2">
-            <button class="btn btn-primary">Salvar</button>
-            <a href="{% url 'pessoa:listar_pessoas' %}"class="btn btn-light border">Cancelar</a>
-        </div>
-    </form>
-</div>
 
+<body class="d-flex flex-row m-0 p-0">
+    <form class="d-flex flex-column w-100" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+        <form class="d-flex flex-column" method="post">
+            <div class="row m-0 p-0">
+                <div class="col m-0 p-2"><small class="m-0 p-0">Pessoas &gt; Cadastrar pessoa</small>
+                    <h2 class="fw-bold">Cadastro de pessoa</h2>
+                </div>
+                <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
+                    <button class="btn btn-primary bg-success border-0" type="submit">Salvar</button>
+                    <a href="{% url 'pessoa:listar_pessoas' %}" class="btn btn-primary bg-dark border-0" type="button">Cancelar</a>
+                </div>
+            </div>
+            <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+                <div class="col border rounded-2 d-flex flex-column m-0 p-0">
+                    <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                        <div class="col">
+                            <div class="fs-5 fw-bold"><span class="m-0 p-0">Formulário de cadastro</span></div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row m-0 p-0">
+                        <div class="col m-0 p-0">
+                            <div
+                                class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                                <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                                    <small class="text-dark-emphasis m-0 p-0">Nome completo:</small>
+                                    {{ form.nome_pessoa }}
+                                </div>
+                                <div class="col-3 d-flex flex-column justify-content-start m-0 p-2">
+                                    <small class="text-dark-emphasis m-0 p-0">CPF:</small>
+                                    {{ form.cpf_pessoa }}
+                                </div>
+                                <div class="col-4 d-flex flex-column justify-content-start m-0 p-2">
+                                    <small class="text-dark-emphasis m-0 p-0">Email:</small>
+                                    {{ form.email_pessoa }}
+                                </div>
+                            </div>
+                            <div
+                                class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                                <div class="col-2 d-flex flex-column justify-content-start m-0 p-2">
+                                    <small class="text-dark-emphasis m-0 p-0">Sexo:</small>
+                                    <span class="fw-medium">
+                                        {{ form.sexo_pessoa }}
+                                    </span>
+                                </div>
+                                <div class="col-3 d-flex flex-column justify-content-start m-0 p-2">
+                                    <small class="text-dark-emphasis m-0 p-0">Nacionalidade</small>
+                                    <span class="fw-medium">
+                                        {{ form.nacionalidade_pessoa }}
+                                    </span>
+                                </div>
+                                <div class="col-3 d-flex flex-column justify-content-start m-0 p-2">
+                                    <small class="text-dark-emphasis m-0 p-0">Data nascimento</small>
+                                    <span class="fw-medium">
+                                        {{ form.dataNasc_pessoa }}
+                                    </span>
+                                </div>
+                                <div class="col-3 d-flex flex-column justify-content-start m-0 p-2">
+                                    <small class="text-dark-emphasis m-0 p-0">Telefone</small>
+                                    <span class="fw-medium">
+                                        {{ form.telefone_pessoa }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div
+                                class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                                <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                                    <small class="text-dark-emphasis m-0 p-0">Observações</small>
+                                    {{ form.descricao_pessoa }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3 d-flex flex-column gap-2 m-0 p-1">
+                            <small class="text-center text-dark-emphasis m-0 p-0">Foto</small>
+                            <div class="d-flex flex-column align-items-center m-0 p-0">
+                                <img
+                                    id="preview-foto"
+                                    class="border rounded-circle border-2 border-dark-subtle"  
+                                    width="150" height="150"
+                                    src="{% static 'assets/img/user.png' %}"
+                                    style="object-fit: cover;">
+                                </div>
+                                {{ form.foto }}
+                            <div class="d-flex flex-row justify-content-center gap-2 m-0 p-0">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary link-dark bg-warning border-0"
+                                    onclick="document.getElementById('id_foto').click()">
+                                    Upload
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-primary link-dark bg-info border-0"
+                                    onclick="abrirCamera()">
+                                    Câmera
+                                </button>
+                                <div id="camera-container" class="d-none flex-column align-items-center gap-2 mt-2">
+                                    <video
+                                        id="camera"
+                                        width="150"
+                                        height="150"
+                                        autoplay
+                                        playsinline
+                                        class="rounded-circle border border-2 border-dark-subtle"
+                                        style="object-fit: cover;">
+                                    </video>
+                                    <button
+                                        type="button"
+                                        class="btn btn-success btn-sm"
+                                        onclick="tirarFoto()">
+                                        Tirar foto
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary btn-sm"
+                                        onclick="fecharCamera()">
+                                        Cancelar
+                                    </button>
+                                </div>
+                                <canvas id="canvas-foto" width="150" height="150" class="d-none"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+                <div class="col border rounded-2 m-0 p-0">
+                    <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                        <div class="col">
+                            <div class="fs-5 fw-bold"><span class="m-0 p-0">Endereço</span></div>
+                        </div>
+                    </div>
+                    <div
+                        class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-2">
+                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">País</small>
+                            {{ form_end.pais }}
+                        </div>
+                        <div class="col-2 d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">CEP</small>
+                                {{ form_end.cep }}
+                        </div>
+                        <div class="col-2 d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Estado</small>
+                                {{ form_end.estado }}
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Cidade</small>
+                                {{ form_end.cidade }}
+                        </div>
+                    </div>
+                    <div
+                        class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-2">
+                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Bairro</small>
+                                {{ form_end.bairro }}
+                        </div>
+                        <div class="col-1 d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Número</small>
+                                {{ form_end.numero }}
+                        </div>
+                        <div class="col-2 d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Complemento</small>
+                                {{ form_end.complemento }}
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Logradouro</small>
+                                {{ form_end.logradouro }}
+                        </div>
+                    </div>
+                    <div
+                        class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-2">
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Descrição / referências (Obrigatório para
+                                estrangeiro)</small>
+                                {{ form_end.descricao }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    </form>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
+<script>
+    document.getElementById('id_foto').addEventListener('change', function(event) {
+
+        const arquivo = event.target.files[0];
+
+        if (arquivo) {
+            const imagem = document.getElementById('preview-foto');
+
+            imagem.src = URL.createObjectURL(arquivo);
+        }
+
+    });
+</script>
+<script>
+
+let streamCamera = null;
+
+async function abrirCamera() {
+
+    try {
+
+        streamCamera = await navigator.mediaDevices.getUserMedia({
+            video: true
+        });
+
+        const video = document.getElementById("camera");
+
+        video.srcObject = streamCamera;
+
+        const container = document.getElementById("camera-container");
+
+        container.classList.remove("d-none");
+        container.classList.add("d-flex");
+
+    } catch (erro) {
+
+        console.error("Erro ao acessar a câmera:", erro);
+
+        alert("Não foi possível acessar a câmera.");
+
+    }
+}
+
+function tirarFoto() {
+
+    const video = document.getElementById("camera");
+    const canvas = document.getElementById("canvas-foto");
+    const preview = document.getElementById("preview-foto");
+    const inputFoto = document.getElementById("id_foto");
+
+    const contexto = canvas.getContext("2d");
+
+    contexto.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    // Atualiza a prévia
+    preview.src = canvas.toDataURL("image/jpeg");
+
+    // Transforma o canvas em arquivo
+    canvas.toBlob(function(blob) {
+
+        const arquivo = new File(
+            [blob],
+            "foto-camera.jpg",
+            {
+                type: "image/jpeg"
+            }
+        );
+
+        // Coloca o arquivo no input do Django
+        const dataTransfer = new DataTransfer();
+
+        dataTransfer.items.add(arquivo);
+
+        inputFoto.files = dataTransfer.files;
+
+    }, "image/jpeg");
+
+    fecharCamera();
+}
+
+function fecharCamera() {
+
+    if (streamCamera) {
+
+        streamCamera.getTracks().forEach(track => {
+            track.stop();
+        });
+
+        streamCamera = null;
+    }
+
+    const container = document.getElementById("camera-container");
+
+    container.classList.remove("d-flex");
+    container.classList.add("d-none");
+}
+</script>
 {% endblock %}

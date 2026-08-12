@@ -1,220 +1,196 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="container-fluid">
-    <div class="mb-4">
-        <small class="text-muted">Pessoa > Dados pessoa</small>
-        <h1 class="fw-bold mt-2">{{pessoa.nome_pessoa}}</h1>
-    </div>
-    <div class="card border-primary shadow-sm mb-3">
-        <div class="card-header bg-primary-subtle">
-            <strong>Dados pessoais</strong>
-        </div>
-        <div class="card-body bg-body-tertiary">
-            <div class="row">
-                <!-- FOTO -->
-                <div class="col-md-2 text-center border-end">
-                    <img src="#" class="rounded-circle border shadow-sm mb-3"
-                        style="width:140px;height:140px;object-fit:cover;">
-                </div>
-                <!-- DADOS -->
-                <div class="col-md-10">
-                    <div class="row mb-4">
-                        <div class="col-md-8">
-                            <small class="text-muted d-block">Nome</small>
-                            <div class="border-bottom pb-1 fw-semibold">
-                                {{ pessoa.nome_pessoa }}
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <small class="text-muted d-block">CPF</small>
-                            <div class="border-bottom pb-1 fw-semibold">
-                                {{ pessoa.cpf_pessoa }}
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <small class="text-muted d-block">Data cadastro</small>
-                            <div class="border-bottom pb-1 fw-semibold">
-                                {{ pessoa.dataCadastro }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-4">
 
-                        <div class="col-md-4">
-                            <small class="text-muted d-block">Data nascimento</small>
-                            <div class="border-bottom pb-1 fw-semibold">
-                                {{ pessoa.dataNasc_pessoa }}
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <small class="text-muted d-block">Idade</small>
-                            <div class="border-bottom pb-1 fw-semibold">
-                                {{ pessoa.idade }} anos
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <small class="text-muted d-block">Sexo</small>
-                            <div class="border-bottom pb-1 fw-semibold">
-                                {{ pessoa.get_sexo_pessoa_display }}
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <small class="text-muted d-block">Nacionalidade</small>
-                            <div class="border-bottom pb-1 fw-semibold">
-                                {{ pessoa.nacionalidade_pessoa }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <small class="text-muted d-block">Telefone</small>
-                            <div class="border-bottom pb-1 fw-semibold">
-                                {{ pessoa.telefone_pessoa }}
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <small class="text-muted d-block">Email</small>
-                            <div class="border-bottom pb-1 fw-semibold">
-                                {{ pessoa.email_pessoa|default:"-" }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <small class="text-muted d-block">Outras informações</small>
-                            <div class="border rounded bg-light p-3">
-                                {{ pessoa.descricao_pessoa|default:"Sem observações" }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<body class="d-flex flex-row m-0 p-0">
+    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+        <div class="row m-0 p-0">
+            <div class="col m-0 p-2"><small class="m-0 p-0">Pessoa &gt; dados</small>
+                <h2 class="fw-bold">{{pessoa.nome_pessoa}}</h2>
+            </div>
+            <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
+                <a href="{% url 'pessoa:editar_pessoa' pessoa.id %}" class="btn btn-primary bg-primary border-0" type="submit">Editar pessoa</a>
             </div>
         </div>
-    </div>
-    <div class="card border-primary shadow-sm mb-3">
-        <div class="card-header bg-primary-subtle">
-            <strong>Endereço atual de {{pessoa.nome_pessoa}} </strong>
-        </div>
-        <div class="card-body bg-body-tertiary">
-            <div class="row g-3 align-items-start mb-2">
-                <div class="col-md-1">
-                    <small class="text-muted d-block">Pais</small>
-                    <div class="border-bottom pb-1 fw-semibold">
-                        {{ pessoa.endereco.pais }}
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+            <div class="col border rounded-2 m-0 p-0">
+                <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                    <div class="col">
+                        <div class="fs-5 fw-bold"><span class="m-0 p-0">Dados pessoais</span></div>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <small class="text-muted d-block">CEP</small>
-                    <div class="border-bottom pb-1 fw-semibold">
-                        {{ pessoa.endereco.cep }}
-                    </div>
-                </div>
-                <div class="col-md-1">
-                    <small class="text-muted d-block">Estado</small>
-                    <div class="border-bottom pb-1 fw-semibold">
-                        {{ pessoa.endereco.estado }}
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <small class="text-muted d-block">Cidade</small>
-                    <div class="border-bottom pb-1 fw-semibold">
-                        {{ pessoa.endereco.cidade }}
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <small class="text-muted d-block">Bairro</small>
-                    <div class="border-bottom pb-1 fw-semibold">
-                        {{ pessoa.endereco.bairro }}
-                    </div>
-                </div>
-            </div>
-            <div class="row g-3 align-items-start mb-2">
-                <div class="col-md-6">
-                    <small class="text-muted d-block">Logradouro</small>
-                    <div class="border-bottom pb-1 fw-semibold">
-                        {{ pessoa.endereco.logradouro }}
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <small class="text-muted d-block">Número</small>
-                    <div class="border-bottom pb-1 fw-semibold">
-                        {{ pessoa.endereco.numero }}
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <small class="text-muted d-block">Complemento</small>
-                    <div class="border-bottom pb-1 fw-semibold">
-                        {{ pessoa.endereco.complemento }}
-                    </div>
-                </div>
-            </div>
-            <div class="row g-3 align-items-start mb-2">
-                <div class="col-md-12">
-                    <small class="text-muted d-block">Descrição</small>
-                    <div class="border-bottom pb-1 fw-semibold">
-                        {% if pessoa.endereco.descricao %}
-                        {{ pessoa.endereco.descricao }}
+                <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                    <div class="col-2 d-flex flex-column justify-content-start align-items-center m-0 p-0">
+                        {% with foto=pessoa.foto_perfil.first %}
+                        {% if foto %}
+                        <img class="border rounded-circle border-2 border-dark-subtle m-0 p-0"
+                            src="{{ foto.arquivo.url }}" 
+                            width="150" height="150"
+                            style="object-fit: cover; object-position: center;">
                         {% else %}
-                        Sem descrição adicional
+                        <img class="border rounded-circle border-2 border-dark-subtle m-0 p-0"
+                            src="{% static 'assets/img/user.png' %}" 
+                            width="150" height="150">
                         {% endif %}
+                        {% endwith %}
+                    </div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-0">
+                        <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Nome</small><span
+                                    class="fw-medium">{{pessoa.nome_pessoa}}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">CPF</small><span
+                                    class="fw-medium">{{ pessoa.cpf_pessoa }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col m-0 p-0">
+                                <div class="d-flex flex-row m-0 p-0">
+                                    <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                            class="text-dark-emphasis m-0 p-0">Sexo</small><span
+                                            class="fw-medium">{{ pessoa.get_sexo_pessoa_display }}</span>
+                                        <hr class="m-0 p-0 me-3">
+                                    </div>
+                                    <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                            class="text-dark-emphasis m-0 p-0">Data cadastro</small><span
+                                            class="fw-medium">{{ pessoa.dataCadastro | date:"d/m/Y"}}</span>
+                                        <hr class="m-0 p-0 me-3">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Data nascimento</small><span
+                                    class="fw-medium">{{ pessoa.dataNasc_pessoa | date:"d/m/Y"}}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Idade</small>
+                                    <span class="fw-medium">{{ pessoa.idade }} anos</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Nacionalidade</small><span
+                                    class="fw-medium">{{ pessoa.get_nacionalidade_pessoa_display }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Telefone</small><span
+                                    class="fw-medium">{{ pessoa.telefone_pessoa }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                        </div>
+                        <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                            <div class="col-5 d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Email</small><span
+                                    class="fw-medium">{{ pessoa.email_pessoa|default:"-" }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Observações</small>
+                                    <span class="fw-medium">{{ pessoa.descricao_pessoa|default:"Sem observações" }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="mt-4">
-        <div class="d-flex gap-3">
-            <a href="{% url 'pessoa:editar_pessoa' pessoa.id %}" class="btn btn-primary">
-                Editar dados
-            </a>
-            <a href="#" class="btn btn-dark">
-                Ver edições
-            </a>
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+            <div class="col border rounded-2 m-0 p-0">
+                <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                    <div class="col">
+                        <div class="fs-5 fw-bold"><span class="m-0 p-0">Endereço atual</span></div>
+                    </div>
+                </div>
+                <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                    <div class="col d-flex flex-column justify-content-start m-0 p-0">
+                        <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                            <div class="col-1 d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">País</small><span class="fw-medium">{{ pessoa.endereco.pais }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col-2 d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">cep</small><span
+                                    class="fw-medium">{{ pessoa.endereco.cep }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col-2 d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Estado</small><span class="fw-medium">{{ pessoa.endereco.estado }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Cidade</small><span
+                                    class="fw-medium">{{ pessoa.endereco.cidade }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Bairro</small><span
+                                    class="fw-medium">{{ pessoa.endereco.bairro }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                        </div>
+                        <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Logradouro</small><span
+                                    class="fw-medium">{{ pessoa.endereco.logradouro }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col-1 d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Número</small><span class="fw-medium">{{ pessoa.endereco.numero }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Complemento</small>
+                                    <span class="fw-medium">{{ pessoa.endereco.complemento }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                        </div>
+                        <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Descrição</small><span
+                                    class="fw-medium">{{ pessoa.endereco.descricao | default:" - "}}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <hr>
-    <!-- APOIOS -->
-    <div class="mb-4">
-        <h2 class="fw-bold mt-2">Histórico de apoios</h2>
-    </div>
-    <div class="card border-primary shadow-sm">
-        <div class="card-header bg-primary-subtle">
-            <strong>Apoios de {{pessoa.nome_pessoa}}</strong>
-        </div>
-        <div class="card-body bg-light">
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome paciente</th>
-                            <th>Participação</th>
-                            <th>Início apoio</th>
-                            <th>Fim apoio</th>
-                            <th>Check-in</th>
-                            <th>Check-out</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                    </thead>
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+            <div class="col border rounded-2 m-0 p-0">
+                <div class="row bg-primary-subtle border rounded-2 m-0 p-1">
+                    <div class="col">
+                        <div class="fs-5 fw-bold"><span class="fs-4 m-0 p-0">Histórico de apoios</span></div>
+                    </div>
+                </div>
+                <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-column gap-2 m-0 p-2">
                     {% if apoios %}
-                    <tbody>
-                        {% for item in apoios %}
-                        <tr>
-                            <td><strong>{{ item.apoio.id }}</strong></td>
-                            <td>{{ item.apoio.paciente }}</td>
-                            <td>{{ item.participacao }}</td>
-                            <td>{{ item.apoio.dataInicio|date:"d/m/Y" }}</td>
-                            <td>
-                                {% if item.apoio.checkOut %}
-                                {{ item.apoio.checkOut|date:"d/m/Y" }}
-                                {% else %}
-                                -
-                                {% endif %}</td>
-                            <td>{{ item.checkin|date:"d/m/Y H:i"|default:"-" }}</td>
-                            <td>{{ item.checkout|date:"d/m/Y H:i"|default:"-" }}</td>
-                            <td><strong>{% if item.apoio.status %}
+                    {% for item in apoios %}
+                    <div class="col bg-primary-subtle border rounded-2 border-info d-flex flex-column justify-content-start m-0 p-0">
+                        <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                            <div class="col-1 d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">ID apoio</small><span
+                                    class="fw-medium">{{ item.apoio.id }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col-5 d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Paciente</small>
+                                    <span class="fw-medium">{{ item.apoio.paciente }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col-3 d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Participação</small><span
+                                    class="fw-medium">{{ item.participacao }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col-2 d-flex flex-column justify-content-start m-0 p-0">
+                                <small class="text-dark-emphasis m-0 p-0">Status apoio</small>
+                                <span class="fw-medium">
+                                    {% if item.apoio.status %}
                                     <span class="badge bg-success">
                                         Ativo
                                     </span>
@@ -223,21 +199,48 @@
                                         Encerrado
                                     </span>
                                     {% endif %}
-                                </strong>
-                            </td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="{% url 'apoio:detalhe' item.apoio.id %}" class="btn btn-outline-primary btn-sm">
-                                        Abrir</a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+                                </span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col-1 d-flex flex-column justify-content-center align-items-center m-0 p-0">
+                                <a href="{% url 'apoio:detalhe' item.apoio.id %}" class="btn btn-primary link-dark bg-warning border-0 d-flex justify-content-center align-items-center m-0 p-1"
+                                    type="submit">Abrir</a>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                        </div>
+                        <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Data início</small><span
+                                    class="fw-medium">{{ item.apoio.dataInicio|date:"d/m/Y" }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Data fim</small>
+                                    <span class="fw-medium">{{ item.checkout|date:"d/m/Y"|default:"-" }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Check-in</small><span
+                                    class="fw-medium">{{ item.checkin|date:"d/m/Y H:i"|default:"-" }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
+                                    class="text-dark-emphasis m-0 p-0">Check-Out</small><span
+                                    class="fw-medium">{{ item.checkout|date:"d/m/Y H:i"|default:"-" }}</span>
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="col-1 d-flex flex-column justify-content-start m-0 p-0">
+                        <span class="fw-medium">Sem histórico</span>
+                    </div>
                     {% endif %}
-                </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
 {% endblock %}

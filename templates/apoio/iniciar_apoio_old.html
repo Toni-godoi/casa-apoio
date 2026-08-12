@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <small class="text-muted">Apoio > Iniciar apoio</small>
+        <h1 class="fw-bold mt-2">Iniciar apoio</h1>
+    </div>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <!-- DADOS APOIO -->
+        <div class="card border-primary shadow-sm mb-4">
+            <div class="card-header bg-primary-subtle">
+                <strong>Dados do apoio</strong>
+            </div>
+            <div class="card-body bg-light">
+                <div class="row g-3 mb-3 justify-content-center">
+                    <div class="col-md-4">
+                        <label class="form-label">* Paciente</label>
+                        {{ form.paciente }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Solicitante do apoio</label>
+                        {{ form.solicitante }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Data início</label>
+                        {{ form.data_inicio }}
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="form-check">
+                            {{ form.checkIn }}
+                            <label class="form-check-label">Iniciar com check-In</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-2">
+                        <label class="form-label">* Previsão de encerramento</label>
+                        {{ form.previsaoFim_tipo }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Data encerramento</label>
+                        {{ form.previsao_fim }}
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label">Motivo do apoio</label>
+                        {{ form.motivo_apoio }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ACOMPANHANTE -->
+        <div class="card border-primary shadow-sm mb-4">
+            <div class="card-header bg-primary-subtle">
+                <strong> Cadastrar com companhante</strong>
+            </div>
+            <div class="card-body bg-light">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Acompanhante</label>
+                        {{ form.acompanhante }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">
+                            Tipo vínculo
+                        </label>
+                        {{ form.tipoVinculo_acompanhante }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Descrição do vínculo com paciente</label>
+                        {{ form.descricao_vinculo }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- HOSPEDAGEM -->
+        <div class="card border-primary shadow-sm mb-4">
+            <div class="card-header bg-primary-subtle">
+                <strong>Cadastrar com hospedagem</strong>
+            </div>
+            <div class="card-body bg-light">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Descrição hospedagem</label>
+                        {{ form.descHospedagem }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Quarto</label>
+                        {{ form.quarto }}
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <a href="{% url 'apoio:selecionar_quarto' %}" class="btn btn-info btn-sm text-white fw-semibold px-4 rounded-2">
+                                Selecionar
+                            </a>
+                            {% if quarto_selecionado %}
+                            <a href="{% url 'apoio:iniciar' %}" class="btn btn-outline-danger btn-sm">
+                                Limpar
+                            </a>
+                            <span class="badge bg-success">
+                                {{ quarto_selecionado.identificacao }}
+                                •
+                                {{ quarto_selecionado.vagasLivres }} vagas livres
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Início alocação</label>
+                        {{ form.inicio_alocacao }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- BOTÕES -->
+        <div class="mt-4">
+            <div class="d-flex gap-3">
+                <a href="{% url 'apoio:listar_apoios' %}" class="btn btn-outline-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary px-4">
+                    Salvar apoio
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    new TomSelect(
+        "#id_paciente",
+        {
+            create: false,
+            maxOptions: 10,
+            hideSelected: true,
+            openOnFocus: false,
+        });
+</script>
+<script>
+    new TomSelect(
+        "#id_solicitante",
+        {
+            create: false,
+            maxOptions: 10,
+            hideSelected: true,
+            openOnFocus: false,
+        });
+</script>
+<script>
+    new TomSelect(
+        "#id_acompanhante",
+        {
+            create: false,
+            maxOptions: 10,
+            hideSelected: true,
+            openOnFocus: false,
+        });
+</script>
+{% endblock %}

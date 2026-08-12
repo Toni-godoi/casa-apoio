@@ -37,11 +37,12 @@ def editar_quarto(
 
     campos_alterados = []
     if quarto.identificacao != ed_identificacao:
-        campos_alterados.append("Descrição")
-        quarto.identificacao = ed_identificacao
+        raise ValidationError("Não é possivel alterar a identificação do quarto. Considere desativa-lo e criar um novo quarto")
     if quarto.quantidadeVagas != ed_quantidadeVagas:
+        qtd_vagas, vagas_livres = _remanejo_vagas(quarto, ed_quantidadeVagas)
         campos_alterados.append("Quantidade vagas")
-        quarto.quantidadeVagas = ed_quantidadeVagas
+        quarto.quantidadeVagas = qtd_vagas
+        quarto.vagasLivres = vagas_livres
     
     quarto.save()
     return quarto
@@ -53,21 +54,37 @@ def desativar_quarto(
     quarto = _existe_quarto(ed_quarto_id)
     if quarto:
         _valida_quarto_ativo(ed_quarto_id, "desativado")
+        _valida_tem_hospedes(quarto)
     
     quarto.status = False
     quarto.save()
     return quarto
 
+def _valida_tem_hospedes(quarto:Quarto)->None:
+    if quarto.quarto_alocacao.filter(hospedagem__apoio__status = True).exists():
+        raise ValidationError("Não é possivel desativar com hospedagem de apoios ativos")
+
 def _valida_quarto_ativo(quarto_id:int, acao:str)->None:
     
-    existe = Quarto.objects.filter(
-        pk=quarto_id,
-        status = True
-    )
+    existe = Quarto.objects.filter(pk=quarto_id, status = True)
     if not existe:
         raise ValidationError(f"Quarto não encontrado ou desativado. Não pode ser {acao}")
 
+def  _remanejo_vagas(quarto:Quarto, ed_qtdVagas:int) -> tuple[int, int]:
+    
+    vagas_usadas = quarto.quantidadeVagas - quarto.vagasLivres
+    novas_vagas_livres = ed_qtdVagas - vagas_usadas
 
+    if ed_qtdVagas < quarto.quantidadeVagas:
+        if ed_qtdVagas < vagas_usadas:
+            raise ValidationError("A quantidade de vagas deve ser igual ou maior a quantidade ocupada")
+        else:
+            return ed_qtdVagas, novas_vagas_livres
+        
+    if ed_qtdVagas > quarto.quantidadeVagas:
+        return ed_qtdVagas, novas_vagas_livres
+     
+    
 def _existe_quarto(quarto_id:int)->Quarto:
     try:
         return Quarto.objects.get(pk=quarto_id)

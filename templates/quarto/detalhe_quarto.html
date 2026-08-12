@@ -6,6 +6,11 @@
         <small class="text-muted">Quarto > Dados quarto</small>
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="fw-bold m-0">Quarto {{quarto.identificacao}}</h1>
+            <div class="d-flex gap-3">
+                <button type="button" class="btn btn-primary" command="show-modal"
+                commandfor="modalEditarQuarto">Editar</button>
+                <a href="{% url 'quarto:desativar_quarto' quarto.id %}" class="btn btn-dark px-4">Desativar quarto</a>
+            </div>
         </div>
         {% if messages %}
         {% for message in messages %}
@@ -20,6 +25,16 @@
             </div>
             <div class="card-body bg-body-tertiary">
                 <div class="row mb-3">
+                    <div class="col-md-3">
+                        <small class="text-muted d-block">Status:</small>
+                        <div class="border-bottom pb-1 fw-semibold">
+                            {% if quarto.status %}
+                            <span class="text-success fw-bold">Quarto ativo</span>
+                            {% else %}
+                            <span class="text-danger fw-bold">Quarto desativado</span>
+                            {% endif %}
+                        </div>
+                    </div>
                     <div class="col-md-3">
                         <small class="text-muted d-block">Total de vagas:</small>
                         <div class="border-bottom pb-1 fw-semibold">
@@ -118,4 +133,48 @@
         </div>
     </div>
 </div>
+<dialog id="modalEditarQuarto">
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for erro in form.non_field_errors %}
+                {{ erro }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    <h4>Editar Quarto</h4>
+    <form method="post">
+        {% csrf_token %}
+        <div class="card-body mb-3">
+            <div class="row g-3 align-items-start mb-3">
+                <div class="col-md-12">
+                    <label class="form-label">* Identificação do quarto:</label>
+                    {{ form.identificacao }}
+                </div>
+            </div>
+            <div class="row g-3 align-items-start">
+                <div class="col-md-12">
+                    <label class="form-label">* Quantidade de vagas:</label>
+                    {{ form.quantidadeVagas }}
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+            <button 
+                type="button" 
+                class="btn btn-secondary"
+                data-url="{% url 'quarto:detalhe_quarto' quarto.id %}"
+                onclick="window.location.href=this.dataset.url">
+                Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+                Salvar
+            </button>
+        </div>
+    </form>
+</dialog>
+{% if form.non_field_errors %}
+<script>
+document.getElementById("modalEditarQuarto").showModal();
+</script>
+{% endif %}
 {% endblock %}

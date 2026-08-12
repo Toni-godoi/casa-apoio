@@ -23,6 +23,7 @@ class IniciarApoioForm(forms.Form):
 
     previsaoFim_tipo = forms.ChoiceField(
         choices=[('HOJE', 'Hoje'),('DATA','Data'),('INDETERMINADO','Indeterminado')],
+        required=False,
         label = "Previsão de encerramento",
         widget=forms.RadioSelect
     )
@@ -94,13 +95,20 @@ class IniciarApoioForm(forms.Form):
         cleaned = super().clean()
         data_inicio = cleaned.get("data_inicio")
         previsao_fim = cleaned.get("previsao_fim")
-
+        
         data_inicio_mais = data_inicio + timedelta(days=1)
 
         if data_inicio and previsao_fim and previsao_fim < data_inicio_mais:
             self.add_error(
                 "previsao_fim", "A previsão de fim precisa de uma data após a data de inicio.",)
 
+        #define tipo de fim como HOJE ao criar apoio, 
+        #para não ser preciso selecionar quarto na criação
+        #Quarto so deve ser selecionado na edição do apoio
+        fim_tipo = cleaned.get("previsaoFim_tipo")
+        if not fim_tipo:
+            cleaned["previsaoFim_tipo"] = "HOJE"
+        ####
         return cleaned
 
 class AdicionarAcompanhante(forms.Form):

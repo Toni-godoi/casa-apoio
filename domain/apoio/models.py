@@ -12,7 +12,7 @@ class Apoio(models.Model):
     solicitante = models.ForeignKey(SolicitantePessoa, on_delete=models.PROTECT, null=True, blank=True, related_name="solicitantes")
 #-- casaApoio = models.ForeignKey(CasaApoio,)
     dataInicio = models.DateField()
-    previsaoFim_tipo = models.CharField(max_length=50, choices=DATAFIM_CHOICES)
+    previsaoFim_tipo = models.CharField(max_length=50, choices=DATAFIM_CHOICES, default='HOJE')
     previsaoFim = models.DateField(null=True, blank=True)
     checkIn = models.DateTimeField(null=True, blank=True)
     checkOut = models.DateTimeField(null=True, blank=True)

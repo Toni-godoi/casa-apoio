@@ -1,86 +1,74 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="container-fluid">
-    <div class="mb-4">
-        <small class="text-muted">Apoio > Apoios ativos</small>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold m-0">Apoios ativos</h1>
-            <a href="{% url 'apoio:iniciar' %}" class="btn btn-primary">Iniciar novo apoio</a>
+
+<body class="d-flex flex-row m-0 p-0">
+    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+        <div class="row m-0 p-0">
+            <div class="col m-0 p-2">
+                <small class="m-0 p-0">Apoios &gt; Apoios ativos</small>
+                <h2 class="fw-bold">Apoios ativos</h2>
+            </div>
+            <div class="col d-flex justify-content-end align-items-center m-0 p-2">
+                <a href="{% url 'apoio:iniciar' %}" class="btn btn-primary bg-primary border-0" type="button">Novo apoio</a>
+            </div>
         </div>
-    </div>
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}">
-        {{ message }}
-    </div>
-    {% endfor %}
-    {% endif %}
-    <div class="card border-primary shadow-sm">
-        <div class="card-header bg-primary-subtle">
-            <strong>Apoios ativos</strong>
-        </div>
-        <div class="card-body bg-light">
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Paciente</th>
-                            <th>Solicitante</th>
-                            <th>Previsão Fim</th>
-                            <th>Início</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                     {% if apoios %}
-                    <tbody>
-                        {% for apoio in apoios %}
-                        <tr>
-                            <!-- ID -->
-                            <td><strong>#{{ apoio.id }}</strong></td>
-                            <!-- PACIENTE -->
-                            <td>{{ apoio.paciente }}</td>
-                            <!-- SOLICITANTE -->
-                            <td>{{ apoio.solicitante|default:"-" }}</td>
-                            <!-- PREVISÃO -->
-                            <td>{% if apoio.previsaoFim_tipo == "HOJE" %}
-                                <span class="badge bg-secondary">Hoje</span>
-                                {% elif apoio.previsaoFim_tipo == "DATA" %}
-                                <span class="badge bg-info">Até {{ apoio.previsaoFim }}</span>
-                                {% else %}
-                                <span class="badge bg-dark">Indeterminado</span>
-                                {% endif %}
-                            </td>
-                            <!-- INÍCIO -->
-                            <td>{{ apoio.dataInicio }}</td>
-                            <!-- STATUS -->
-                            <td>{% if apoio.status %}
-                                <span class="badge bg-success">Ativo</span>
-                                {% else %}
-                                <span class="badge bg-secondary">Finalizado</span>
-                                {% endif %}
-                            </td>
-                            <!-- AÇÕES -->
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="{% url 'apoio:detalhe' apoio.id %}" class="btn btn-outline-primary btn-sm">
-                                        Abrir</a>
-                                    {% if apoio.status %}
-                                    <a href="{% url 'apoio:editar_apoio' apoio.id %}"
-                                        class="btn btn-outline-secondary btn-sm">
-                                        Editar</a>
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3 pt-2 pb-2">
+            <div class="col border rounded-1 border-2 m-1 p-1">
+                <div class="table-responsive">
+                    {% if apoios %}
+                    <table class="table">
+                        <thead class="table-light">
+                            <tr class="justify-content-start">
+                                <th class="table-primary m-0 p-0">ID</th>
+                                <th class="table-primary m-0 p-0">Paciente</th>
+                                <th class="table-primary m-0 p-0">Solicitante</th>
+                                <th class="table-primary ms-0 ps-0 me-0 pe-0 mt-0 pt-0 mb-0 pb-0">Data início</th>
+                                <th class="table-primary ms-0 ps-0 me-0 pe-0 mt-0 pt-0 mb-0 pb-0">Previsão saída</th>
+                                <th class="table-primary m-0 p-0">Status</th>
+                                <th class="table-primary m-0 p-0"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="flex-row">
+                            {% for apoio in apoios %}
+                            <tr class="m-0 p-0">
+                                <td class="m-0 p-1">{{ apoio.id }}</td>
+                                <td class="m-0 p-1">{{ apoio.paciente }}</td>
+                                <td class="m-0 p-1">{{ apoio.solicitante|default:"-" }}</td>
+                                <td class="m-0 p-1">{{ apoio.dataInicio|date:"j/n/Y" }}</td>
+                                <td class="m-0 p-1">
+                                    {% if apoio.previsaoFim_tipo == "HOJE" %}
+                                    <span class="badge bg-secondary">Hoje</span>
+                                    {% elif apoio.previsaoFim_tipo == "DATA" %}
+                                    <span class="badge bg-info">Até {{ apoio.previsaoFim }}</span>
+                                    {% else %}
+                                    <span class="badge bg-dark">Indeterminado</span>
                                     {% endif %}
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+                                </td>
+                                <td class="m-0 p-1">
+                                    {% if apoio.status %}
+                                    <span class="badge bg-success">Ativo</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Finalizado</span>
+                                    {% endif %}
+                                </td>
+                                <td class="d-flex justify-content-end gap-1 m-0 p-1">
+                                    <a href="{% url 'apoio:detalhe' apoio.id %}" class="btn btn-primary m-0 p-1" type="button">Abrir</a>
+                                    {% if apoio.status %}
+                                    <a href="{% url 'apoio:editar_apoio' apoio.id %}" class="btn btn-primary bg-secondary border-0 m-0 p-1" type="button">Editar</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                     {% else %}
+                        <Span class="m-0 p-0"><strong>Sem apoios ativos</strong></Span>
                     {% endif %}
-                </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
 {% endblock %}

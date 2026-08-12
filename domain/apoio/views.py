@@ -32,7 +32,7 @@ def iniciar_apoio_view(request):
     if quarto_id and request.method != "POST":
         form.initial["quarto"] = quarto_id
         quarto_obj = Quarto.objects.filter(pk=quarto_id).first()
-    
+
     tipo = None
     if request.method == "POST":
         tipo = request.POST.get("previsaoFim_tipo")
@@ -237,7 +237,7 @@ def consultar_apoios_view(request):
     apoios = Apoio.objects.none()
     if any([paciente, solicitante, data_inicio, data_fim, previsaoFim_tipo, checkIn_inicio, checkIn_fim, checkOut_inicio, checkOut_fim]):
         
-        apoios = Apoio.objects.all()
+        apoios = Apoio.objects.all().order_by('-dataInicio')
         if paciente:
             apoios = apoios.filter(paciente__nome_pessoa__icontains=paciente)
         if solicitante:

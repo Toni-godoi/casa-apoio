@@ -1,135 +1,79 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container-fluid">
-    <div class="mb-4">
-        <small class="text-muted">Apoio > Iniciar apoio</small>
-        <h1 class="fw-bold mt-2">Iniciar apoio</h1>
-    </div>
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-danger">
-        {{ message }}
-    </div>
-    {% endfor %}
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        <!-- DADOS APOIO -->
-        <div class="card border-primary shadow-sm mb-4">
-            <div class="card-header bg-primary-subtle">
-                <strong>Dados do apoio</strong>
+
+<body class="d-flex flex-row m-0 p-0">
+    <form class="d-flex flex-column w-100" method="post">
+    {% csrf_token %}
+    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+        <div class="row m-0 p-0">
+            <div class="col m-0 p-2"><small class="m-0 p-0">Apoios &gt; Novo apoio</small>
+                <h2 class="fw-bold">Iniciar apoio</h2>
             </div>
-            <div class="card-body bg-light">
-                <div class="row g-3 mb-3 justify-content-center">
-                    <div class="col-md-4">
-                        <label class="form-label">* Paciente</label>
-                        {{ form.paciente }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Solicitante do apoio</label>
-                        {{ form.solicitante }}
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Data início</label>
-                        {{ form.data_inicio }}
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <div class="form-check">
-                            {{ form.checkIn }}
-                            <label class="form-check-label">Iniciar com check-In</label>
-                        </div>
+            <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
+                <button class="btn btn-primary bg-success border-0" type="submit">Salvar apoio</button>
+                <a href="{% url 'apoio:listar_apoios' %}" class="btn btn-primary bg-dark border-0" type="submit">Cancelar</a></div>
+        </div>
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+            <div class="col border rounded-2 m-0 p-0">
+                <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                    <div class="col">
+                        <div class="fs-5 fw-bold"><span class="m-0 p-0">Dados do apoio</span></div>
                     </div>
                 </div>
-                <div class="row g-3 align-items-start">
-                    <div class="col-md-2">
-                        <label class="form-label">* Previsão de encerramento</label>
-                        {{ form.previsaoFim_tipo }}
+                <div
+                    class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-danger m-0 p-0">Paciente *</small>
+                            {{ form.paciente }}
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Data encerramento</label>
-                        {{ form.previsao_fim }}
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-dark-emphasis m-0 p-0">Solicitante apoio</small>
+                        {{ form.solicitante }}
                     </div>
-                    <div class="col-md-8">
-                        <label class="form-label">Motivo do apoio</label>
+                    <div class="col-2 d-flex flex-column m-0 p-1">
+                        <small class="text-dark-emphasis m-0 p-0">Data início</small>
+                            <span class="fw-medium">{{ form.data_inicio }}</span>
+                    </div>
+                </div>
+                <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                    <div class="col-1 d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-dark-emphasis m-0 p-0">Iniciar apoio com check-In</small>
+                        <span class="fw-medium">{{ form.checkIn }}</span>
+                    </div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-danger m-0 p-0">Descrição do apoio *</small>
                         {{ form.motivo_apoio }}
                     </div>
                 </div>
             </div>
         </div>
-        <!-- ACOMPANHANTE -->
-        <div class="card border-primary shadow-sm mb-4">
-            <div class="card-header bg-primary-subtle">
-                <strong> Cadastrar com companhante</strong>
-            </div>
-            <div class="card-body bg-light">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">Acompanhante</label>
-                        {{ form.acompanhante }}
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+            <div class="col border rounded-2 m-0 p-0">
+                <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                    <div class="col">
+                        <div class="fs-5 fw-bold"><span class="m-0 p-0">Informar acompanhante</span></div>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label">
-                            Tipo vínculo
-                        </label>
-                        {{ form.tipoVinculo_acompanhante }}
+                </div>
+                <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-2">
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-dark-emphasis m-0 p-0">Nome</small>
+                            {{ form.acompanhante }}
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Descrição do vínculo com paciente</label>
+                    <div class="col-2 d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-dark-emphasis m-0 p-0">Tipo vínculo</small>
+                        <span class="fw-medium">{{ form.tipoVinculo_acompanhante }}</span>
+                    </div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
+                        class="text-dark-emphasis m-0 p-0">Descrição de vínculo com paciente</small>
                         {{ form.descricao_vinculo }}
                     </div>
                 </div>
             </div>
         </div>
-        <!-- HOSPEDAGEM -->
-        <div class="card border-primary shadow-sm mb-4">
-            <div class="card-header bg-primary-subtle">
-                <strong>Cadastrar com hospedagem</strong>
-            </div>
-            <div class="card-body bg-light">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Descrição hospedagem</label>
-                        {{ form.descHospedagem }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Quarto</label>
-                        {{ form.quarto }}
-                        <div class="d-flex align-items-center gap-2 mt-2">
-                            <a href="{% url 'apoio:selecionar_quarto' %}" class="btn btn-info btn-sm text-white fw-semibold px-4 rounded-2">
-                                Selecionar
-                            </a>
-                            {% if quarto_selecionado %}
-                            <a href="{% url 'apoio:iniciar' %}" class="btn btn-outline-danger btn-sm">
-                                Limpar
-                            </a>
-                            <span class="badge bg-success">
-                                {{ quarto_selecionado.identificacao }}
-                                •
-                                {{ quarto_selecionado.vagasLivres }} vagas livres
-                            </span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Início alocação</label>
-                        {{ form.inicio_alocacao }}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- BOTÕES -->
-        <div class="mt-4">
-            <div class="d-flex gap-3">
-                <a href="{% url 'apoio:listar_apoios' %}" class="btn btn-outline-secondary">
-                    Cancelar
-                </a>
-                <button type="submit" class="btn btn-primary px-4">
-                    Salvar apoio
-                </button>
-            </div>
-        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     </form>
-</div>
+</body>
 <script>
     new TomSelect(
         "#id_paciente",

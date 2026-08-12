@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4">
+        <small class="text-muted">Apoio > Detalhes do apoio</small>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold m-0">Detalhes do apoio nº{{apoio.id}}</h1>
+            {% if apoio.checkOut %}
+            <a href="{% url 'apoio:relatorio_apoio' apoio.id %}" class="btn btn-dark px-4">
+                Gerar relatório
+            </a>
+            {% endif %}
+        </div>
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        <div class="card border-primary shadow-sm">
+            <div class="card-header bg-primary-subtle">
+                <strong>Dados do apoio</strong>
+            </div>
+            <div class="card-body bg-body-tertiary">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <small class="text-muted d-block">Paciente</small>
+                        <div class="border-bottom pb-1 d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold">{{ apoio.paciente }}</span>
+                            <a href="{% url 'pessoa:dados_pessoa' apoio.paciente.id %}"
+                                class="btn btn-outline-primary btn-sm">
+                                Ver
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted d-block">Solicitante</small>
+                        <div class="border-bottom pb-1 fw-semibold">
+                            {{ apoio.solicitante }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Descrição do apoio</small>
+                        <div class="border-bottom pb-1 fw-semibold">
+                            {{ apoio.motivo }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <small class="text-muted d-block">Data de início</small>
+                        <div class="border-bottom pb-1 fw-semibold">
+                            {{ apoio.dataInicio | date:"d/m/Y"}}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <small class="text-muted d-block">Duração prevista</small>
+                        <div class="border-bottom pb-1 fw-semibold">
+                            {{ apoio.previsaoFim_tipo }}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <small class="text-muted d-block">Data de fim prevista</small>
+                        <div class="border-bottom pb-1 fw-semibold">
+                            {{ apoio.previsaoFim| date:"d/m/Y" | default:"-" }}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <small class="text-muted d-block">Check-In do paciente</small>
+                        <div class="border-bottom pb-1 fw-semibold">
+                            {{ apoio.checkIn|date:"d/m/Y H:i" | default:"Aguardando" }}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <small class="text-muted d-block">Check-Out do paciente</small>
+                        <div class="border-bottom pb-1 fw-semibold">
+                            {{ apoio.checkOut| date:"d/m/Y H:i" |default:"Aguardando" }}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <small class="text-muted d-block">Status atual</small>
+                        <div class="border-bottom pb-1 fw-semibold">
+                            {% if apoio.status %}
+                            <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Finalizado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4 mb-3">
+            <div class="d-flex gap-3">
+                <a href="{% url 'apoio:editar_apoio' apoio.id %}" class="btn btn-primary">
+                    Editar apoio
+                </a>
+                <form method="post" action="{% url 'apoio:checkin_paciente' apoio.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-success btn-sm">
+                        Fazer Check-in paciente
+                    </button>
+                </form>
+                <form method="post" action="{% url 'apoio:checkout_paciente' apoio.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger btn-sm">
+                        Fazer Check-Out paciente
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="card border-primary shadow-sm mb-3">
+            <div class="card-header bg-primary-subtle">
+                <strong>Acompanhante</strong>
+            </div>
+            <div class="card-body bg-body-tertiary">
+                <div class="row mb-3">
+                    <div class="col-md-10">
+                        <h4>Acompanhante atual</h4>
+                        {% if apoio.acompanhante_atual %}
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Nome</small>
+                                <div class="border-bottom pb-1 fw-semibold">
+                                    {{ apoio.acompanhante_atual.nomeAcompanhante }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Vínculo</small>
+                                <div class="border-bottom pb-1 fw-semibold">
+                                    {{ apoio.acompanhante_atual.vinculo }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Check-in</small>
+                                <div class="border-bottom pb-1 fw-semibold">
+                                    {{ apoio.acompanhante_atual.checkIn }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Sem acompanhante ativo</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mt-4 mb-3">
+                <div class="d-flex gap-3">
+                    <form method="post" action="{% url 'apoio:adicionar_acompanhante' apoio.id %}">
+                        {% csrf_token %}
+                        <button class="btn btn-success btn-sm">
+                            Adicionar acompanhante
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'apoio:checkout_acompanhante' apoio.id %}">
+                        {% csrf_token %}
+                        <button class="btn btn-danger btn-sm">
+                            Fazer Check-out acompanhante atual
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="card border-primary shadow-sm">
+                <div class="card-header bg-primary-subtle">
+                    <strong>Histórico de acompanhantes</strong>
+                </div>
+                <div class="card-body bg-body-tertiary p-0">
+                    {% if apoio.acompanhantes.all %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Vínculo</th>
+                                    <th>Descrição</th>
+                                    <th>Check-in</th>
+                                    <th>Check-out</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for acomp in apoio.acompanhantes.all %}
+                                <tr>
+                                    <td>{{ acomp.nomeAcompanhante }}</td>
+                                    <td>{{ acomp.vinculo }}</td>
+                                    <td>{{ acomp.descricaoVinculo }}</td>
+                                    <td>{{ acomp.checkIn | date:"d/m/Y H:i"}}</td>
+                                    <td>{{ acomp.checkOut | date:"d/m/Y H:i" | default:"Aguardando" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-muted">Sem histórico</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card border-primary shadow-sm">
+    <div class="card-header bg-primary-subtle">
+        <strong>Hospedagem</strong>
+    </div>
+    <div class="card-body bg-body-tertiary">
+        <div class="row mb-3">
+            {% if hospedagem %}
+            <p>
+                <strong>Observação:</strong>
+                {{ hospedagem.observacao|default:"Sem observação" }}
+            </p>
+            {% for alocacao in hospedagem.hospedagem_alocacao.all %}
+            {% if not alocacao.fimLocacao %}
+            <div class="border rounded p-3 mb-3">
+                <p>
+                    <strong>Quarto atual:</strong>
+                    {{ alocacao.quarto.identificacao }}
+                </p>
+                <p>
+                    <strong>Entrada:</strong>
+                    {{ alocacao.inicioLocacao }}
+                </p>
+                <p>
+                    <strong>Encerramento:</strong>
+                    {{ alocacao.fimLocacao|default:"Aguardando" }}
+                </p>
+            </div>
+            {% endif %}
+            {% empty %}
+            <p class="text-muted">Sem quarto alocado</p>
+            {% endfor %}
+            <hr>
+        </div>
+        <div class="card border-primary shadow-sm">
+            <div class="card-header bg-primary-subtle">
+                <strong>Hostórico de quartos</strong>
+            </div>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Quarto</th>
+                        <th>Entrada</th>
+                        <th>Saída</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alocacao in hospedagem.hospedagem_alocacao.all %}
+                    <tr>
+                        <td>{{ alocacao.quarto.identificacao }}</td>
+                        <td>{{ alocacao.inicioLocacao }}</td>
+                        <td>{{ alocacao.fimLocacao|default:"Atual" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">Sem hospedagem</p>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}
