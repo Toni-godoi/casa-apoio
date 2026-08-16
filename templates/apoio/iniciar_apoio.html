@@ -2,76 +2,101 @@
 {% block content %}
 
 <body class="d-flex flex-row m-0 p-0">
-    <form class="d-flex flex-column w-100" method="post">
-    {% csrf_token %}
-    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
-        <div class="row m-0 p-0">
-            <div class="col m-0 p-2"><small class="m-0 p-0">Apoios &gt; Novo apoio</small>
-                <h2 class="fw-bold">Iniciar apoio</h2>
-            </div>
-            <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
-                <button class="btn btn-primary bg-success border-0" type="submit">Salvar apoio</button>
-                <a href="{% url 'apoio:listar_apoios' %}" class="btn btn-primary bg-dark border-0" type="submit">Cancelar</a></div>
-        </div>
-        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
-            <div class="col border rounded-2 m-0 p-0">
-                <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
-                    <div class="col">
-                        <div class="fs-5 fw-bold"><span class="m-0 p-0">Dados do apoio</span></div>
-                    </div>
+    <form class="d-flex flex-column w-100" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+            <div class="row m-0 p-0">
+                <div class="col m-0 p-2"><small class="m-0 p-0">Apoios &gt; Novo apoio</small>
+                    <h2 class="fw-bold">Iniciar apoio</h2>
                 </div>
-                <div
-                    class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
-                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
-                        <small class="text-danger m-0 p-0">Paciente *</small>
+                <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
+                    <button class="btn btn-primary bg-success border-0" type="submit">Salvar apoio</button>
+                    <a href="{% url 'apoio:listar_apoios' %}" class="btn btn-primary bg-dark border-0"
+                        type="submit">Cancelar</a>
+                </div>
+            </div>
+            <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+                <div class="col border rounded-2 m-0 p-0">
+                    <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                        <div class="col">
+                            <div class="fs-5 fw-bold"><span class="m-0 p-0">Dados do apoio</span></div>
+                        </div>
+                    </div>
+                    <div
+                        class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-danger m-0 p-0">Paciente *</small>
                             {{ form.paciente }}
-                    </div>
-                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
-                        <small class="text-dark-emphasis m-0 p-0">Solicitante apoio</small>
-                        {{ form.solicitante }}
-                    </div>
-                    <div class="col-2 d-flex flex-column m-0 p-1">
-                        <small class="text-dark-emphasis m-0 p-0">Data início</small>
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Solicitante apoio</small>
+                            {{ form.solicitante }}
+                        </div>
+                        <div class="col-3 d-flex flex-column m-0 p-1">
+                            <small class="text-dark-emphasis m-0 p-0">Data início</small>
                             <span class="fw-medium">{{ form.data_inicio }}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
-                    <div class="col-1 d-flex flex-column justify-content-start m-0 p-2">
-                        <small class="text-dark-emphasis m-0 p-0">Iniciar apoio com check-In</small>
-                        <span class="fw-medium">{{ form.checkIn }}</span>
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                        <div class="col-1 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Iniciar apoio com check-In</small>
+                            <span class="fw-medium">{{ form.checkIn }}</span>
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-danger m-0 p-0">Descrição do apoio *</small>
+                            {{ form.motivo_apoio }}
+                        </div>
                     </div>
-                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
-                        <small class="text-danger m-0 p-0">Descrição do apoio *</small>
-                        {{ form.motivo_apoio }}
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-start align-items-start m-0 p-1">
+                        <div class="col-3 d-flex flex-column gap-2 m-0 p-1">
+                            <small class="text-dark-emphasis m-0 p-0">Anexo (apenas 1 arquivo)</small>
+                            <div class="d-flex flex-row justify-content-left gap-2 m-0 p-0">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary link-dark bg-warning border-0 m-0 p-1"
+                                    onclick="document.getElementById('id_anexo').click()">
+                                    Upload
+                                </button>
+                            </div>
+                            {{ form.anexo }}
+                            <div
+                                id="nome-anexo"
+                                class="d-flex flex-row align-items-center gap-2 mt-1">
+                            </div>
+                        </div>
+                        <div id="campo-nome-anexo" class="col flex-column m-0 p-1" style="display: none;">
+                            <small class="text-danger m-0 p-0">Nome para o arquivo *</small>
+                            {{form.nome_anexo}}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
-            <div class="col border rounded-2 m-0 p-0">
-                <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
-                    <div class="col">
-                        <div class="fs-5 fw-bold"><span class="m-0 p-0">Informar acompanhante</span></div>
+            <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+                <div class="col border rounded-2 m-0 p-0">
+                    <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                        <div class="col">
+                            <div class="fs-5 fw-bold"><span class="m-0 p-0">Informar acompanhante</span></div>
+                        </div>
                     </div>
-                </div>
-                <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-2">
-                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
-                        <small class="text-dark-emphasis m-0 p-0">Nome</small>
+                    <div
+                        class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-2">
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Nome</small>
                             {{ form.acompanhante }}
-                    </div>
-                    <div class="col-2 d-flex flex-column justify-content-start m-0 p-2">
-                        <small class="text-dark-emphasis m-0 p-0">Tipo vínculo</small>
-                        <span class="fw-medium">{{ form.tipoVinculo_acompanhante }}</span>
-                    </div>
-                    <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
-                        class="text-dark-emphasis m-0 p-0">Descrição de vínculo com paciente</small>
-                        {{ form.descricao_vinculo }}
+                        </div>
+                        <div class="col-2 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Tipo vínculo</small>
+                            <span class="fw-medium">{{ form.tipoVinculo_acompanhante }}</span>
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Descrição de vínculo com paciente</small>
+                            {{ form.descricao_vinculo }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+        <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     </form>
 </body>
 <script>
@@ -103,5 +128,46 @@
             hideSelected: true,
             openOnFocus: false,
         });
+</script>
+<script>
+    const inputAnexo = document.getElementById('id_anexo');
+    const nomeAnexo = document.getElementById('nome-anexo');
+    const campoNomeAnexo = document.getElementById('campo-nome-anexo');
+
+    inputAnexo.addEventListener('change', function () {
+
+        const arquivo = this.files[0];
+
+        if (!arquivo) {
+            nomeAnexo.innerHTML = '';
+            campoNomeAnexo.style.display = 'none';
+            return;
+        }
+
+        nomeAnexo.innerHTML = `
+            <span class="text-truncate">
+                ${arquivo.name}
+            </span>
+
+            <button
+                type="button"
+                class="btn btn-sm btn-danger p-0 px-1"
+                onclick="removerAnexo()">
+                X
+            </button>
+        `;
+
+        campoNomeAnexo.style.display = '';
+    });
+
+
+    function removerAnexo() {
+
+        inputAnexo.value = '';
+
+        nomeAnexo.innerHTML = '';
+
+        campoNomeAnexo.style.display = 'none';
+    }
 </script>
 {% endblock %}

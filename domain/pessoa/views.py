@@ -8,20 +8,21 @@ from domain.pessoa.forms import CadastrarEditarPessoaForm
 from domain.pessoa.utils import calcular_idade
 from domain.pessoa.models import Pessoa, FotoPerfilPessoa, PessoaEditada
 from domain.pessoa.services import cadastrar_pessoa, editar_pessoa
-from domain.endereco.forms import BrasilEndercoForm
-from domain.endereco.services import cadastrar_endereco, buscar_endereco_cep, editar_endereco
+from domain.endereco.forms import EndercoForm
+from domain.endereco.models import Pais, Estado, Cidade, Bairro, Endereco
+from domain.endereco.services import cadastrar_end_pessoa, buscar_endereco_cep, editar_end_pessoa
 from domain.apoio.models import Apoio
 
 # Create your views here.
 @login_required
 def cadastrar_pessoa_view(request):
-    
+
     form = CadastrarEditarPessoaForm(request.POST or None, request.FILES or None)
-    form_end = BrasilEndercoForm(request.POST or None)
+    form_end = EndercoForm(request.POST or None)
     idade = None
 
     if request.method == "POST" and form.is_valid() and form_end.is_valid():
-    
+
         data_nascimento = form.cleaned_data['dataNasc_pessoa']
         idade = calcular_idade(data_nascimento)
         foto_pessoa = form.cleaned_data.get("foto")
@@ -29,12 +30,12 @@ def cadastrar_pessoa_view(request):
         cd = form.cleaned_data
         cd_end = form_end.cleaned_data
         try:
-            endereco = cadastrar_endereco(
-                pais = cd_end['pais'],
+            endereco = cadastrar_end_pessoa(
+                pais = cd_end['pais'].pk,
                 cep = cd_end['cep'],
-                estado = cd_end['estado'],
-                cidade = cd_end['cidade'],
-                bairro = cd_end['bairro'],
+                estado = cd_end['estado'].pk,
+                cidade = cd_end['cidade'].pk,
+                bairro = cd_end['bairro'].pk,
                 logradouro = cd_end['logradouro'],
                 numero = cd_end['numero'],
                 complemento = cd_end['complemento'],
@@ -57,11 +58,19 @@ def cadastrar_pessoa_view(request):
         except ValidationError as exc:
             for msg in exc.messages:
                 messages.error(request, msg)
+    paises = list(Pais.objects.values("id", "pais"))
+    estados = list(Estado.objects.values("id", "pais_id", "estado"))
+    cidades = list(Cidade.objects.values("id", "estado_id", "cidade"))
+    bairros = list(Bairro.objects.values("id", "cidade_id", "bairro"))
 
     return render(request, "pessoa/cadastrar_pessoa.html", {
         "form": form,
         "form_end": form_end,
-        "idade": idade})
+        "idade": idade,
+        "paises": paises,
+        "estados": estados,
+        "cidades": cidades,
+        "bairros": bairros})
 
 @login_required
 def dados_pessoa_view(request, pk):
@@ -90,7 +99,7 @@ def dados_pessoa_view(request, pk):
             "checkout": acomp.checkOut,})
 
     apoios.sort(
-        key=lambda x: x["apoio"].dataInicio,
+        key=lambda x: x["apoio"].id,
         reverse=True)
 
     return render(request, "pessoa/dados_pessoa.html", {
@@ -148,10 +157,10 @@ def editar_pessoa_view(request, pk):
         'email_pessoa':pessoa.email_pessoa,
         'descricao_pessoa':pessoa.descricao_pessoa,
         #endereços:
-        'pais':pessoa.endereco.pais,
+        'pais':pessoa.endereco.bairro.cidade.estado.pais,
         'cep':pessoa.endereco.cep,
-        'estado':pessoa.endereco.estado,
-        'cidade':pessoa.endereco.cidade,
+        'estado':pessoa.endereco.bairro.cidade.estado,
+        'cidade':pessoa.endereco.bairro.cidade,
         'bairro':pessoa.endereco.bairro,
         'logradouro':pessoa.endereco.logradouro,
         'numero':pessoa.endereco.numero,
@@ -160,20 +169,20 @@ def editar_pessoa_view(request, pk):
     }
 
     form = CadastrarEditarPessoaForm(request.POST or None, initial=initial)
-    form_end = BrasilEndercoForm(request.POST or None, initial=initial)
+    form_end = EndercoForm(request.POST or None, initial=initial)
     
     if request.method == "POST" and form.is_valid() and form_end.is_valid():
         cd = form.cleaned_data
         cd_end = form_end.cleaned_data
 
         try:
-            endereco = editar_endereco(
+            endereco = editar_end_pessoa(
                 ed_endereco_id=pessoa.endereco.pk,
-                ed_pais = cd_end['pais'],
+                ed_pais = cd_end['pais'].pk,
                 ed_cep = cd_end['cep'],
-                ed_estado = cd_end['estado'],
-                ed_cidade = cd_end['cidade'],
-                ed_bairro = cd_end['bairro'],
+                ed_estado = cd_end['estado'].pk,
+                ed_cidade = cd_end['cidade'].pk,
+                ed_bairro = cd_end['bairro'].pk,
                 ed_logradouro = cd_end['logradouro'],
                 ed_numero = cd_end['numero'],
                 ed_complemento = cd_end['complemento'],
@@ -195,10 +204,19 @@ def editar_pessoa_view(request, pk):
         except ValidationError as exc:
             for msg in exc.messages: messages.error(request, msg)
 
+    paises  = list(Pais.objects.values("id", "pais"))
+    estados = list(Estado.objects.values("id", "pais_id", "estado"))
+    cidades = list(Cidade.objects.values("id", "estado_id", "cidade"))
+    bairros = list(Bairro.objects.values("id", "cidade_id", "bairro"))
+
     return render(request, "pessoa/editar_pessoa.html", {
         "form": form,
         "form_end": form_end, 
-        "pessoa":pessoa})
+        "pessoa":pessoa,
+        "paises": paises,
+        "estados": estados,
+        "cidades": cidades,
+        "bairros": bairros,})
 
 
 

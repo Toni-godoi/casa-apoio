@@ -10,6 +10,7 @@ def cadastrar_quarto(
         *,
         identificacao:str,
         quantidadeVagas:int,
+        descricao:Optional[str]=None,
 )->Quarto:
     
     _valida_quarto(identificacao)
@@ -17,6 +18,7 @@ def cadastrar_quarto(
 
     quarto = Quarto(
         identificacao=identificacao,
+        descricao = descricao,
         quantidadeVagas=quantidadeVagas,
         dataCadastro_quarto=cadastro
     )
@@ -28,6 +30,7 @@ def editar_quarto(
         *,
         ed_quarto_id:int,
         ed_identificacao:str,
+        ed_descricao:Optional[str]=None,
         ed_quantidadeVagas:int
 ):
     
@@ -43,6 +46,8 @@ def editar_quarto(
         campos_alterados.append("Quantidade vagas")
         quarto.quantidadeVagas = qtd_vagas
         quarto.vagasLivres = vagas_livres
+    if quarto.descricao != ed_descricao:
+        quarto.descricao = ed_descricao
     
     quarto.save()
     return quarto

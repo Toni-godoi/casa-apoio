@@ -9,7 +9,8 @@ def encerrar_apoios_sem_hospedagem():
     hoje = timezone.localdate()
     apoios = Apoio.objects.filter(
         status=True,
-        dataInicio=hoje,
+        previsaoFim_tipo="HOJE",
+        dataInicio__lt=hoje,
         checkOut__isnull=True
     ).select_related("paciente")
 

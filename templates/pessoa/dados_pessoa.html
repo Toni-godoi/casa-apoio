@@ -110,7 +110,7 @@
                     <div class="col d-flex flex-column justify-content-start m-0 p-0">
                         <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
                             <div class="col-1 d-flex flex-column justify-content-start m-0 p-0"><small
-                                    class="text-dark-emphasis m-0 p-0">País</small><span class="fw-medium">{{ pessoa.endereco.pais }}</span>
+                                    class="text-dark-emphasis m-0 p-0">País</small><span class="fw-medium">{{ pessoa.endereco.bairro.cidade.estado.pais }}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
                             <div class="col-2 d-flex flex-column justify-content-start m-0 p-0"><small
@@ -119,12 +119,12 @@
                                 <hr class="m-0 p-0 me-3">
                             </div>
                             <div class="col-2 d-flex flex-column justify-content-start m-0 p-0"><small
-                                    class="text-dark-emphasis m-0 p-0">Estado</small><span class="fw-medium">{{ pessoa.endereco.estado }}</span>
+                                    class="text-dark-emphasis m-0 p-0">Estado</small><span class="fw-medium">{{ pessoa.endereco.bairro.cidade.estado }}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
                             <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
                                     class="text-dark-emphasis m-0 p-0">Cidade</small><span
-                                    class="fw-medium">{{ pessoa.endereco.cidade }}</span>
+                                    class="fw-medium">{{ pessoa.endereco.bairro.cidade }}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
                             <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
@@ -140,7 +140,7 @@
                                 <hr class="m-0 p-0 me-3">
                             </div>
                             <div class="col-1 d-flex flex-column justify-content-start m-0 p-0"><small
-                                    class="text-dark-emphasis m-0 p-0">Número</small><span class="fw-medium">{{ pessoa.endereco.numero }}</span>
+                                    class="text-dark-emphasis m-0 p-0">Número</small><span class="fw-medium">{{ pessoa.endereco.numero | default:" - " }}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
                             <div class="col d-flex flex-column justify-content-start m-0 p-0"><small

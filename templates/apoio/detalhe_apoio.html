@@ -12,7 +12,9 @@
                 {% if apoio.checkOut %}
                 <a href="{% url 'apoio:relatorio_apoio' apoio.id %}" class="btn btn-primary bg-success border-0" type="button">Gerar relatório</a>
                 {% endif %}
+                {% if not apoio.checkOut %}
                 <a href="{% url 'apoio:editar_apoio' apoio.id %}" class="btn btn-primary bg-primary border-0" type="button">Editar apoio</a>
+                {% endif %}
             </div>
         </div>
         <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
@@ -91,7 +93,20 @@
                                 {{ apoio.motivo }}</span>
                         <hr class="m-0 p-0 me-3">
                     </div>
+                    <div class="col-4 d-flex flex-column justify-content-start m-0 p-0"><small class="text-dark-emphasis m-0 p-0">Anexo</small>
+                        {% if anexo %}
+                        {% for arquivo in anexo %}
+                        <div class="d-flex flex-row gap-1 m-0 p-0">
+                            <a href="{{ arquivo.arquivo.url }}" target="_blank" class="d-flex align-items-center m-0 p-0">{{ arquivo.nome_arquivo }}</a>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <span class="fw-medium">Sem anexo</span>
+                        {% endif %}
+                        <hr class="m-0 p-0 me-3" />
+                    </div>
                 </div>
+                {% if not apoio.checkOut %}
                 <div class="d-flex flex-row gap-2 rounded-1 border-1 border-secondary-subtle m-0 p-2">
                     <form method="post" action="{% url 'apoio:checkin_paciente' apoio.id %}">
                         {% csrf_token %}
@@ -102,6 +117,7 @@
                         <button class="btn btn-primary link-dark bg-warning border-0 m-0 p-1" type="submit">Check-Out paciente</button>
                     </form>
                 </div>
+                {% endif %}
             </div>
         </div>
         <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3 pb-2">
@@ -115,11 +131,12 @@
                     <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
                             class="text-dark-emphasis m-0 p-0">Acompanhante atual</small>
                             {% if apoio.acompanhante_atual %}
-                            <a href="{% url 'pessoa:dados_pessoa' apoio.paciente.id %}" class="fw-medium">{{ apoio.acompanhante_atual.nomeAcompanhante}}</a>
+                            <a href="{% url 'pessoa:dados_pessoa' apoio.acompanhante_atual.id %}" class="fw-medium">{{ apoio.acompanhante_atual.nomeAcompanhante}}</a>
                             {% else %}
                             <span class="fw-medium"> - </span>
                             {% endif %}
                         <hr class="m-0 p-0 me-3">
+                        {% if not apoio.checkOut %}
                         <div class="d-flex flex-row gap-2 m-0 p-0 mt-2">
                             <form method="post" action="{% url 'apoio:adicionar_acompanhante' apoio.id %}">
                                 {% csrf_token %}
@@ -130,6 +147,7 @@
                                 <button class="btn btn-primary link-dark bg-warning border-0 m-0 p-1" type="submit">Check-out atual</button>
                             </form>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="row d-flex flex-column m-0 p-2">

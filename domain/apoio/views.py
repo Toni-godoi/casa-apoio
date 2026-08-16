@@ -24,7 +24,7 @@ def iniciar_apoio_view(request):
     acompanhantes = Pessoa.objects.all()
     solicitantes = SolicitantePessoa.objects.all()
 
-    form = IniciarApoioForm(request.POST or None)
+    form = IniciarApoioForm(request.POST or None, request.FILES or None)
     form.fields["paciente"].choices = [("", "Digite um nome")]+[(p.id, p.nome_pessoa)for p in pacientes]
     form.fields["solicitante"].choices = [("", "Digite um nome")]+[(p.id, p.pessoa)for p in solicitantes]
     form.fields["acompanhante"].choices = [("", "Digite um nome")]+[(p.id, p.nome_pessoa)for p in acompanhantes]
@@ -41,7 +41,10 @@ def iniciar_apoio_view(request):
     precisa_hospedagem = tipo in ["INDETERMINADO", "DATA"]
 
     if request.method == "POST" and form.is_valid():
+                
+        anexo_apoio = form.cleaned_data.get("anexo")
         cd = form.cleaned_data
+
         try:
             apoio = iniciar_apoio(
                 #casa_apoio
@@ -57,7 +60,9 @@ def iniciar_apoio_view(request):
                 solicitante_id=cd["solicitante"] if cd.get("solicitante") else None,
                 descHospedagem=cd.get("descHospedagem", ""),
                 quarto_id=cd["quarto"].pk if cd.get("quarto") else None,
-                inicio_alocacao=cd["data_inicio"]
+                inicio_alocacao=cd["data_inicio"],
+                nome_anexo=cd['nome_anexo'],
+                anexo=anexo_apoio
             )
             return redirect("apoio:detalhe", pk=apoio.pk)
         
@@ -71,9 +76,50 @@ def iniciar_apoio_view(request):
         "precisa_hospedagem": precisa_hospedagem})
 
 @login_required
+def adicionar_acompanhante_view(request, pk):
+    apoio = get_object_or_404(Apoio, pk=pk, status=True)
+    form = AdicionarAcompanhante(request.POST or None)
+
+    acompanhantes = Pessoa.objects.all()
+    form.fields["acompanhante"].choices = [("", "Digite um nome")]+[(p.id, p.nome_pessoa)for p in acompanhantes]
+
+    if request.method == "POST" and form.is_valid():
+        cd = form.cleaned_data
+
+        acompanhante = cd.get("acompanhante")
+
+        if not acompanhante:
+            messages.error(request, "Selecione um acompanhante")
+            return render(request, "apoio/adicionar_acompanhante.html", {
+                "form": form,
+                "apoio":apoio
+            })
+        try:
+            vincular_acompanhante(
+                apoio=apoio,
+                acompanhante_id=cd["acompanhante"] if cd.get("acompanhante") else None,
+                tipoVinculo_acompanhante=cd.get("tipoVinculo_acompanhante", ""),
+                descricao_vinculo=cd.get("descricao_vinculo", ""),
+            )
+            return redirect("apoio:detalhe", pk=apoio.pk)
+        except ValidationError as exc:
+            for msg in exc.messages:
+                messages.error(request, msg)
+
+    return render(request, "apoio/adicionar_acompanhante.html", {
+        "form": form,
+        "apoio": apoio
+    })
+
+@login_required
 def detalhe_apoio_view(request, pk):
     apoio = get_object_or_404(Apoio, pk=pk)
-    return render(request, "apoio/detalhe_apoio.html", {"apoio": apoio, "hospedagem": getattr(apoio, "hospedagem", None)})
+    anexo = apoio.apoio_anexo.all()
+
+    return render(request, "apoio/detalhe_apoio.html", 
+                  {"apoio": apoio, 
+                   "anexo": anexo, 
+                   "hospedagem": getattr(apoio, "hospedagem", None)})
 
 @login_required
 def checkin_apoio_view(request, pk):
@@ -96,38 +142,6 @@ def checkout_apoio_view(request, pk):
         for msg in exc.messages:
             messages.error(request, msg)
     return redirect("apoio:detalhe", pk=pk)
-
-@login_required
-def adicionar_acompanhante_view(request, pk):
-    apoio = get_object_or_404(Apoio, pk=pk, status=True)
-    form = AdicionarAcompanhante(request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        cd = form.cleaned_data
-        acompanhante = cd.get("acompanhante")
-        if not acompanhante:
-            messages.error(request, "Selecione um acompanhante")
-            return render(request, "apoio/adicionar_acompanhante.html", {
-                "form": form,
-                "apoio":apoio
-            })
-        try:
-            vincular_acompanhante(
-                apoio=apoio,
-                acompanhante_id=acompanhante.pk,
-                tipoVinculo_acompanhante=cd.get("tipoVinculo_acompanhante", ""),
-                descricao_vinculo=cd.get("descricao_vinculo", ""),
-            )
-            messages.success(request, "Acompanhante adicionado com sucesso.")
-            return redirect("apoio:detalhe", pk=apoio.pk)
-        except ValidationError as exc:
-            for msg in exc.messages:
-                messages.error(request, msg)
-
-    return render(request, "apoio/adicionar_acompanhante.html", {
-        "form": form,
-        "apoio": apoio
-    })
 
 @login_required
 def checkout_acompanhante_view(request, pk):
@@ -171,6 +185,9 @@ def editar_apoio_view(request, pk):
             if atual:
                 quarto_obj = atual.quarto
 
+    anexo = apoio.apoio_anexo.all()
+    anexo_atual = apoio.apoio_anexo.first()
+    
     initial = {
         "motivo_apoio": apoio.motivo,
         "previsaoFim_tipo": apoio.previsaoFim_tipo,
@@ -178,17 +195,18 @@ def editar_apoio_view(request, pk):
         "solicitante": apoio.solicitante.pk if apoio.solicitante else None,
         "descHospedagem": getattr(apoio, "hospedagem", None) and apoio.hospedagem.observacao,
         "quarto": quarto_obj,
+        "nome_anexo": anexo_atual.nome_arquivo if anexo_atual else "",
     }
 
     solicitantes = SolicitantePessoa.objects.all()
 
-    form = EditarApoioForm(request.POST or None, initial=initial)
-
+    form = EditarApoioForm(request.POST or None, request.FILES or None, initial=initial)
     form.fields["solicitante"].choices = [("", "Digite um nome")]+[(p.id, p.pessoa)for p in solicitantes]
 
     if request.method == "POST" and form.is_valid():
+        anexo_apoio = form.cleaned_data.get("anexo")
+        remover_anexo = request.POST.get("remover_anexo") == "1"
         cd = form.cleaned_data
-
         try:
             editar_apoio(
                 apoio_id=apoio.pk,
@@ -198,9 +216,11 @@ def editar_apoio_view(request, pk):
                 solicitante_id=cd["solicitante"] if cd.get("solicitante") else None,
                 descHospedagem=cd.get("descHospedagem"),
                 quarto_id=cd["quarto"].pk if cd.get("quarto") else None,
-                inicio_alocacao=cd["inicio_alocacao"]
+                inicio_alocacao=cd["inicio_alocacao"],
+                ed_anexo=anexo_apoio,
+                remover_anexo=remover_anexo,
+               nome_anexo=cd.get("nome_anexo"),
             )
-
             messages.success(request, "Apoio atualizado com sucesso")
             return redirect("apoio:detalhe", pk=apoio.pk)
 
@@ -211,6 +231,8 @@ def editar_apoio_view(request, pk):
     return render(request, "apoio/editar_apoio.html", {
         "form": form,
         "apoio": apoio,
+        "anexo": anexo,
+        "anexo_atual": anexo_atual,
         "quarto_selecionado": quarto_obj
     })
 

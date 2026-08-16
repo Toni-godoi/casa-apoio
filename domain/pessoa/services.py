@@ -6,7 +6,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from datetime import date, time, datetime, timedelta
 from domain.pessoa.models import Pessoa, PessoaEditada, FotoPerfilPessoa
-from domain.endereco.models import Endereco
+from domain.endereco.models import Endereco, Pais, Estado, Cidade, Bairro
 
 @transaction.atomic
 def cadastrar_pessoa(

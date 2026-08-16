@@ -1,40 +1,40 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-<div class="container-fluid">
-    <div class="mb-4">
-        <small class="text-muted">Quarto > Cadastrar quarto</small>
-        <h1 class="fw-bold mt-2">Cadastrar quarto</h1>
-    </div>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-danger">
-                {{ message }}
+<body class="d-flex flex-row m-0 p-0">
+    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+        <form class="d-flex flex-column" method="post">
+            {% csrf_token %}
+            <div class="row m-0 p-0">
+                <div class="col m-0 p-2"><small class="m-0 p-0">Quarto &gt; novo quarto</small>
+                    <h2 class="fw-bold">Cadastrar quarto</h2>
+                </div>
+                <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
+                    <button class="btn btn-primary bg-success border-0" type="submit">Salvar</button>
+                    <a href="{% url 'quarto:quartos_ativos' %}" class="btn btn-primary bg-dark border-0" type="submit">Cancelar</a>
+                </div>
             </div>
-        {% endfor %}
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        <div class="card border-primary shadow-sm">
-            <div class="card-header bg-primary-subtle">
-                <strong>Dados do quarto</strong>
-            </div>
-            <div class="card-body">
-                <div class="row g-3 align-items-start">
-                    <div class="col-md-8">
-                        <label class="form-label">* Identificação do quarto:</label>
-                        {{ form.identificacao }}
+            <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+                <div class="col border rounded-2 m-0 p-0">
+                    <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                        <div class="col">
+                            <div class="fs-5 fw-bold"><span class="m-0 p-0">Dados do quarto</span></div>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">* Quantidade de vagas:</label>
-                        {{ form.quantidadeVagas }}
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2"><small class="text-dark-emphasis m-0 p-0">Identificação</small>
+                            {{ form.identificacao }}
+                        </div>
+                        <div class="col-2 d-flex flex-column justify-content-start m-0 p-2"><small class="text-dark-emphasis m-0 p-0">Qtd. Vagas</small>
+                            {{ form.quantidadeVagas }}
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small class="text-dark-emphasis m-0 p-0">Descrição ao quarto</small>
+                            {{ form.descricao }}
+                        </div>
                     </div>
                 </div>
-            </div>    
-        </div>
-        <div class="mt-4 d-flex gap-2">
-            <button class="btn btn-primary">Salvar</button>
-            <a href="{% url 'quarto:quartos_ativos' %}"class="btn btn-light border">Cancelar</a>
-        </div>
-    </form>
-</div>
+            </div>
+        </form>
+    </div>
+</body>
 {% endblock %}

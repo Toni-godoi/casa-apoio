@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-
 <body class="d-flex justify-content-start m-0 p-0">
     <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
         <div class="row m-0 p-0">
@@ -26,9 +25,8 @@
                     <span class="fw-medium m-0 p-0">Total de vagas: {{ quarto.quantidadeVagas }}</span>
                     <span class="fw-medium m-0 p-0"><strong>Vagas livres: {{ quarto.vagasLivres }}</strong></span>
                 </div>
-                <div class="d-flex flex-row justify-content-center align-items-center gap-2 m-0 p-0 mt-1 pt-2">
+                <div class="d-flex flex-column justify-content-center align-items-center gap-2 m-0 p-0 mt-1 pt-2">
                     <a href="{% url 'quarto:detalhe_quarto' quarto.id %}" class="btn btn-primary m-0 p-1" type="button">Acessar</a>
-                    <button class="btn btn-primary link-dark bg-warning border-0 m-0 p-1" type="button">Reserva</button>
                 </div>
             </div>
             {% endfor %}

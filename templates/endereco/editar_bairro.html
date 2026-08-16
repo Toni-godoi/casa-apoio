@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<body class="d-flex flex-row m-0 p-0">
+    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+        <form class="d-flex flex-column" method="post">
+            {% csrf_token %}
+            <div class="row m-0 p-0">
+                <div class="col m-0 p-2"><small class="m-0 p-0">Cidade &gt; novo bairro</small>
+                    <h2 class="fw-bold">Editar bairro</h2>
+                    <h4 class="fw-bold">{{bairro.cidade}}</h4>
+                </div>
+                <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
+                    <button class="btn btn-primary bg-success border-0" type="submit">Salvar</button>
+                    <a href="{% url 'endereco:listar_bairros' cidade.pk %}" class="btn btn-primary bg-dark border-0" type="submit">Cancelar</a>
+                </div>
+            </div>
+            <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+                <div class="col border rounded-2 m-0 p-0">
+                    <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                        <div class="col">
+                            <div class="fs-5 fw-bold"><span class="m-0 p-0">Cidade</span></div>
+                        </div>
+                    </div>
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Cidade</small>
+                            {{ cidade.cidade }}
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Nome cidade</small>
+                            {{ form.bairro }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+{% endblock %}

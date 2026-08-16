@@ -2,63 +2,99 @@ from django import forms
 from django.utils import timezone
 from datetime import date, time, datetime, timedelta
 from django.core.exceptions import ValidationError
-from domain.endereco.models import Endereco
+from domain.endereco.models import Endereco, Pais, Estado, Cidade, Bairro
 from domain.endereco.services import buscar_endereco_cep
 
-CAMPOS_OBRIGATORIOS_BRASIL = ["cep", "estado", "cidade", "bairro", "logradouro"]
-SIGLAS_BRASIL = {sigla for sigla, _ in Endereco.ESTADO_CHOICES if sigla}
-
-class BrasilEndercoForm(forms.Form):
-
-    pais = forms.ChoiceField(
-        choices=[("","selecionar")] + Endereco.PAIS_CHOICES,
-        initial="BR",
-        label="Pais",
-        widget=forms.Select(
-            attrs={"class": "form-select"}),
-    )
-
-    cep = forms.CharField(
-        max_length=9,
-        required=False,
-        label="CEP",
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control",
-                "id": "id_cep",
-                "placeholder": "00000-000",
-                "maxlength": "9",
-            }
-        ),
-    )
-
-    estado = forms.ChoiceField(
-        choices=[("","selecionar")] + Endereco.ESTADO_CHOICES,
-        initial="",
-        required=False,
-        label="Estado",
-        widget=forms.Select(
-            attrs={"class": "form-select"}),
-    )
-
-    cidade = forms.CharField(
-        max_length=100,
-        required=False,
-        label="Cidade",
-        widget=forms.TextInput(attrs={
-            "class": "form-control",
-            "id": "id_cidade"}),
-    )
+class CadastrarEditarBairro(forms.Form):
 
     bairro = forms.CharField(
-        max_length=100,
-        required=False,
-        label="Bairro",
-        widget=forms.TextInput(attrs={
-            "class": "form-control",
-            "id": "id_bairro"}),
+            max_length=100,
+            widget=forms.TextInput(attrs={"class": "form-control"})
+        )
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
+
+class CadastrarCidade(forms.Form):
+
+    cidade = forms.CharField(
+            max_length=100,
+            widget=forms.TextInput(attrs={"class": "form-control"})
+        )
+
+    estado = forms.ModelChoiceField(
+            queryset=Estado.objects.all(),
+            empty_label="Selecione",
+            label="Estado",
+            widget=forms.Select(
+                attrs={"id": "id_estado", 
+                        "class": "form-select",
+                        "placeholder": "Selecione",}),
+            )
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
+
+class EndercoForm(forms.Form):
+
+    pais = forms.ModelChoiceField(
+        queryset=Pais.objects.all(),
+        empty_label="Selecione",
+        label="Pais",
+        widget=forms.Select(
+            attrs={"id": "id_pais", 
+                   "class": "form-select"}),
     )
 
+    estado = forms.ModelChoiceField(
+            queryset=Estado.objects.all(),
+            empty_label="Selecione",
+            required=False,
+            label="Estado",
+            widget=forms.Select(
+                attrs={"id": "id_estado", 
+                       "class": "form-select",
+                       "placeholder": "Selecione",}),
+        )
+
+    cidade = forms.ModelChoiceField(
+            queryset=Cidade.objects.all(),
+            empty_label="Selecione",
+            required=False,
+            label="Cidade",
+            widget=forms.Select(
+                attrs={
+                "id": "id_cidade",
+                "class": "form-select",}),
+        )
+
+    bairro = forms.ModelChoiceField(
+            queryset=Bairro.objects.all(),
+            empty_label="Selecione",
+            required=False,
+            label="Bairro",
+            widget=forms.Select(
+                attrs={
+                "id": "id_bairro",
+                "class": "form-select",}),
+        )   
+
+    cep = forms.CharField(
+            max_length=9,
+            required=False,
+            label="CEP",
+            widget=forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "id": "id_cep",
+                    "placeholder": "00000-000",
+                    "maxlength": "9",
+                }
+            ),
+        )
+    
     logradouro = forms.CharField(
         max_length=255,
         required=False,
@@ -95,45 +131,7 @@ class BrasilEndercoForm(forms.Form):
             "id": "id_descricao"}),
     )
 
-    class Meta:
-        model = Endereco
-        fields = [
-            "pais",
-            "cep",
-            "estado",
-            "cidade",
-            "bairro",
-            "logradouro",
-            "numero",
-            "complemento",
-            "descricao",
-        ]
- 
     def clean(self):
         cleaned_data = super().clean()
-        pais = cleaned_data.get("pais")
-        descricao = cleaned_data.get("descricao")
-
-        if pais == "BR":
-            # Obrigatoriedade dos campos brasileiros
-            for campo in CAMPOS_OBRIGATORIOS_BRASIL:
-                valor = cleaned_data.get(campo)
-                if not valor or not valor.strip():
-                    label = self.fields[campo].label
-                    self.add_error(
-                        campo,
-                        f"{label} é obrigatório para endereços no Brasil.",
-                    )
- 
-            # Valida que a sigla de estado é uma UF válida
-            estado = cleaned_data.get("estado", "")
-            if estado and estado.upper() not in SIGLAS_BRASIL:
-                self.add_error(
-                    "estado",
-                    "Selecione um estado válido.",
-                )
-        if pais != 'BR' and not descricao:
-            #self.add_error("Descreva o endereço estrangeiro")
-            raise ValidationError("Descreva o endereço estrangeiro")
-
+    
         return cleaned_data

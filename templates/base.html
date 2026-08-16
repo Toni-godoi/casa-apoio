@@ -50,6 +50,10 @@
                                         class="nav-link active link-light bg-transparent rounded-1 border-0 m-0 p-0"
                                         href="{% url 'apoio:listar_apoios' %}">Apoios ativos</a></li>
                                 <li class="nav-item bg-transparent w-100 m-0 p-0 pt-2"><a
+                                        class="nav-link active link-light bg-transparent rounded-1 border-0 m-0 p-0"
+                                        href="#">Agendamentos</a></li>
+                                <li class="nav-item bg-transparent w-100 m-0 p-0 pt-2">
+                                    <a
                                         class="nav-link active link-light bg-transparent border-0 m-0 p-0"
                                         href="{% url 'apoio:consultar_apoios' %}">Buscar apoio</a></li>
                                 <li class="nav-item bg-transparent w-100 m-0 p-0 pt-2"><a
@@ -77,7 +81,7 @@
                     <div class="d-inline w-100 m-0 p-0 pt-1" style="background: rgba(73,80,87,0);border-style: none;"><a
                             class="btn btn-primary border-0 border-black d-flex w-100 justify-content-start m-0 p-1 ps-2"
                             data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapse-3"
-                            href="#collapse-3" style="background: var(--bs-light-text-emphasis);">Solicitante</a>
+                            href="#collapse-3" style="background: var(--bs-light-text-emphasis);">Solicitações</a>
                         <div class="collapse w-100 m-0 p-0 ps-4 pe-3 pb-2" id="collapse-3">
                             <ul class="nav nav-tabs d-inline w-100 m-0 p-0">
                                 <li class="nav-item bg-transparent w-100 m-0 p-0 pt-2"><a
@@ -91,6 +95,9 @@
                                 <li class="nav-item bg-transparent w-100 m-0 p-0 pt-2"><a
                                         class="nav-link active link-light bg-transparent border-0 m-0 p-0"
                                         href="{% url 'solicitacao:listar_funcoes' %}">Tipos solicitantes</a></li>
+                                <li class="nav-item bg-transparent w-100 m-0 p-0 pt-2"><a
+                                        class="nav-link active link-light bg-transparent border-0 m-0 p-0"
+                                        href="{% url 'solicitacao:listar_funcoes' %}">Origens</a></li>
                             </ul>
                         </div>
                     </div>
@@ -105,7 +112,22 @@
                                         href="{% url 'quarto:quartos_ativos' %}">Painel de quartos</a></li>
                                 <li class="nav-item bg-transparent w-100 m-0 p-0 pt-2"><a
                                         class="nav-link active link-light bg-transparent border-0 m-0 p-0"
-                                        href="#">Cadastrar quarto</a></li>
+                                        href="{% url 'quarto:cadastrar_quarto' %}">Cadastrar quarto</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="d-inline w-100 m-0 p-0 pt-1" style="background: rgba(73,80,87,0);border-style: none;"><a
+                            class="btn btn-primary border-0 border-black d-flex w-100 justify-content-start m-0 p-1 ps-2"
+                            data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapse-4"
+                            href="#collapse-5" style="background: var(--bs-light-text-emphasis);">Endereços</a>
+                        <div class="collapse w-100 m-0 p-0 ps-4 pe-3 pb-2" id="collapse-5">
+                            <ul class="nav nav-tabs d-inline w-100 m-0 p-0">
+                                <li class="nav-item bg-transparent w-100 m-0 p-0 pt-2"><a
+                                        class="nav-link active link-light bg-transparent border-0 m-0 p-0"
+                                        href="{% url 'endereco:listar_enderecos' %}">Endereços</a></li>
+                                <li class="nav-item bg-transparent w-100 m-0 p-0 pt-2"><a
+                                        class="nav-link active link-light bg-transparent border-0 m-0 p-0"
+                                        href="#">Relatórios</a></li>
                             </ul>
                         </div>
                     </div>

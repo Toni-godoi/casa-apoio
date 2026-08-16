@@ -1,163 +1,167 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="container-fluid">
-    <div class="mb-4">
-        <small class="text-muted">Pessoa > Pessoas</small>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold m-0">Pessoas cadastradas</h1>
-            <a href="{% url 'pessoa:cadastrar_pessoa' %}" class="btn btn-primary">Cadastrar pessoa</a>
+<body class="d-flex flex-row m-0 p-0">
+    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+        <div class="row m-0 p-0">
+            <div class="col m-0 p-2"><small class="m-0 p-0">Pessoas &gt; buscar pessoa</small>
+                <h2 class="fw-bold">Buscar pessoa</h2>
+            </div>
+            <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2"><button class="btn btn-primary bg-primary border-0" type="button">Cadastrar pessoa</button></div>
         </div>
-    </div>
-    <div class="card border-primary shadow-sm mb-4">
-        <div class="card-header bg-primary-subtle d-flex justify-content-between align-items-center">
-            <strong>Filtros</strong>
-        </button>
-        </div>
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-danger md-4">
-            {{ message }}
-        </div>
-        {% endfor %}
-        {% endif %}
-        <div class="card-body bg-light">
-            <form method="get">
-                <div class="row g-3">
-                    <!-- DATA INICIAL -->
-                    <div class="col-md-4">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label">
-                                    Data de cadastro (inicial)
-                                </label>
-                                <input type="date" name="data_inicio" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">
-                                    Data de cadastro (final)
-                                </label>
-                                <input type="date" name="data_fim" class="form-control">
+        <form class="d-flex flex-column" method="get">
+            <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+                <div class="col border rounded-2 m-0 p-0">
+                    <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                        <div class="col">
+                            <div class="fs-5 fw-bold"><span class="m-0 p-0">Filtros de busca</span></div>
+                        </div>
+                    </div>
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Nome pessoa</small>
+                            <div class="input-group">
+                                <input class="border rounded-2 border-1 border-dark-subtle form-control m-0 p-1" type="text" name="nome">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
                             </div>
                         </div>
-                    </div>
-                    <!-- EMAIL -->
-                    <div class="col-md-4">
-                        <label class="form-label">
-                            Email da pessoa
-                        </label>
-                        <div class="input-group">
-                            <input type="text" name="email" class="form-control">
-                            <span class="input-group-text">
-                                <i class="bi bi-search"></i>
-                            </span>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">CPF</small>
+                            <div class="input-group">
+                                <input class="border rounded-2 border-1 border-dark-subtle form-control m-0 p-1" type="text" name="cpf">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                            </div> 
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Telefone</small>
+                            <div class="input-group">
+                                <input class="border rounded-2 border-1 border-dark-subtle form-control m-0 p-1" type="text" name="telefone">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                            </div> 
                         </div>
                     </div>
-                    <!-- CPF -->
-                    <div class="col-md-3">
-                        <label class="form-label">
-                            CPF
-                        </label>
-                        <div class="input-group">
-                            <input type="text" name="cpf" class="form-control">
-                            <span class="input-group-text">
-                                <i class="bi bi-search"></i>
-                            </span>
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start gap-2 m-0 p-2">
+                        <div class="col-4 border rounded-2 border-1 border-dark-subtle d-flex flex-column justify-content-around m-0 pb-1">
+                            <small class="text-dark-emphasis d-flex justify-content-center m-0 p-0">Período de cadastro (90 dias)</small>
+                            <hr class="m-0 p-0 me-3">
+                            <div class="d-flex flex-row justify-content-around m-0 p-0">
+                                <div class="d-flex flex-column m-0 p-0">
+                                    <small class="text-center text-dark-emphasis m-0 p-0">De</small>
+                                    <span class="fw-medium">
+                                        <input type="date" name="data_inicio" class="form-control">
+                                    </span>
+                                    </div>
+                                <div class="d-flex flex-column m-0 p-0">
+                                    <small class="text-center text-dark-emphasis m-0 p-0">a</small>
+                                    <span class="fw-medium">
+                                        <input type="date" name="data_fim" class="form-control">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Email</small>
+                            <div class="input-group">
+                                <input class="border rounded-2 border-1 border-dark-subtle form-control m-0 p-1" type="text" name="email">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                            </div> 
                         </div>
                     </div>
-                    <!-- TELEFONE -->
-                    <div class="col-md-3">
-                        <label class="form-label">
-                            Telefone
-                        </label>
-                        <div class="input-group">
-                            <input type="text" name="telefone" class="form-control">
-                            <span class="input-group-text">
-                                <i class="bi bi-search"></i>
-                            </span>
-                        </div>
-                    </div>
-                    <!-- NOME -->
-                    <div class="col-md-5">
-                        <label class="form-label">
-                            Nome da pessoa
-                        </label>
-                        <div class="input-group">
-                            <input type="text" name="nome" class="form-control">
-                            <span class="input-group-text">
-                                <i class="bi bi-search"></i>
-                            </span>
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start gap-2 m-0 p-1">
+                        <div class="col rounded-2 border-1 border-dark-subtle d-flex flex-column justify-content-around m-0">
+                            <div class="d-flex flex-row justify-content-start gap-2 m-0 p-0 mt-2">
+                                <button class="btn btn-primary fw-semibold link-dark bg-info border-0" type="submit">Buscar</button>
+                                <a href="{% url 'pessoa:listar_pessoas' %}" class="btn btn-primary link-dark bg-warning border-0" type="button">Limpar filtro</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- BOTÕES -->
-                <div class="mt-4 d-flex gap-3">
-                    <button type="submit" class="btn btn-info text-white px-4">
-                        Buscar
-                    </button>
-                    <a href="{% url 'pessoa:listar_pessoas' %}" class="btn btn-dark px-4">
-                        Limpar
-                    </a>
+            </div>
+        </form>
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+            <div class="col border rounded-2 m-0 p-0">
+                <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                    <div class="col">
+                        <div class="fs-5 fw-bold"><span class="m-0 p-0">Resultados</span></div>
+                    </div>
                 </div>
-            </form>
+                <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-2">
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        {% if pessoas %}
+                        <div class="mb-2">
+                            <input
+                                type="text"
+                                id="pesquisaPessoa"
+                                class="form-control"
+                                placeholder="Pesquisar...">
+                        </div>
+                        <div class="table-responsive m-0 p-0">
+                            <table class="table">
+                                <thead class="table-light m-0 p-0">
+                                    <tr class="justify-content-start">
+                                        <th class="table-primary m-0 p-0 ps-1">Nome</th>
+                                        <th class="table-primary m-0 p-0">CPF</th>
+                                        <th class="table-primary m-0 p-0">Cadastro</th>
+                                        <th class="table-primary m-0 p-0">Telefone</th>
+                                        <th class="table-primary m-0 p-0">Email</th>
+                                        <th class="table-primary m-0 p-0"></th>
+                                    </tr>
+                                </thead>
+                                {% for pessoa in pessoas %}
+                                <tbody class="flex-row linha-pessoa">
+                                    <tr class="m-0 p-0">
+                                        <td class="m-0 p-1">{{ pessoa.nome_pessoa }}</td>
+                                        <td class="m-0 p-1">{{ pessoa.cpf_pessoa }}</td>
+                                        <td class="m-0 p-1">{{ pessoa.dataCadastro | date:"d/m/Y" }}</td>
+                                        <td class="m-0 p-1">{{ pessoa.telefone_pessoa }}</td>
+                                        <td class="m-0 p-1">{{ pessoa.email_pessoa }}</td>
+                                        <td class="d-flex justify-content-end gap-1 m-0 p-1">
+                                            <a href="{% url 'pessoa:dados_pessoa' pessoa.id %}" class="btn btn-primary m-0 p-1" type="submit">Abrir</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                {% endfor %}
+                            </table>
+                        </div>
+                        {% else %}
+                        <Span class="m-0 p-0">Faça uma busca</Span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="card border-primary shadow-sm">
-        <div class="card-header bg-primary-subtle">
-            <strong>Cadastros</strong>
-        </div>
-        <div class="card-body bg-light">
-            <table class="table align-middle">
-                <thead>
-                    <tr class="border-primary">
-                        <th width="120"></th>
-                        <th>
-                            Nome
-                        </th>
-                        <th>
-                            CPF
-                        </th>
-                        <th>
-                            Data cadastro
-                        </th>
-                        <th>
-                            Telefone
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for pessoa in pessoas %}
-                    <tr class="border-primary">
-                        <!-- BOTÃO -->
-                        <td>
-                            <a href="{% url 'pessoa:dados_pessoa' pessoa.id %}"
-                                class="btn btn-info btn-sm text-white fw-semibold px-4 rounded-2">
-                                Ver
-                            </a>
-                        </td>
-                        <!-- NOME -->
-                        <td class="fw-semibold">
-                            {{ pessoa.nome_pessoa }}
-                        </td>
-                        <!-- CPF -->
-                        <td class="fw-semibold">
-                            {{ pessoa.cpf_pessoa }}
-                        </td>
-                        <!-- DATA -->
-                        <td class="fw-semibold">
-                            {{ pessoa.dataCadastro|date:"d M. Y" }}
-                        </td>
-                        <!-- TELEFONE -->
-                        <td class="fw-semibold">
-                            {{ pessoa.telefone_pessoa }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
+<script>
+    const pesquisa = document.getElementById('pesquisaPessoa');
 
+    pesquisa.addEventListener('input', function () {
 
+        const texto = this.value.toLowerCase().trim();
+
+        const linhas = document.querySelectorAll('.linha-pessoa');
+
+        linhas.forEach(function (linha) {
+
+            const conteudo = linha.textContent.toLowerCase();
+
+            if (conteudo.includes(texto)) {
+                linha.style.display = '';
+            } else {
+                linha.style.display = 'none';
+            }
+
+        });
+
+    });
+</script>
 {% endblock %}

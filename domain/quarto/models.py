@@ -9,6 +9,7 @@ class Quarto(models.Model):
     quantidadeVagas = models.IntegerField()
     vagasLivres = models.IntegerField(blank=True)
     dataCadastro_quarto = models.DateField()
+    descricao = models.CharField(max_length=200, blank=True, null=True)
     status = models.BooleanField(default=True, verbose_name="Quarto ativo")
 
     def clean(self):

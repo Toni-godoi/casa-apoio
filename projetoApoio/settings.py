@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+#from celery.schedules import crontab
 from dotenv import load_dotenv
 import os
 
@@ -202,3 +203,12 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
+"""
+CELERY_BEAT_SCHEDULE = {
+    "encerrar-apoios-meia-noite": {
+        "task": "domain.apoio.tasks.encerrar_apoios_sem_hospedagem",
+        "schedule": crontab(hour=0, minute=0),
+    },
+}
+"""

@@ -25,6 +25,8 @@ def iniciar_apoio(
     descHospedagem:Optional[str]=None,
     quarto_id:Optional[int]=None,
     inicio_alocacao:Optional[date]=None,
+    nome_anexo:str,
+    anexo = None
 )->Apoio:
     
     paciente = _existe_pessoa(paciente_id, "Paciente")
@@ -51,6 +53,17 @@ def iniciar_apoio(
     )
 
     apoio.save()
+
+    if anexo:
+        if not nome_anexo:
+            raise ValidationError("Nome para o arquivo anexo é obrigatório")
+        else:
+            anexo = AnexoApoio(
+                apoio = apoio,
+                nome_arquivo = nome_anexo,
+                arquivo = anexo
+            )
+            anexo.save()
     
     if checkIn:
         checkIn_apoio(apoio.pk)
@@ -80,7 +93,7 @@ def iniciar_apoio(
 def vincular_acompanhante(
     *,
     apoio:Apoio,
-    acompanhante_id:Optional[int]=None,
+    acompanhante_id:int,
     tipoVinculo_acompanhante:str = "",
     descricao_vinculo:str = "",
 )->Acompanhante:
@@ -120,7 +133,10 @@ def editar_apoio(
     solicitante_id: int = None,
     descHospedagem: str = "",
     quarto_id: int = None,
-    inicio_alocacao:Optional[date]=None
+    inicio_alocacao:Optional[date]=None,
+    ed_anexo=None,
+    remover_anexo=False,
+    nome_anexo=str
 ):
 
     apoio = Apoio.objects.get(pk=apoio_id)
@@ -214,6 +230,26 @@ def editar_apoio(
                     inicio_alocacao=inicio_alocacao
                 )
     apoio.save()
+
+    anexo_atual = apoio.apoio_anexo.first()
+    if remover_anexo:
+        if anexo_atual:
+            anexo_atual.delete()
+    elif anexo_atual:
+        if ed_anexo:
+            # mudou o arquivo
+            anexo_atual.arquivo = ed_anexo
+        if nome_anexo:
+            # mudou o nome ou manteve o nome informado
+            anexo_atual.nome_arquivo = nome_anexo
+        anexo_atual.save()
+    elif ed_anexo:
+        # não existia anexo e foi enviado um novo
+        AnexoApoio.objects.create(
+            apoio=apoio,
+            arquivo=ed_anexo,
+            nome_arquivo=nome_anexo
+        )
     return apoio
     
 @transaction.atomic
@@ -309,10 +345,10 @@ def checkOut_apoio(apoio_id:int):
         inicio_apoio=apoio.dataInicio,
         checkIn_paciente=apoio.checkIn,
         encerramento_apoio=apoio.checkOut,
-        pais=apoio.paciente.endereco.pais,
+        pais=apoio.paciente.endereco.bairro.cidade.estado.pais,
         cep=apoio.paciente.endereco.cep,
-        estado=apoio.paciente.endereco.estado,
-        cidade=apoio.paciente.endereco.cidade,
+        estado=apoio.paciente.endereco.bairro.cidade.estado,
+        cidade=apoio.paciente.endereco.bairro.cidade,
         bairro=apoio.paciente.endereco.bairro,
         logradouro=apoio.paciente.endereco.logradouro,
         numero=apoio.paciente.endereco.numero,

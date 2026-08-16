@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<body class="d-flex flex-row m-0 p-0">
+    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+        <div class="row m-0 p-0">
+            <div class="col m-0 p-2"><small class="m-0 p-0">Endereço &gt; Endereços</small>
+                <h2 class="fw-bold">Endereços</h2>
+            </div>
+            <div class="col d-flex justify-content-end align-items-center gap-2 m-0 p-2"></div>
+        </div>
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3 pt-2 pb-2">
+            <div class="col border rounded-1 border-2 m-1 p-1">
+                {% if paises %}
+                <div class="mb-2">
+                    <input
+                        type="text"
+                        id="pesquisa"
+                        class="form-control"
+                        placeholder="Pesquisar...">
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead class="table-light">
+                            <tr class="justify-content-start">
+                                <th class="m-0 p-2 ps-1">
+                                    <button type="button" class="btn btn-primary fs-6 bg-primary border-0 m-0 p-1">Novo país</button>
+                                </th>
+                                <th class="m-0 p-2 ps-1">
+                                    <button type="button" class="btn btn-primary fs-6 bg-primary border-0 m-0 p-1">Novo estado</button>
+                                </th>
+                                <th class="m-0 p-2 ps-1">
+                                    <a href="{% url 'endereco:cadastrar_cidade' %}" type="button" class="btn btn-primary fs-6 bg-primary border-0 m-0 p-1">Nova cidade</a>
+                                </th>
+                                <th class="m-0 p-2 ps-1"></th>
+                            </tr>
+                            <tr class="justify-content-start">
+                                <th class="table-primary m-0 p-0 ps-1">País</th>
+                                <th class="table-primary m-0 p-0 ps-1">Estado/Província</th>
+                                <th class="table-primary m-0 p-0 ps-1">Cidade</th>
+                                <th class="table-primary m-0 p-0 ps-1"></th>
+                            </tr>
+                        </thead>
+                        {% for cidade in cidades %}
+                        <tbody class="flex-row linha-pesquisa">
+                            <tr class="m-0 p-0">
+                                <td class="m-0 p-1">{{ cidade.estado.pais }}</td>
+                                <td class="m-0 p-1">{{ cidade.estado }}</td>
+                                <td class="m-0 p-1">{{ cidade.cidade | default:"-" }}</td>
+                                <td class="d-flex justify-content-end gap-1 m-0 p-1">
+                                    <a href="{% url 'endereco:listar_bairros' cidade.id %}" class="btn btn-dark m-0 p-1" type="submit">Abrir</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        {% endfor %}
+                    </table>
+                </div>
+                {% else %}
+                    <span class="fw-medium">Sem registros</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
+<script>
+    const pesquisa = document.getElementById('pesquisa');
+
+    pesquisa.addEventListener('input', function () {
+
+        const texto = this.value.toLowerCase().trim();
+
+        const linhas = document.querySelectorAll('.linha-pesquisa');
+
+        linhas.forEach(function (linha) {
+
+            const conteudo = linha.textContent.toLowerCase();
+
+            if (conteudo.includes(texto)) {
+                linha.style.display = '';
+            } else {
+                linha.style.display = 'none';
+            }
+
+        });
+
+    });
+</script>
+{% endblock %}

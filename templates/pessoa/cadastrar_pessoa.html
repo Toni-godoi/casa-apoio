@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-
 <body class="d-flex flex-row m-0 p-0">
     <form class="d-flex flex-column w-100" method="post" enctype="multipart/form-data">
     {% csrf_token %}
@@ -84,22 +83,24 @@
                                     width="150" height="150"
                                     src="{% static 'assets/img/user.png' %}"
                                     style="object-fit: cover;">
+                                    {{ form.foto }}
+                            </div>
+                            <div class="d-flex flex-column justify-content-center gap-2 m-0 p-0">
+                                <div class="d-flex flex-row justify-content-center gap-2 m-0 p-0">
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary link-dark bg-warning border-0"
+                                        onclick="document.getElementById('id_foto').click()">
+                                        Upload
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary link-dark bg-info border-0"
+                                        onclick="abrirCamera()">
+                                        Câmera
+                                    </button>
                                 </div>
-                                {{ form.foto }}
-                            <div class="d-flex flex-row justify-content-center gap-2 m-0 p-0">
-                                <button
-                                    type="button"
-                                    class="btn btn-primary link-dark bg-warning border-0"
-                                    onclick="document.getElementById('id_foto').click()">
-                                    Upload
-                                </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-primary link-dark bg-info border-0"
-                                    onclick="abrirCamera()">
-                                    Câmera
-                                </button>
-                                <div id="camera-container" class="d-none flex-column align-items-center gap-2 mt-2">
+                                <div id="camera-container" class="d-none flex-row align-items-center gap-2 mt-2">
                                     <video
                                         id="camera"
                                         width="150"
@@ -128,6 +129,10 @@
                     </div>
                 </div>
             </div>
+            {{ paises|json_script:"paises-data" }}
+            {{ estados|json_script:"estados-data" }}
+            {{ cidades|json_script:"cidades-data" }}
+            {{ bairros|json_script:"bairros-data" }}
             <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
                 <div class="col border rounded-2 m-0 p-0">
                     <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
@@ -145,13 +150,17 @@
                                 class="text-dark-emphasis m-0 p-0">CEP</small>
                                 {{ form_end.cep }}
                         </div>
-                        <div class="col-2 d-flex flex-column justify-content-start m-0 p-2"><small
+                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2"><small
                                 class="text-dark-emphasis m-0 p-0">Estado</small>
                                 {{ form_end.estado }}
                         </div>
-                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
+                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2"><small
                                 class="text-dark-emphasis m-0 p-0">Cidade</small>
                                 {{ form_end.cidade }}
+                        </div>
+                        <div class="col-1 d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Número</small>
+                                {{ form_end.numero }}
                         </div>
                     </div>
                     <div
@@ -159,10 +168,6 @@
                         <div class="col-3 d-flex flex-column justify-content-start m-0 p-2"><small
                                 class="text-dark-emphasis m-0 p-0">Bairro</small>
                                 {{ form_end.bairro }}
-                        </div>
-                        <div class="col-1 d-flex flex-column justify-content-start m-0 p-2"><small
-                                class="text-dark-emphasis m-0 p-0">Número</small>
-                                {{ form_end.numero }}
                         </div>
                         <div class="col-2 d-flex flex-column justify-content-start m-0 p-2"><small
                                 class="text-dark-emphasis m-0 p-0">Complemento</small>
@@ -290,5 +295,141 @@ function fecharCamera() {
     container.classList.remove("d-flex");
     container.classList.add("d-none");
 }
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const paises  = JSON.parse(document.getElementById('paises-data').textContent);
+    const estados = JSON.parse(document.getElementById('estados-data').textContent);
+    const cidades = JSON.parse(document.getElementById('cidades-data').textContent);
+    const bairros = JSON.parse(document.getElementById('bairros-data').textContent);
+
+    const selPais    = document.getElementById('id_pais');
+    const selEstado  = document.getElementById('id_estado');
+    const selCidade  = document.getElementById('id_cidade');
+    const selBairro  = document.getElementById('id_bairro');
+    const camposTexto = ['id_cep', 'id_logradouro', 'id_numero', 'id_complemento']
+        .map(id => document.getElementById(id));
+
+    // Guarda seleção prévia (caso a página recarregue por erro de validação)
+    const valorEstadoInicial = selEstado.value;
+    const valorCidadeInicial = selCidade.value;
+    const valorBairroInicial = selBairro.value;
+
+    const choicesCidade = new Choices(selCidade, {
+        searchEnabled: true, itemSelectText: '', shouldSort: false,
+        placeholder: true, placeholderValue: 'Digite para buscar...'
+    });
+    const choicesBairro = new Choices(selBairro, {
+        searchEnabled: true, itemSelectText: '', shouldSort: false,
+        placeholder: true, placeholderValue: 'Digite para buscar...'
+    });
+
+    function resetarChoices(instancia, mensagem) {
+        instancia.clearStore();
+        instancia.setChoices(
+            [{ value: '', label: mensagem, selected: true, disabled: false }],
+            'value', 'label', true
+        );
+        instancia.disable();
+    }
+
+    function popularEstados(paisId, selecionar) {
+        selEstado.innerHTML = '<option value="">Selecione</option>';
+        estados
+            .filter(e => String(e.pais_id) === String(paisId))
+            .forEach(e => {
+                const opt = document.createElement('option');
+                opt.value = e.id;
+                opt.textContent = e.estado;
+                if (selecionar && String(e.id) === String(selecionar)) opt.selected = true;
+                selEstado.appendChild(opt);
+            });
+        selEstado.disabled = false;
+    }
+
+    function popularCidades(estadoId, selecionar) {
+        const opcoes = [{ value: '', label: 'Selecione', selected: !selecionar, disabled: false }];
+        cidades
+            .filter(c => String(c.estado_id) === String(estadoId))
+            .forEach(c => opcoes.push({
+                value: String(c.id), label: c.cidade,
+                selected: selecionar && String(c.id) === String(selecionar)
+            }));
+        choicesCidade.clearStore();
+        choicesCidade.setChoices(opcoes, 'value', 'label', true);
+        choicesCidade.enable();
+    }
+
+    function popularBairros(cidadeId, selecionar) {
+        const opcoes = [{ value: '', label: 'Selecione', selected: !selecionar, disabled: false }];
+        bairros
+            .filter(b => String(b.cidade_id) === String(cidadeId))
+            .forEach(b => opcoes.push({
+                value: String(b.id), label: b.bairro,
+                selected: selecionar && String(b.id) === String(selecionar)
+            }));
+        choicesBairro.clearStore();
+        choicesBairro.setChoices(opcoes, 'value', 'label', true);
+        choicesBairro.enable();
+    }
+
+    function ehBrasil(paisId) {
+        const pais = paises.find(p => String(p.id) === String(paisId));
+        return !!pais && pais.pais.trim().toLowerCase() === 'brasil';
+    }
+
+    function bloquearTudoMenosDescricao() {
+        selEstado.innerHTML = '<option value="">Selecione</option>';
+        selEstado.disabled = true;
+        resetarChoices(choicesCidade, 'Selecione o estado primeiro');
+        resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
+        camposTexto.forEach(el => { el.value = ''; el.disabled = true; });
+    }
+
+    function atualizarPorPais(selecionarEstado) {
+        const paisId = selPais.value;
+
+        if (!paisId) { bloquearTudoMenosDescricao(); return; }
+
+        if (ehBrasil(paisId)) {
+            popularEstados(paisId, selecionarEstado);
+            camposTexto.forEach(el => el.disabled = false);
+            if (!selecionarEstado) {
+                resetarChoices(choicesCidade, 'Selecione o estado primeiro');
+                resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
+            }
+        } else {
+            // Só "Descrição" fica liberado
+            bloquearTudoMenosDescricao();
+        }
+    }
+
+    selPais.addEventListener('change', () => atualizarPorPais(null));
+
+    selEstado.addEventListener('change', function () {
+        if (this.value) popularCidades(this.value, null);
+        else resetarChoices(choicesCidade, 'Selecione o estado primeiro');
+        resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
+    });
+
+    selCidade.addEventListener('change', function () {
+        const cidadeId = choicesCidade.getValue(true);
+        if (cidadeId) popularBairros(cidadeId, null);
+        else resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
+    });
+
+    // Estado inicial da página
+    bloquearTudoMenosDescricao();
+
+    if (selPais.value) {
+        atualizarPorPais(valorEstadoInicial);
+        if (valorEstadoInicial) {
+            popularCidades(valorEstadoInicial, valorCidadeInicial);
+            if (valorCidadeInicial) popularBairros(valorCidadeInicial, valorBairroInicial);
+        }
+    }
+});
 </script>
 {% endblock %}

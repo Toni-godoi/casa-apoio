@@ -91,6 +91,21 @@ class IniciarApoioForm(forms.Form):
         disabled=True
     )
 
+    nome_anexo = forms.CharField(
+            max_length=20,
+            required=False,
+            widget=forms.TextInput(attrs={"class": "form-control"})
+        )
+
+    anexo = forms.FileField(
+            required=False,
+            widget=forms.ClearableFileInput(attrs={
+                "id": "id_anexo",
+                "accept": "image/*,.pdf",
+                "capture": "environment",
+                "class": "d-none",})
+        )
+
     def clean(self):
         cleaned = super().clean()
         data_inicio = cleaned.get("data_inicio")
@@ -109,29 +124,30 @@ class IniciarApoioForm(forms.Form):
         if not fim_tipo:
             cleaned["previsaoFim_tipo"] = "HOJE"
         ####
+
         return cleaned
 
 class AdicionarAcompanhante(forms.Form):
     
-    acompanhante = forms.ModelChoiceField(
-        queryset=Pessoa.objects.all(),
-        required=False,
-        label="Acompanhante",
-        help_text="Selecione"
-    )
+    acompanhante = forms.ChoiceField(
+            required=False,
+            choices=[],
+            widget=forms.Select()
+        )
 
     tipoVinculo_acompanhante = forms.ChoiceField(
-        choices=[("","---------")] + Acompanhante.VINCULO_CHOICES,
-        required=False,
-        label="Vinculo do acompanhante com paciente"
-    )
+            choices=[('PAI_MAE', 'Pai ou Mãe'),('CONJUGUE', 'Conjugue'), ('OUTROS', 'Outros')],
+            label = "Previsão de encerramento",
+            required=False,
+            widget=forms.RadioSelect
+        )
 
     descricao_vinculo = forms.CharField(
-        max_length=300,
-        required=False,
-        label="Descrição de vinculo",
-        help_text="Obrigatório para outros tipos de vinculo"
-    )
+            max_length=300,
+            required=False,
+            label="Descrição do vínculo com paciente",
+            widget=forms.TextInput(attrs={"class": "form-control"})
+        )
 
 class EditarApoioForm(forms.Form):
 
@@ -178,3 +194,20 @@ class EditarApoioForm(forms.Form):
         label="Data de início para hospedagem de quarto",
         disabled=True
     )
+
+    nome_anexo = forms.CharField(
+                max_length=20,
+                required=False,
+                widget=forms.TextInput(attrs={"class": "form-control"})
+            )
+
+    anexo = forms.FileField(
+                required=False,
+                widget=forms.ClearableFileInput(attrs={
+                    "id": "id_anexo",
+                    "accept": "image/*,.pdf",
+                    "capture": "environment",
+                    "class": "d-none",})
+            )
+    def clean(self):
+        return super().clean()

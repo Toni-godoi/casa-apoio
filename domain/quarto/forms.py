@@ -7,9 +7,14 @@ class QuartoForm(forms.Form):
 
     identificacao = forms.CharField(
         max_length=20,
-        label="Nome completo",
+        label="Identificação",
         widget=forms.TextInput(attrs={"class": "form-control"})
     )
+
+    descricao = forms.CharField(
+            label="Descrição",
+            widget=forms.TextInput(attrs={"class": "form-control"})
+        )
 
     quantidadeVagas = forms.IntegerField(
         label="Quantidade de vagas",

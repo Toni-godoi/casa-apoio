@@ -8,29 +8,36 @@ from domain.quarto.services import cadastrar_quarto, editar_quarto, desativar_qu
 from domain.quarto.forms import QuartoForm
 
 # Create your views here.
-def designer(request):
-    return render(request, "quarto/designer.html")
-
 @login_required
 def cadastrar_quarto_view(request):
-
+    
     form = QuartoForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        cd = form.cleaned_data
-        try:
-            quarto = cadastrar_quarto(
-                identificacao=cd['identificacao'],
-                quantidadeVagas=cd['quantidadeVagas']
-            )
-            return redirect ("quarto:detalhe_quarto", quarto.pk)
-        
-        except ValidationError as exc:
-            for msg in exc.messages:
-                messages.error(request, msg)
+
+    if request.method == "POST":
+        print("POST RECEBIDO")
+        print("DADOS:", request.POST)
+
+        print("FORM VÁLIDO:", form.is_valid())
+        print("ERROS:", form.errors)
+
+        if form.is_valid():
+            print("FORM VÁLIDO")
+
+            cd = form.cleaned_data
+            try:
+                quarto = cadastrar_quarto(
+                    identificacao=cd['identificacao'],
+                    quantidadeVagas=cd['quantidadeVagas'],
+                    descricao=cd['descricao'],
+                )
+                return redirect ("quarto:detalhe_quarto", quarto.pk)
+            
+            except ValidationError as exc:
+                for msg in exc.messages:
+                    messages.error(request, msg)
 
     return render(request, "quarto/cadastrar_quarto.html", {"form": form,})
 
-"""
 @login_required
 def editar_quarto_view(request, pk):
 
@@ -38,7 +45,8 @@ def editar_quarto_view(request, pk):
 
     initial = {
         'identificacao':quarto.identificacao,
-        'quantidadeVagas':quarto.quantidadeVagas
+        'quantidadeVagas':quarto.quantidadeVagas,
+        'descricao':quarto.descricao
     }
 
     form = QuartoForm(request.POST or None, initial=initial)
@@ -48,6 +56,7 @@ def editar_quarto_view(request, pk):
             quarto = editar_quarto(
                 ed_quarto_id=quarto.pk,
                 ed_identificacao=cd['identificacao'],
+                ed_descricao=cd['descricao'],
                 ed_quantidadeVagas=cd['quantidadeVagas']
             )
             return redirect ("quarto:detalhe_quarto", quarto.pk)
@@ -57,7 +66,7 @@ def editar_quarto_view(request, pk):
                 messages.error(request, msg)
 
     return render(request, "quarto/cadastrar_quarto.html", {"form": form,})
-"""
+
 
 @login_required
 def listar_quartos_desativados_view(request):
@@ -88,26 +97,6 @@ def desativar_quarto_view(request, pk):
 def detalhe_quarto_view(request, pk):
     quarto = get_object_or_404(Quarto, pk=pk)
 
-    initial = {
-        'identificacao':quarto.identificacao,
-        'quantidadeVagas':quarto.quantidadeVagas
-    }
-    form = QuartoForm(request.POST or None, initial=initial)
-    if request.method == "POST" and form.is_valid():
-        cd = form.cleaned_data
-        try:
-            quarto = editar_quarto(
-                ed_quarto_id=quarto.pk,
-                ed_identificacao=cd['identificacao'],
-                ed_quantidadeVagas=cd['quantidadeVagas']
-            )
-            return redirect ("quarto:detalhe_quarto", quarto.pk)
-        
-        except ValidationError as exc:
-            for msg in exc.messages:
-                #messages.error(request, msg)
-                form.add_error(None, msg)
-
     alocacoes_ativas = quarto.quarto_alocacao.filter(fimLocacao__isnull=True)
     historico = quarto.quarto_alocacao.all().order_by("-inicioLocacao")
 
@@ -116,6 +105,5 @@ def detalhe_quarto_view(request, pk):
             "quarto": quarto,
             "alocacoes_ativas": alocacoes_ativas,
             "historico": historico,
-            "form":form
         }
     )

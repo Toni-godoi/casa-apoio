@@ -1,4 +1,6 @@
 from django.db import models
+import os
+from uuid import uuid4
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from domain.pessoa.models import Pessoa
@@ -148,6 +150,32 @@ class AlocacaoQuarto(models.Model):
     def alocacao_atual(self):
         return self.quarto_alocacao.filter(checkOut__isnull=True).first()
 
+##################################
+#CONTROLE DE UPLOADS DO APOIO
+##################################
+
+def caminho_upload(instance, filename):
+    extensao = os.path.splitext(filename)[1].lower()
+    agora = timezone.now()
+
+    IMAGENS = {".jpg", ".jpeg", ".png"}
+    ARQUIVOS = {".pdf"}
+    if extensao in IMAGENS:
+        pasta = f"uploads/imagens/{agora:%Y/%m}"
+    elif extensao in ARQUIVOS:
+        pasta = f"uploads/documentos/{agora:%Y/%m}"
+    else:
+        raise ValidationError("Fomato invalido")
+    return os.path.join(pasta, f"{uuid4()}{extensao}")
+
+class AnexoApoio(models.Model):
+    apoio = models.ForeignKey(Apoio, on_delete=models.CASCADE, related_name='apoio_anexo')
+    nome_arquivo = models.CharField(max_length=20, null=False, blank=False)
+    arquivo = models.FileField(upload_to=caminho_upload)
+
+    def __str__(self):
+        return f"{self.nome_arquivo}|apoio {self.apoio.id}"
+
 class AnexoAcompanhante(models.Model):
     EXTENSAO_CHOICES = [('PDF', 'Pdf'), ('FOTO', 'Foto')]
     acompanhante = models.OneToOneField(Acompanhante, on_delete=models.SET_NULL, null=True, blank=True, related_name="anexos")
@@ -174,18 +202,6 @@ class AnexoAcompanhante(models.Model):
 
     def __str__(self):
         return f"{self.nome}(apoio: {self.acomapanhante})"
-    
-class AnexoApoio(models.Model):
-    EXTENSAO_CHOICES = [('PDF', 'Pdf'), ('FOTO', 'Foto')]
-    apoio = models.ForeignKey(Apoio, on_delete=models.PROTECT, related_name="anexos")
-    nome = models.CharField(max_length=50)
-    tipo = models.CharField(max_length=10, choices=EXTENSAO_CHOICES, default='Pdf')
-    arquivo = models.FileField(upload_to="arquivos/apoios")
-    dataUpload = models.DateTimeField(auto_now_add=True)
-    dataAlteracao = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.nome}(apoio: {self.apoio})"
 
 
 

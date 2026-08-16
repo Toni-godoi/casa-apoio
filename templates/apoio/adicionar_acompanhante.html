@@ -1,39 +1,54 @@
 {% extends "base.html" %}
-
 {% block content %}
 
-<div class="container py-4">
-
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-danger">
-        {{ message }}
-    </div>
-    {% endfor %}
-    {% endif %}
-
-    <div class="card shadow border-0">
-        <div class="card-body p-4">
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h3 class="mb-1">Adicionar acompanhante</h3>
-                    <p class="text-muted mb-0">
-                        Paciente: <strong>{{ apoio }}</strong>
-                    </p>
+<body class="d-flex flex-row m-0 p-0">
+    <form class="d-flex flex-column w-100" method="post">
+    {% csrf_token %}
+    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+        <div class="row m-0 p-0">
+            <div class="col m-0 p-2"><small class="m-0 p-0">Apoios &gt; Adicionar/Editar acompanhante</small>
+                <h2 class="fw-bold">Adicionar acompanhante</h2>
+                <h4 class="fw-bold">Apoio de {{ apoio }} (nº {{apoio.id}})</h4>
+            </div>
+            <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
+                <button class="btn btn-primary bg-success border-0" type="submit">Salvar apoio</button>
+                <a href="{% url 'apoio:listar_apoios' %}" class="btn btn-primary bg-dark border-0" type="submit">Cancelar</a></div>
+        </div>
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
+            <div class="col border rounded-2 m-0 p-0">
+                <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
+                    <div class="col">
+                        <div class="fs-5 fw-bold"><span class="m-0 p-0">Informar acompanhante</span></div>
+                    </div>
+                </div>
+                <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-2">
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-dark-emphasis m-0 p-0">Nome</small>
+                            {{ form.acompanhante }}
+                    </div>
+                    <div class="col-2 d-flex flex-column justify-content-start m-0 p-2">
+                        <small class="text-dark-emphasis m-0 p-0">Tipo vínculo</small>
+                        <span class="fw-medium">{{ form.tipoVinculo_acompanhante }}</span>
+                    </div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
+                        class="text-dark-emphasis m-0 p-0">Descrição de vínculo com paciente</small>
+                        {{ form.descricao_vinculo }}
+                    </div>
                 </div>
             </div>
-
-            <form method="post">
-
-                {% csrf_token %}
-
-                {{ form.as_p }}
-
-                <div class="d-flex gap-2"> <a href="{% url 'apoio:detalhe' apoio.id %}"
-                        class="btn btn-outline-secondary"> Cancelar </a> <button type="submit" class="btn btn-primary">
-                        Salvar acompanhante </button> </div>
-            </form>
         </div>
     </div>
-</div>{% endblock %}
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    </form>
+</body>
+<script>
+    new TomSelect(
+        "#id_acompanhante",
+        {
+            create: false,
+            maxOptions: 10,
+            hideSelected: true,
+            openOnFocus: false,
+        });
+</script>
+{% endblock %}
