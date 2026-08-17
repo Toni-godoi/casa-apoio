@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-*-pf^13iz8qwpz2uac7zck$lr6pk-3*j(szrb+!ptdv-l7#@3s
 DEBUG = True
 
 LOGIN_URL = "autenticacao:login"
-LOGIN_REDIRECT_URL = "home"
+LOGIN_REDIRECT_URL = 'apoio:listar_apoios'
 
 ALLOWED_HOSTS = ['casadeapoio.local',
                  'localhost',
@@ -204,6 +204,9 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
 """
 CELERY_BEAT_SCHEDULE = {
     "encerrar-apoios-meia-noite": {

@@ -31,7 +31,7 @@ def login_view(request):
             )
         if usuario:
             login(request, usuario)
-            return redirect('home')
+            return redirect('apoio:listar_apoios')
         
         messages.error(request,'login ou senha inválidos')
     
