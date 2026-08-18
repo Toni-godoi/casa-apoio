@@ -33,7 +33,7 @@
                     <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
                             class="text-dark-emphasis m-0 p-0">Solicitante</small>
                         {% if apoio.solicitante %}
-                        <a href="{% url 'pessoa:dados_pessoa' apoio.paciente.id %}" class="fw-medium">
+                        <a href="{% url 'pessoa:dados_pessoa' apoio.solicitante.id %}" class="fw-medium">
                             {{apoio.solicitante }}</a>
                         {% else %}
                         <span class="fw-medium"> - </span>

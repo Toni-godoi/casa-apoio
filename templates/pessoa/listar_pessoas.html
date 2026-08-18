@@ -7,7 +7,9 @@
             <div class="col m-0 p-2"><small class="m-0 p-0">Pessoas &gt; buscar pessoa</small>
                 <h2 class="fw-bold">Buscar pessoa</h2>
             </div>
-            <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2"><button class="btn btn-primary bg-primary border-0" type="button">Cadastrar pessoa</button></div>
+            <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
+                <a href="{% url 'pessoa:cadastrar_pessoa' %}"class="btn btn-primary bg-primary border-0" type="submit">Cadastrar pessoa</a>
+            </div>
         </div>
         <form class="d-flex flex-column" method="get">
             <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">

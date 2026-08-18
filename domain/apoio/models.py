@@ -87,7 +87,7 @@ class HistoricoPacienteApoio(models.Model):
     encerramento_apoio = models.DateTimeField()
     pais = models.CharField(max_length=15, null=False, blank=False)
     cep = models.CharField(max_length=9)
-    estado = models.CharField(max_length=2, null=False, blank=False)
+    estado = models.CharField(max_length=20, null=False, blank=False)
     cidade = models.CharField(max_length=100, null=False, blank=False)
     bairro = models.CharField(max_length=100, null=False, blank=False)
     logradouro = models.CharField(max_length=200, null=False, blank=False)
