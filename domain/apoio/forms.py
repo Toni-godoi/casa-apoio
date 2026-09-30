@@ -4,7 +4,7 @@ from datetime import date, time, datetime, timedelta
 from domain.pessoa.models import Pessoa
 from domain.apoio.models import Apoio, Acompanhante
 from domain.quarto.models import Quarto
-from domain.solicitacao.models import SolicitantePessoa
+from domain.solicitante.models import SetorUnidadeSolicitante
 
 class IniciarApoioForm(forms.Form):
 
@@ -22,7 +22,7 @@ class IniciarApoioForm(forms.Form):
     )
 
     previsaoFim_tipo = forms.ChoiceField(
-        choices=[('HOJE', 'Hoje'),('DATA','Data'),('INDETERMINADO','Indeterminado')],
+        choices=[('INTRADIA', 'Intradia'),('DATA','Data'),('INDETERMINADO','Indeterminado')],
         required=False,
         label = "Previsão de encerramento",
         widget=forms.RadioSelect
@@ -39,6 +39,56 @@ class IniciarApoioForm(forms.Form):
         widget=forms.Select()
     )
 
+    origem = forms.ModelChoiceField(
+        queryset=SetorUnidadeSolicitante.objects.all(),
+        empty_label="Selecione",
+        label="Origem solicitação",
+        widget=forms.Select(attrs={"id": "id_origem", 
+                    "class": "form-select",
+                    "placeholder": "Selecione",}),
+    )
+
+    tratamento = forms.CharField(
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+
+    local_tratamento = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+
+    dataHora_tratamento = forms.DateTimeField(
+        required=False,
+        widget=forms.DateTimeInput(
+            format="%Y-%m-%dT%H:%M",
+            attrs={
+                "type": "datetime-local",
+                "class": "form-control",
+                }
+            )
+    )
+
+    contato_nome = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+
+    contato_telefone = forms.CharField(
+        max_length=16,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+
+    contato_descricao = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    
     checkIn = forms.BooleanField(
     required=False,
     label="Selecione se o paciente for fazer check-in agora",
@@ -63,12 +113,6 @@ class IniciarApoioForm(forms.Form):
         required=False,
         label="Descrição do vínculo com paciente",
         widget=forms.TextInput(attrs={"class": "form-control"})
-    )
-
-    solicitante = forms.ChoiceField(
-        required=False,
-        choices=[],
-        widget=forms.Select()
     )
 
     descHospedagem = forms.CharField(
@@ -122,7 +166,7 @@ class IniciarApoioForm(forms.Form):
         #Quarto so deve ser selecionado na edição do apoio
         fim_tipo = cleaned.get("previsaoFim_tipo")
         if not fim_tipo:
-            cleaned["previsaoFim_tipo"] = "HOJE"
+            cleaned["previsaoFim_tipo"] = "INTRADIA"
         ####
 
         return cleaned
@@ -157,8 +201,47 @@ class EditarApoioForm(forms.Form):
         widget=forms.TextInput(attrs={"class": "form-control"})
     )
 
+    tratamento = forms.CharField(
+            max_length=150,
+            required=False,
+            widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    
+    local_tratamento = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    
+    dataHora_tratamento = forms.DateTimeField(
+        required=False,
+        widget=forms.DateTimeInput(
+            format="%Y-%m-%dT%H:%M",
+            attrs={
+                "type": "datetime-local",
+                "class": "form-control",})
+    )
+
+    contato_nome = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    
+    contato_telefone = forms.CharField(
+        max_length=16,
+        required=False,
+         widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    
+    contato_descricao = forms.CharField(
+         max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+
     previsaoFim_tipo = forms.ChoiceField(
-        choices=[('HOJE', 'Hoje'),('DATA','Data'),('INDETERMINADO','Indeterminado')],
+        choices=[('INTRADIA', 'Intradia'),('DATA','Data'),('INDETERMINADO','Indeterminado')],
         label = "Previsão de encerramento",
         widget=forms.RadioSelect
     )
@@ -167,12 +250,6 @@ class EditarApoioForm(forms.Form):
         required=False,
         widget=forms.DateInput(attrs={"type":"date", "class": "form-control"}),
         label="Data de Nascimento"
-    )
-
-    solicitante = forms.ChoiceField(
-        required=False,
-        choices=[],
-        widget=forms.Select()
     )
 
     descHospedagem = forms.CharField(

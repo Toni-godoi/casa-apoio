@@ -1,7 +1,8 @@
 from django import forms
 from django.utils import timezone
 from datetime import date, time, datetime, timedelta
-from domain.pessoa.models import Pessoa, PessoaEditada
+from domain.pessoa.models import Pessoa, PessoaEditada, Deficiencia
+from domain.endereco.models import Pais
 
 class CadastrarEditarPessoaForm(forms.Form):
 
@@ -29,11 +30,14 @@ class CadastrarEditarPessoaForm(forms.Form):
     )
 
     nacionalidade_pessoa = forms.ChoiceField(
-        choices=[("","selecionar")] + Pessoa.PAIS_CHOICES,
-        label="Nacionalidade",
-        widget=forms.Select(attrs={"class": "form-select"})
+    label="Nacionalidade",
+    choices=[
+        (pais.nome_pais, pais.nome_pais)
+        for pais in Pais.objects.all()
+    ],
+    widget=forms.Select(attrs={"class": "form-select"})
     )
-
+    
     telefone_pessoa = forms.CharField(
         max_length=16,
         label="Telefone de contato",
@@ -51,6 +55,17 @@ class CadastrarEditarPessoaForm(forms.Form):
         required=False,
         label="Outras Informações",
         widget=forms.Textarea(attrs={"class": "form-control","rows": 2})
+    )
+
+    deficiencia = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+
+    tipos_deficiencias = forms.ModelMultipleChoiceField(
+        queryset=Deficiencia.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "d-flex flex-row gap-3"})
     )
 
     foto = forms.FileField(

@@ -11,34 +11,18 @@ from domain.apoio.forms import IniciarApoioForm, AdicionarAcompanhante, EditarAp
 from domain.apoio.models import Apoio
 from domain.quarto.models import Quarto
 from domain.pessoa.models import Pessoa
-from domain.solicitacao.models import SolicitantePessoa
 from domain.apoio.services import iniciar_apoio, editar_apoio, vincular_acompanhante, checkout_acompanhante, checkIn_apoio, checkOut_apoio
 
 # Create your views here. #Entoni
 @login_required
 def iniciar_apoio_view(request):
 
-    quarto_id = request.GET.get("quarto_id")
-    quarto_obj = None
     pacientes = Pessoa.objects.all()
     acompanhantes = Pessoa.objects.all()
-    solicitantes = SolicitantePessoa.objects.all()
 
     form = IniciarApoioForm(request.POST or None, request.FILES or None)
     form.fields["paciente"].choices = [("", "Digite um nome")]+[(p.id, p.nome_pessoa)for p in pacientes]
-    form.fields["solicitante"].choices = [("", "Digite um nome")]+[(p.id, p.pessoa)for p in solicitantes]
     form.fields["acompanhante"].choices = [("", "Digite um nome")]+[(p.id, p.nome_pessoa)for p in acompanhantes]
-
-    if quarto_id and request.method != "POST":
-        form.initial["quarto"] = quarto_id
-        quarto_obj = Quarto.objects.filter(pk=quarto_id).first()
-
-    tipo = None
-    if request.method == "POST":
-        tipo = request.POST.get("previsaoFim_tipo")
-    else:
-        tipo = request.GET.get("previsaoFim_tipo")
-    precisa_hospedagem = tipo in ["INDETERMINADO", "DATA"]
 
     if request.method == "POST" and form.is_valid():
                 
@@ -57,23 +41,23 @@ def iniciar_apoio_view(request):
                 acompanhante_id=cd["acompanhante"] if cd.get("acompanhante") else None,
                 tipoVinculo_acompanhante=cd.get("tipoVinculo_acompanhante", ""),
                 descricao_vinculo=cd.get("descricao_vinculo", ""),
-                solicitante_id=cd["solicitante"] if cd.get("solicitante") else None,
-                descHospedagem=cd.get("descHospedagem", ""),
-                quarto_id=cd["quarto"].pk if cd.get("quarto") else None,
-                inicio_alocacao=cd["data_inicio"],
                 nome_anexo=cd['nome_anexo'],
+                origem=cd['origem'].id,
+                contato_nome=cd['contato_nome'],
+                contato_telefone=cd['contato_telefone'],
+                contato_descricao=cd['contato_descricao'],
+                tratamento=cd['tratamento'],
+                local_tratamento=cd['local_tratamento'],
+                dataHora_tratamento=cd['dataHora_tratamento'],
                 anexo=anexo_apoio
             )
             return redirect("apoio:detalhe", pk=apoio.pk)
         
-        except ValidationError as exc:
-            for msg in exc.messages:
-                messages.error(request, msg)
+        except ValidationError as e:
+            form.add_error(None, e.message)
 
     return render(request, "apoio/iniciar_apoio.html", {
-        "form":form,
-        "quarto_selecionado": quarto_obj,
-        "precisa_hospedagem": precisa_hospedagem})
+        "form":form})
 
 @login_required
 def adicionar_acompanhante_view(request, pk):
@@ -102,9 +86,9 @@ def adicionar_acompanhante_view(request, pk):
                 descricao_vinculo=cd.get("descricao_vinculo", ""),
             )
             return redirect("apoio:detalhe", pk=apoio.pk)
-        except ValidationError as exc:
-            for msg in exc.messages:
-                messages.error(request, msg)
+
+        except ValidationError as e:
+            form.add_error(None, e.message)
 
     return render(request, "apoio/adicionar_acompanhante.html", {
         "form": form,
@@ -192,16 +176,18 @@ def editar_apoio_view(request, pk):
         "motivo_apoio": apoio.motivo,
         "previsaoFim_tipo": apoio.previsaoFim_tipo,
         "previsao_fim": apoio.previsaoFim,
-        "solicitante": apoio.solicitante.pk if apoio.solicitante else None,
+        "contato_nome":apoio.contato_nome,
+        "contato_telefone":apoio.contato_telefone,
+        "contato_descricao":apoio.contato_descricao,
+        "tratamento":apoio.tratamento,
+        "local_tratamento":apoio.local_tratamento,
+        "dataHora_tratamento":apoio.dataHora_tratamento,
         "descHospedagem": getattr(apoio, "hospedagem", None) and apoio.hospedagem.observacao,
         "quarto": quarto_obj,
         "nome_anexo": anexo_atual.nome_arquivo if anexo_atual else "",
     }
 
-    solicitantes = SolicitantePessoa.objects.all()
-
     form = EditarApoioForm(request.POST or None, request.FILES or None, initial=initial)
-    form.fields["solicitante"].choices = [("", "Digite um nome")]+[(p.id, p.pessoa)for p in solicitantes]
 
     if request.method == "POST" and form.is_valid():
         anexo_apoio = form.cleaned_data.get("anexo")
@@ -213,10 +199,15 @@ def editar_apoio_view(request, pk):
                 motivo_apoio=cd["motivo_apoio"],
                 previsaoFim_tipo=cd["previsaoFim_tipo"],
                 previsao_fim=cd.get("previsao_fim"),
-                solicitante_id=cd["solicitante"] if cd.get("solicitante") else None,
                 descHospedagem=cd.get("descHospedagem"),
                 quarto_id=cd["quarto"].pk if cd.get("quarto") else None,
                 inicio_alocacao=cd["inicio_alocacao"],
+                ed_contato_nome=cd['contato_nome'],
+                ed_contato_telefone=cd['contato_telefone'],
+                ed_contato_descricao=cd['contato_descricao'],
+                ed_tratamento=cd['tratamento'],
+                ed_local_tratamento=cd['local_tratamento'],
+                ed_dataHora_tratamento=cd['dataHora_tratamento'],
                 ed_anexo=anexo_apoio,
                 remover_anexo=remover_anexo,
                nome_anexo=cd.get("nome_anexo"),
@@ -238,7 +229,6 @@ def editar_apoio_view(request, pk):
 
 @login_required
 def listar_apoios_view(request):
-
     apoios = Apoio.objects.filter(
         status=True).order_by("-dataInicio")
     return render(request,"apoio/listar_apoios.html",{"apoios": apoios})
@@ -247,7 +237,6 @@ def listar_apoios_view(request):
 def consultar_apoios_view(request):
 
     paciente = request.GET.get("paciente")
-    solicitante = request.GET.get("solicitante")
     data_inicio = request.GET.get("data_inicio")
     data_fim = request.GET.get("data_fim")
     previsaoFim_tipo = request.GET.get("previsaoFim_tipo")
@@ -257,13 +246,11 @@ def consultar_apoios_view(request):
     checkOut_fim = request.GET.get("data_fim_checkOut")
 
     apoios = Apoio.objects.none()
-    if any([paciente, solicitante, data_inicio, data_fim, previsaoFim_tipo, checkIn_inicio, checkIn_fim, checkOut_inicio, checkOut_fim]):
+    if any([paciente, data_inicio, data_fim, previsaoFim_tipo, checkIn_inicio, checkIn_fim, checkOut_inicio, checkOut_fim]):
         
         apoios = Apoio.objects.all().order_by('-dataInicio')
         if paciente:
             apoios = apoios.filter(paciente__nome_pessoa__icontains=paciente)
-        if solicitante:
-            apoios = apoios.filter(solicitante__pessoa__nome_pessoa__icontains=solicitante)
         if previsaoFim_tipo:
             apoios = apoios.filter(previsaoFim_tipo__icontains=previsaoFim_tipo)
         if checkIn_inicio and checkIn_fim:

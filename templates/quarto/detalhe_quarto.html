@@ -33,7 +33,9 @@
                         </span>
                         <hr class="m-0 p-0 me-3">
                     </div>
-                    <div class="col-2 d-flex flex-column justify-content-start m-0 p-0"><small class="text-dark-emphasis m-0 p-0">Total de vagas</small><span class="fw-medium">{{ quarto.quantidadeVagas }}</span>
+                    <div class="col-2 d-flex flex-column justify-content-start m-0 p-0">
+                        <small class="text-dark-emphasis m-0 p-0">Total de vagas</small>
+                        <span class="fw-medium">{{ quarto.quantidadeVagas }}</span>
                         <hr class="m-0 p-0 me-3">
                     </div>
                     <div class="col-2 d-flex flex-column justify-content-start m-0 p-0"><small class="text-dark-emphasis m-0 p-0">Vagas livres</small>
@@ -44,13 +46,21 @@
                         {% endif %}
                         <hr class="m-0 p-0 me-3">
                     </div>
-                    <div class="col d-flex flex-column justify-content-start m-0 p-0"><small class="text-dark-emphasis m-0 p-0">Descrição</small><span class="fw-medium">{{ quarto.descricao | default:"-"  }}</span>
+                    <div class="col-2 d-flex flex-column justify-content-start m-0 p-0">
+                        <small class="text-dark-emphasis m-0 p-0">Cadastro</small>
+                        <span class="fw-medium">{{ quarto.dataCadastro_quarto | date:"d/m/Y"}}</span>
+                        <hr class="m-0 p-0 me-3">
+                    </div>
+                </div>
+                <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                    <div class="col d-flex flex-column justify-content-start m-0 p-0">
+                        <small class="text-dark-emphasis m-0 p-0">Descrição</small>
+                        <span class="fw-medium">{{ quarto.descricao | default:"-"  }}</span>
                         <hr class="m-0 p-0 me-3">
                     </div>
                 </div>
                 <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
                     <div class="col d-flex flex-column justify-content-start gap-1 m-0 p-0">
-                        <hr class="m-0 p-0 me-3">
                         <span class="fs-5 fw-medium">Hospedagens atuais</span>
                         {% if alocacoes_ativas %}
                         {% for alocacao in alocacoes_ativas %}

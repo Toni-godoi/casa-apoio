@@ -4,8 +4,8 @@ from django.core.exceptions import ValidationError
 from datetime import date, time, datetime, timedelta
 from domain.apoio.models import Apoio, Acompanhante, Hospedagem, AlocacaoQuarto, HistoricoPacienteApoio, AnexoAcompanhante, AnexoApoio
 from domain.pessoa.models import Pessoa
-from domain.solicitacao.models import SolicitantePessoa
 from domain.quarto.models import Quarto
+from domain.solicitante.models import UnidadeSolicitante, SetorUnidadeSolicitante
 from typing import Optional
     
 @transaction.atomic
@@ -14,44 +14,60 @@ def iniciar_apoio(
     #casa_apoio
     motivo_apoio:str,
     data_inicio:date,
-    previsaoFim_tipo:str = 'HOJE',
+    previsaoFim_tipo:str = 'INTRADIA',
     previsao_fim:Optional[date]=None,
     paciente_id:int,
     checkIn:bool = False,
     acompanhante_id:Optional[int]=None,
     tipoVinculo_acompanhante:str,
     descricao_vinculo:str,
-    solicitante_id:Optional[int]=None,
-    descHospedagem:Optional[str]=None,
-    quarto_id:Optional[int]=None,
-    inicio_alocacao:Optional[date]=None,
+    origem:int,
+    contato_nome:Optional[str]=None,
+    contato_telefone:Optional[str]=None,
+    contato_descricao:Optional[str]=None,
+    tratamento:Optional[str]=None,
+    local_tratamento:Optional[str]=None,
+    dataHora_tratamento:Optional[datetime]=None,
     nome_anexo:str,
     anexo = None
 )->Apoio:
     
     paciente = _existe_pessoa(paciente_id, "Paciente")
     _previsao_fim_data(previsaoFim_tipo, previsao_fim)
-
     if paciente:
         _validar_paciente_com_apoio(paciente_id, "Paciente")
         _validar_se_paciente_menor(paciente, acompanhante_id, tipoVinculo_acompanhante, descricao_vinculo)
+    
+    origem_valida = _existe_origem(origem)
+    if paciente.endereco.bairro.cidade != origem_valida.unidade_solicitante.endereco.bairro.cidade:
+        raise ValidationError("O paciente não pertence a mesma cidade de origem da solicitação")
 
-    apoio_hospedagem = _valida_solicitante_hospedagem(solicitante_id, previsaoFim_tipo)
+    if paciente.idade > 65 and not acompanhante_id:
+        if not contato_descricao or not contato_nome or not contato_telefone:
+            raise ValidationError("O paciente com +65 anos sem acompanhante precisa de dados completos de um segundo contato")
+    
+    numero_contato = None
+    if contato_telefone:
+        numero_contato = _valida_telefone(contato_telefone)
 
-    solicitante_pessoa = None
-    if solicitante_id:
-        solicitante_pessoa = _valida_solicitante_existe(solicitante_id)
-        
+    if not checkIn and not acompanhante_id:
+        raise ValidationError("O paciente ou um acompanhante precisa fazer Check-In para iniciar o apoio")
+    
     apoio = Apoio(
         motivo=motivo_apoio,
         paciente=paciente,
         dataInicio=data_inicio,
         previsaoFim_tipo=previsaoFim_tipo,
         previsaoFim=previsao_fim,
-        solicitante=solicitante_pessoa,
+        origem = origem_valida,
         status = True,
+        contato_nome = contato_nome,
+        contato_telefone = numero_contato,
+        contato_descricao = contato_descricao,
+        tratamento = tratamento,
+        local_tratamento = local_tratamento,
+        dataHora_tratamento = dataHora_tratamento
     )
-
     apoio.save()
 
     if anexo:
@@ -77,16 +93,6 @@ def iniciar_apoio(
             tipoVinculo_acompanhante=tipoVinculo_acompanhante,
             descricao_vinculo=descricao_vinculo
         )
-
-    #aqui vou criar evolução para hospedagem com base em previsãoFim_tipo.
-    if apoio_hospedagem == True:
-        _validar_quarto_ativo(quarto_id)
-        iniciar_hospedagem(
-            apoio=apoio,
-            descHospedagem=descHospedagem,
-            quarto_id=quarto_id,
-            inicio_alocacao=inicio_alocacao
-        )
     return apoio
 
 @transaction.atomic
@@ -107,7 +113,7 @@ def vincular_acompanhante(
         
     if not tipoVinculo_acompanhante:
         raise ValidationError("Informe o vinculo do acompanhante")
-    if tipoVinculo_acompanhante: 
+    if tipoVinculo_acompanhante:
         if tipoVinculo_acompanhante != 'OUTROS':
             descricao_vinculo = tipoVinculo_acompanhante
         if tipoVinculo_acompanhante == 'OUTROS' and not descricao_vinculo:
@@ -130,10 +136,15 @@ def editar_apoio(
     motivo_apoio: str,
     previsaoFim_tipo: str,
     previsao_fim,
-    solicitante_id: int = None,
     descHospedagem: str = "",
     quarto_id: int = None,
     inicio_alocacao:Optional[date]=None,
+    ed_contato_nome:Optional[str]=None,
+    ed_contato_telefone:Optional[str]=None,
+    ed_contato_descricao:Optional[str]=None,
+    ed_tratamento:Optional[str]=None,
+    ed_local_tratamento:Optional[str]=None,
+    ed_dataHora_tratamento:Optional[datetime]=None,
     ed_anexo=None,
     remover_anexo=False,
     nome_anexo=str
@@ -144,23 +155,30 @@ def editar_apoio(
         raise ValidationError("Apoio já finalizado não pode ser editado")
     
     hoje = timezone.localdate()
-    if previsaoFim_tipo == 'HOJE' and apoio.dataInicio != hoje:
+    if previsaoFim_tipo == 'INTRADIA' and apoio.dataInicio != hoje:
         raise ValidationError("Apoio ja recebeu HOSPEDAGEM. Defina tipo DATA e selecione a data para encerramento")
     
     _previsao_fim_data(previsaoFim_tipo, previsao_fim)
 
     # estado antes/depois
-    era_hospedagem = apoio.previsaoFim_tipo != "HOJE"
-    agora_hospedagem = previsaoFim_tipo != "HOJE"
+    era_hospedagem = apoio.previsaoFim_tipo != "INTRADIA"
+    agora_hospedagem = previsaoFim_tipo != "INTRADIA"
 
-    if not era_hospedagem and previsaoFim_tipo == "HOJE" and quarto_id:
-        raise ValidationError("Apoio que finaliza hoje não pode ter quarto")
+    if not era_hospedagem and previsaoFim_tipo == "INTRADIA" and quarto_id:
+        raise ValidationError("Apoio que finaliza no mesmo dia não pode ter quarto")
 
     #atualiza dados simples
+    numero_contato = _valida_telefone(ed_contato_telefone)
+
     apoio.motivo = motivo_apoio
     apoio.previsaoFim_tipo = previsaoFim_tipo
     apoio.previsaoFim = previsao_fim
-    apoio.solicitante_id = solicitante_id
+    apoio.tratamento = ed_tratamento
+    apoio.local_tratamento = ed_local_tratamento
+    apoio.dataHora_tratamento = ed_dataHora_tratamento
+    apoio.contato_nome = ed_contato_nome
+    apoio.contato_telefone = numero_contato
+    apoio.contato_descricao = ed_contato_descricao
 
     # NÃO ERA e agora VIROU HOSPEDAGEM
     if not era_hospedagem and agora_hospedagem:
@@ -371,7 +389,7 @@ def checkout_acompanhante(acompanhante_id:int):
 
 #Função quando chamada, encerra o apoio no horario definido - corrigir ainda
 def encerrar_apoio_automatico(apoio: Apoio) -> None:
-    if apoio.previsaoFim_tipo == 'HOJE' and apoio.status:
+    if apoio.previsaoFim_tipo == 'INTRADIA' and apoio.status:
         encerramento = datetime.combine(apoio.dataInicio, time(23,59,59))
         encerramento = timezone.make_aware(encerramento)
         apoio.fazer_checkout(momento=encerramento)
@@ -380,11 +398,24 @@ def encerrar_apoio_automatico(apoio: Apoio) -> None:
 #-- funções da regra de nogocio
 ###
 #verifica se a pessoa que vai assumir papel esta cadastrado no sistema
+def _valida_telefone(telefone:str)->str:
+
+    tel = ''.join(filter(str.isdigit, telefone))
+    if len(tel) not in [10,11]:
+        raise ValidationError("Telefone invalido")
+    return tel
+
 def _existe_pessoa(pessoa:int, papel:str) -> Pessoa:
     try:
         return Pessoa.objects.get(pk=pessoa)
     except Pessoa.DoesNotExist:
         raise ValidationError(f"Não foi possivel econtrar {pessoa} para {papel}")
+
+def _existe_origem(origem_id)-> SetorUnidadeSolicitante:
+    try: 
+        return SetorUnidadeSolicitante.objects.get(pk = origem_id)
+    except SetorUnidadeSolicitante.DoesNotExist:
+        raise ValidationError("Origem de solicitação não econtrada")
 
 #validação: tipo previsão de fim = DATA, precisa ser informado uma data para previsão de fim
 def _previsao_fim_data(tipo:str, fim_previsto:date)->None:
@@ -393,7 +424,7 @@ def _previsao_fim_data(tipo:str, fim_previsto:date)->None:
     if fim_previsto:
         if tipo == 'INDETERMINADO':
             raise ValidationError("apoio INDETERMINADO não se aplica data para fim")
-        if tipo == 'HOJE':
+        if tipo == 'INTRADIA':
             raise ValidationError("NÃO é necessário definir uma data para o apoio que encerra hoje")
 
     #tipo data precisa de uma data fornecida.
@@ -490,24 +521,6 @@ def _validar_acompanhante_livre(acompanhante_pk:int)->None:
 def _validar_apoioTem_acompanhante(apoio: Apoio)->None:
     if apoio.acompanhantes.filter(checkOut__isnull=True).exists():
         raise ValidationError("O apoio ja possui acompanhante")
-
-#validação: tipo Identerminado e Data correspondem a hospedagem. São obrigatórios terem solicitantes
-def _valida_solicitante_hospedagem(solicitante_id:int, tipo:str)->bool:
-    if tipo =='HOJE':
-        return False
-    if tipo == 'INDETERMINADO' or tipo == 'DATA':
-        if not solicitante_id:
-            raise ValidationError("Um apoio que precisa de hospedagem requer solicitante")
-    return True
-    
-def _valida_solicitante_existe(solicitante_pk:int)->SolicitantePessoa:
-    solicitante = SolicitantePessoa.objects.filter(
-        pk=solicitante_pk,
-    ).first()
-    if not solicitante:
-        raise ValidationError("Solicitante não existe")
-    
-    return solicitante
 ###
 #-- funções da regra de nogocio - HOSPEDAGENS
 ###

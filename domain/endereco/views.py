@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET, require_http_methods
-from domain.endereco.services import buscar_endereco_cep, cadastrar_cidade, cadastrar_bairro, editar_bairro
+from domain.endereco.services import cadastrar_cidade, cadastrar_bairro, editar_bairro
 from domain.endereco.models import Estado, Pais, Cidade, Bairro
 from domain.endereco.forms import CadastrarCidade, CadastrarEditarBairro
 
@@ -77,9 +77,9 @@ def w_cadastrar_cidade(request):
     return render(request, "endereco/cadastrar_cidade.html", {"form":form,"estados":estados})
 
 def listar_estados(request):
-    paises = Pais.objects.all().order_by("pais")
-    estados = Estado.objects.all().order_by("pais__pais", "estado")
-    cidades = Cidade.objects.all().order_by("estado__pais__pais", "estado__estado", "cidade")
+    paises = Pais.objects.all().order_by("nome_pais")
+    estados = Estado.objects.all().order_by("pais__nome_pais", "nome_estado")
+    cidades = Cidade.objects.all().order_by("estado__pais__nome_pais", "estado__nome_estado", "nome_cidade")
 
     return render(request, 
                   "endereco/listar_cidades.html",
@@ -89,7 +89,7 @@ def listar_estados(request):
 
 def listar_bairros(request, pk):
     cidade = get_object_or_404(Cidade, pk=pk)
-    bairros = cidade.cidade_bairro.all().order_by("bairro")
+    bairros = cidade.cidade_bairro.all().order_by("nome_bairro")
 
     return render(request, 
                   "endereco/listar_bairros.html",

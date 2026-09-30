@@ -3,7 +3,6 @@ from django.utils import timezone
 from datetime import date, time, datetime, timedelta
 from django.core.exceptions import ValidationError
 from domain.endereco.models import Endereco, Pais, Estado, Cidade, Bairro
-from domain.endereco.services import buscar_endereco_cep
 
 class CadastrarEditarBairro(forms.Form):
 
@@ -48,9 +47,7 @@ class EndercoForm(forms.Form):
                    "class": "form-select"}),
     )
 
-    estado = forms.ModelChoiceField(
-            queryset=Estado.objects.all(),
-            empty_label="Selecione",
+    estado = forms.CharField(
             required=False,
             label="Estado",
             widget=forms.Select(
@@ -58,10 +55,17 @@ class EndercoForm(forms.Form):
                        "class": "form-select",
                        "placeholder": "Selecione",}),
         )
+    
+    uf_estado = forms.CharField(
+    required=False,
+    widget=forms.TextInput(
+        attrs={
+            "class": "form-control",
+            "id": "id_uf_estado",
+            "readonly": "readonly",}),
+        )
 
-    cidade = forms.ModelChoiceField(
-            queryset=Cidade.objects.all(),
-            empty_label="Selecione",
+    cidade = forms.CharField(
             required=False,
             label="Cidade",
             widget=forms.Select(
@@ -70,9 +74,7 @@ class EndercoForm(forms.Form):
                 "class": "form-select",}),
         )
 
-    bairro = forms.ModelChoiceField(
-            queryset=Bairro.objects.all(),
-            empty_label="Selecione",
+    bairro = forms.CharField(
             required=False,
             label="Bairro",
             widget=forms.Select(
@@ -133,5 +135,4 @@ class EndercoForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-    
         return cleaned_data

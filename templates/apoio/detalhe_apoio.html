@@ -30,14 +30,9 @@
                         <a href="{% url 'pessoa:dados_pessoa' apoio.paciente.id %}" class="fw-medium">{{ apoio.paciente}}</a>
                         <hr class="m-0 p-0 me-3">
                     </div>
-                    <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
-                            class="text-dark-emphasis m-0 p-0">Solicitante</small>
-                        {% if apoio.solicitante %}
-                        <a href="{% url 'pessoa:dados_pessoa' apoio.solicitante.id %}" class="fw-medium">
-                            {{apoio.solicitante }}</a>
-                        {% else %}
-                        <span class="fw-medium"> - </span>
-                        {% endif %}
+                    <div class="col d-flex flex-column justify-content-start m-0 p-0">
+                        <small class="text-dark-emphasis m-0 p-0">Solicitante</small>
+                        <span class="fw-medium"> {{apoio.origem}} </span>
                         <hr class="m-0 p-0 me-3">
                     </div>
                     <div class="col d-flex flex-column justify-content-start m-0 p-0">
@@ -106,15 +101,52 @@
                         <hr class="m-0 p-0 me-3" />
                     </div>
                 </div>
+                <hr>
+                <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                    <div class="col d-flex flex-column justify-content-start m-0 p-0">
+                        <small class="text-dark-emphasis m-0 p-0">Tratamento</small>
+                        <span class="fw-medium">{{ apoio.tratamento | default:"-"}}</span>
+                        <hr class="m-0 p-0 me-3">
+                    </div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-0">
+                        <small class="text-dark-emphasis m-0 p-0">Local</small>
+                        <span class="fw-medium">{{ apoio.local_tratamento | default:"-"}}</span>
+                        <hr class="m-0 p-0 me-3">
+                    </div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-0">
+                        <small class="text-dark-emphasis m-0 p-0">Data/hora</small>
+                        <span class="fw-medium">{{ apoio.dataHora_tratamento |date:"d/m/Y H:i" | default:"-"}}</span>
+                        <hr class="m-0 p-0 me-3">
+                    </div>
+                </div>
+                <hr>
+                <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
+                    <span class="fw-medium">Contato de emergência: </span>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-0">
+                        <small class="text-dark-emphasis m-0 p-0">Nome</small>
+                        <span class="fw-medium">{{ apoio.contato_nome | default:"-"}}</span>
+                        <hr class="m-0 p-0 me-3">
+                    </div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-0">
+                        <small class="text-dark-emphasis m-0 p-0">Telefone</small>
+                        <span class="fw-medium">{{ apoio.contato_telefone | default:"-"}}</span>
+                        <hr class="m-0 p-0 me-3">
+                    </div>
+                    <div class="col d-flex flex-column justify-content-start m-0 p-0">
+                        <small class="text-dark-emphasis m-0 p-0">Descrição</small>
+                        <span class="fw-medium">{{ apoio.contato_descricao | default:"-"}}</span>
+                        <hr class="m-0 p-0 me-3">
+                    </div>
+                </div>
                 {% if not apoio.checkOut %}
                 <div class="d-flex flex-row gap-2 rounded-1 border-1 border-secondary-subtle m-0 p-2">
                     <form method="post" action="{% url 'apoio:checkin_paciente' apoio.id %}">
                         {% csrf_token %}
-                        <button class="btn btn-primary link-dark bg-info border-0 m-0 p-1" type="submit">Check-In paciente</button>
+                        <button class="btn btn-primary link-dark bg-info border-0 m-0 p-1" type="submit" onclick="return confimarChekinPaciente()">Check-In paciente</button>
                     </form>
                     <form method="post" action="{% url 'apoio:checkout_paciente' apoio.id %}">
                         {% csrf_token %}
-                        <button class="btn btn-primary link-dark bg-warning border-0 m-0 p-1" type="submit">Check-Out paciente</button>
+                        <button class="btn btn-primary link-dark bg-warning border-0 m-0 p-1" type="submit" onclick="return confimarChekoutPaciente()">Check-Out paciente</button>
                     </form>
                 </div>
                 {% endif %}
@@ -131,7 +163,7 @@
                     <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
                             class="text-dark-emphasis m-0 p-0">Acompanhante atual</small>
                             {% if apoio.acompanhante_atual %}
-                            <a href="{% url 'pessoa:dados_pessoa' apoio.acompanhante_atual.id %}" class="fw-medium">{{ apoio.acompanhante_atual.nomeAcompanhante}}</a>
+                            <a href="{% url 'pessoa:dados_pessoa' apoio.acompanhante_atual.nomeAcompanhante.id %}" class="fw-medium">{{ apoio.acompanhante_atual.nomeAcompanhante.nome_pessoa}}</a>
                             {% else %}
                             <span class="fw-medium"> - </span>
                             {% endif %}
@@ -259,4 +291,14 @@
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
+<script>
+function confimarChekoutPaciente() {
+    return confirm("Confirmar encerramento do apoio?");
+}
+</script>
+<script>
+function confimarChekinPaciente() {
+    return confirm("Confirmar Check-in do paciente?");
+}
+</script>
 {% endblock %}

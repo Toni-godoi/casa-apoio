@@ -35,8 +35,10 @@ LOGIN_REDIRECT_URL = 'apoio:listar_apoios'
 ALLOWED_HOSTS = ['casadeapoio.local',
                  'localhost',
                  '127.0.0.1',
+                 '0.0.0.0',
                  'auth.local',
-                 '192.168.0.4']
+                 '192.168.0.4',
+                 '172.28.131.80']
 
 #descomente e adicione a url
 #CSRF_TRUSTED_ORIGINS = [
@@ -58,7 +60,7 @@ INSTALLED_APPS = [
     'domain.casadeapoio',
     'domain.quarto',
     'domain.endereco',
-    'domain.solicitacao',
+    'domain.solicitante',
     'autenticacao'
 ]
 

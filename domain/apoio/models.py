@@ -5,21 +5,27 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from domain.pessoa.models import Pessoa
 from domain.quarto.models import Quarto
-from domain.solicitacao.models import SolicitantePessoa
+from domain.solicitante.models import SetorUnidadeSolicitante
 
 class Apoio(models.Model):
-    DATAFIM_CHOICES=[('HOJE', 'Hoje'),('DATA','Data'),('INDETERMINADO','Indeterminado')]
+    DATAFIM_CHOICES=[('INTRADIA', 'Intradia'),('DATA','Data'),('INDETERMINADO','Indeterminado')]
     motivo = models.CharField(max_length=500)
     paciente = models.ForeignKey(Pessoa, on_delete=models.PROTECT, related_name="pacientes")
-    solicitante = models.ForeignKey(SolicitantePessoa, on_delete=models.PROTECT, null=True, blank=True, related_name="solicitantes")
 #-- casaApoio = models.ForeignKey(CasaApoio,)
     dataInicio = models.DateField()
-    previsaoFim_tipo = models.CharField(max_length=50, choices=DATAFIM_CHOICES, default='HOJE')
+    previsaoFim_tipo = models.CharField(max_length=50, choices=DATAFIM_CHOICES, default='INTRADIA')
     previsaoFim = models.DateField(null=True, blank=True)
     checkIn = models.DateTimeField(null=True, blank=True)
     checkOut = models.DateTimeField(null=True, blank=True)
     status = models.BooleanField(default=True, verbose_name="Status do Apoio")
-
+    origem = models.ForeignKey(SetorUnidadeSolicitante, on_delete=models.PROTECT, related_name='unidadeSolicitante_apoio')
+    tratamento = models.CharField(max_length=150, blank=True, null=True)
+    local_tratamento = models.CharField(max_length=100, blank=True, null=True)
+    dataHora_tratamento = models.DateTimeField(null=True, blank=True)
+    contato_nome = models.CharField(max_length=100, blank=True, null=True)
+    contato_telefone = models.CharField(max_length=11, blank=True, null=True)
+    contato_descricao = models.CharField(max_length=100, blank=True, null=True)
+    
     def clean(self):
         agora = timezone.now()
 
@@ -33,7 +39,7 @@ class Apoio(models.Model):
             raise ValidationError("checkOut não tem data anterior a checkIn")
     
         if not self.previsaoFim_tipo:
-            self.previsaoFim_tipo = 'HOJE'
+            self.previsaoFim_tipo = 'INTRADIA'
 
         if self.previsaoFim_tipo == 'DATA':
             if not self.previsaoFim:

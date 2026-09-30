@@ -34,11 +34,11 @@
                             <tr class="m-0 p-0">
                                 <td class="m-0 p-1">{{ apoio.id }}</td>
                                 <td class="m-0 p-1">{{ apoio.paciente }}</td>
-                                <td class="m-0 p-1">{{ apoio.solicitante|default:"-" }}</td>
+                                <td class="m-0 p-1">-</td>
                                 <td class="m-0 p-1">{{ apoio.dataInicio|date:"j/n/Y" }}</td>
                                 <td class="m-0 p-1">
-                                    {% if apoio.previsaoFim_tipo == "HOJE" %}
-                                    <span class="badge bg-secondary">Hoje</span>
+                                    {% if apoio.previsaoFim_tipo == "INTRADIA" %}
+                                    <span class="badge bg-secondary">Intradia</span>
                                     {% elif apoio.previsaoFim_tipo == "DATA" %}
                                     <span class="badge bg-info">Até {{ apoio.previsaoFim }}</span>
                                     {% else %}

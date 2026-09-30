@@ -9,6 +9,7 @@
                 <h2 class="fw-bold">{{pessoa.nome_pessoa}}</h2>
             </div>
             <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
+                <a href="{% url 'apoio:iniciar' %}" class="btn btn-primary bg-success border-0" type="submit">Novo apoio</a>
                 <a href="{% url 'pessoa:editar_pessoa' pessoa.id %}" class="btn btn-primary bg-primary border-0" type="submit">Editar pessoa</a>
             </div>
         </div>
@@ -74,7 +75,7 @@
                             </div>
                             <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
                                     class="text-dark-emphasis m-0 p-0">Nacionalidade</small><span
-                                    class="fw-medium">{{ pessoa.get_nacionalidade_pessoa_display }}</span>
+                                    class="fw-medium">{{ pessoa.nacionalidade_pessoa }}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
                             <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
@@ -89,6 +90,21 @@
                                     class="fw-medium">{{ pessoa.email_pessoa|default:"-" }}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
+                            <div class="col d-flex flex-column justify-content-start m-0 p-0">
+                                <small class="text-dark-emphasis m-0 p-0">Deficiências: </small>
+                                {% if deficiencias %}
+                                <div class="d-flex flex-row flex-wrap gap-2">
+                                {% for item in deficiencias %}
+                                <span class="fw-medium">{{ item.deficiencia}}, </span>
+                                {% endfor %}
+                                </div>
+                                {% else %}
+                                <span class="fw-medium">Não possui</span>
+                                {% endif %}
+                                <hr class="m-0 p-0 me-3">
+                            </div>
+                        </div>
+                        <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
                             <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
                                     class="text-dark-emphasis m-0 p-0">Observações</small>
                                     <span class="fw-medium">{{ pessoa.descricao_pessoa|default:"Sem observações" }}</span>
@@ -110,7 +126,7 @@
                     <div class="col d-flex flex-column justify-content-start m-0 p-0">
                         <div class="row rounded-1 border-1 border-secondary-subtle m-0 p-2">
                             <div class="col-1 d-flex flex-column justify-content-start m-0 p-0"><small
-                                    class="text-dark-emphasis m-0 p-0">País</small><span class="fw-medium">{{ pessoa.endereco.bairro.cidade.estado.pais }}</span>
+                                    class="text-dark-emphasis m-0 p-0">País</small><span class="fw-medium">{{ pessoa.endereco.bairro.cidade.estado.pais.nome_pais }}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
                             <div class="col-2 d-flex flex-column justify-content-start m-0 p-0"><small
@@ -118,18 +134,19 @@
                                     class="fw-medium">{{ pessoa.endereco.cep }}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
-                            <div class="col-2 d-flex flex-column justify-content-start m-0 p-0"><small
-                                    class="text-dark-emphasis m-0 p-0">Estado</small><span class="fw-medium">{{ pessoa.endereco.bairro.cidade.estado }}</span>
+                            <div class="col-2 d-flex flex-column justify-content-start m-0 p-0">
+                                <small class="text-dark-emphasis m-0 p-0">Estado</small>
+                                    <span class="fw-medium">{{ pessoa.endereco.bairro.cidade.estado.nome_estado }}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
                             <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
                                     class="text-dark-emphasis m-0 p-0">Cidade</small><span
-                                    class="fw-medium">{{ pessoa.endereco.bairro.cidade }}</span>
+                                    class="fw-medium">{{ pessoa.endereco.bairro.cidade.nome_cidade }}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
                             <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
                                     class="text-dark-emphasis m-0 p-0">Bairro</small><span
-                                    class="fw-medium">{{ pessoa.endereco.bairro }}</span>
+                                    class="fw-medium">{{ pessoa.endereco.bairro.nome_bairro }}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
                         </div>
@@ -145,7 +162,7 @@
                             </div>
                             <div class="col d-flex flex-column justify-content-start m-0 p-0"><small
                                     class="text-dark-emphasis m-0 p-0">Complemento</small>
-                                    <span class="fw-medium">{{ pessoa.endereco.complemento }}</span>
+                                    <span class="fw-medium">{{ pessoa.endereco.complemento | default:" - "}}</span>
                                 <hr class="m-0 p-0 me-3">
                             </div>
                         </div>

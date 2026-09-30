@@ -5,7 +5,7 @@ from validate_docbr import CPF
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from datetime import date, time, datetime, timedelta
-from domain.pessoa.models import Pessoa, PessoaEditada, FotoPerfilPessoa
+from domain.pessoa.models import Pessoa, PessoaEditada, FotoPerfilPessoa, DeficienciaPessoa
 from domain.endereco.models import Endereco, Pais, Estado, Cidade, Bairro
 
 @transaction.atomic
@@ -19,8 +19,10 @@ def cadastrar_pessoa(
     telefone_pessoa:str,
     email_pessoa:Optional[str]=None,
     descricao_pessoa:Optional[str]=None,
-    endereco_pessoa=Endereco,
-    foto_perfil=None
+    endereco_pessoa:Endereco,
+    deficiencia=bool,
+    tipos_deficiencias=None,
+    foto_perfil=None,
 )->Pessoa:
     
     nome_pessoa = _valida_nome(nome_pessoa)
@@ -45,9 +47,18 @@ def cadastrar_pessoa(
         dataCadastro = cadastro,
         email_pessoa = email_pessoa,
         descricao_pessoa = descricao_pessoa,
-        endereco = endereco
+        endereco = endereco,
+        deficiencia = deficiencia,
     )
     pessoa.save()
+
+    if deficiencia:
+        if tipos_deficiencias:
+            for defic in tipos_deficiencias:
+                DeficienciaPessoa.objects.create(
+                    pessoa = pessoa,
+                    deficiencia = defic,
+                )
 
     if foto_perfil:
         foto = FotoPerfilPessoa(
@@ -68,6 +79,8 @@ def editar_pessoa(
     ed_nacionalidade_pessoa:str,
     ed_telefone_pessoa:str,
     ed_email_pessoa:Optional[str]=None,
+    ed_deficiencia=bool,
+    ed_tipos_deficiencias=None,
     ed_descricao_pessoa:Optional[str]=None,
     ):
 
@@ -118,7 +131,20 @@ def editar_pessoa(
         campos_alterados.append("Outras Informações")
         pessoa.descricao_pessoa = ed_descricao_pessoa
 
+    if pessoa.deficiencia != ed_deficiencia:
+        pessoa.deficiencia = ed_deficiencia
+    
     pessoa.save()
+
+    DeficienciaPessoa.objects.filter(pessoa=pessoa).delete()
+    if pessoa.deficiencia and not ed_tipos_deficiencias:
+        raise ValidationError("Selecione as deficiencias da pessoa")
+    if pessoa.deficiencia and ed_tipos_deficiencias:
+        for defic in ed_tipos_deficiencias:
+            DeficienciaPessoa.objects.create(
+                pessoa = pessoa,
+                deficiencia = defic
+            )
 
     #registra os campos modificados na tabela de dados do usuário modificados
     if campos_alterados:

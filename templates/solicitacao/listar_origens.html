@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<body class="d-flex flex-row m-0 p-0">
+    <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
+        <div class="row m-0 p-0">
+            <div class="col m-0 p-2"><small class="m-0 p-0">Solicitantes &gt; Origens</small>
+                <h2 class="fw-bold">Origens de solicitação</h2>
+            </div>
+            <div class="col d-flex justify-content-end align-items-center m-0 p-2"><button class="btn btn-primary bg-primary border-0" type="button">Cadastrar origem</button></div>
+        </div>
+        <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3 pt-2 pb-2">
+            <div class="col d-flex flex-column gap-2 m-0 p-0 ps-2 pe-2">
+                {% if origens %}
+                {% for origem in origens %}
+                <div class="row bg-secondary-subtle border rounded-3 border-1 border-primary d-flex w-100 flex-row m-0 p-0 pt-1 pb-1">
+                    <div class="col d-flex flex-row align-items-center m-0 p-0 ps-1 pe-1">
+                        <span class="fs-5 fw-normal">{{origem.nome_unidade}}</span>
+                    </div>
+                    <div class="col fs-4 d-flex flex-row justify-content-end m-0 p-0 ps-1 pe-1">
+                        <button class="btn btn-primary bg-primary rounded-4 border-0" type="button">Ver</button>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="col d-flex flex-row align-items-center m-0 p-0 ps-1 pe-1">
+                    <span class="fs-4 fw-normal">{{origem.nome_unidade}}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
+{% endblock %}

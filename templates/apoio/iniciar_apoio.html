@@ -15,6 +15,15 @@
                         type="submit">Cancelar</a>
                 </div>
             </div>
+             <div class="row m-0 p-0">
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger" style="color: red; background-color: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                    {% for error in form.non_field_errors %}
+                    <p style="margin: 0;">⚠️ {{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
             <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
                 <div class="col border rounded-2 m-0 p-0">
                     <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
@@ -29,10 +38,10 @@
                             {{ form.paciente }}
                         </div>
                         <div class="col d-flex flex-column justify-content-start m-0 p-2">
-                            <small class="text-dark-emphasis m-0 p-0">Solicitante apoio</small>
-                            {{ form.solicitante }}
+                            <small class="text-dark-emphasis m-0 p-0">Origem da solicitação</small>
+                            {{form.origem}}
                         </div>
-                        <div class="col-3 d-flex flex-column m-0 p-1">
+                        <div class="col d-flex flex-column m-0 p-1">
                             <small class="text-dark-emphasis m-0 p-0">Data início</small>
                             <span class="fw-medium">{{ form.data_inicio }}</span>
                         </div>
@@ -47,6 +56,38 @@
                             {{ form.motivo_apoio }}
                         </div>
                     </div>
+                    <hr>
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                        <div class="col-5 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Tratamento</small>
+                            <span class="fw-medium">{{ form.tratamento }}</span>
+                        </div>
+                        <div class="col-4 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Local de Tratamento</small>
+                            <span class="fw-medium">{{ form.local_tratamento }}</span>
+                        </div>
+                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Horário de Tratamento</small>
+                            <span class="fw-medium">{{ form.dataHora_tratamento }}</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                        <span class="fw-medium">Dados de contato de emergência: </span>
+                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Telefone: </small>
+                            <span class="fw-medium">{{ form.contato_telefone }}</span>
+                        </div>
+                        <div class="col-4 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Nome do contato: </small>
+                            <span class="fw-medium">{{ form.contato_nome }}</span>
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Descrição do contato: </small>
+                            <span class="fw-medium">{{ form.contato_descricao }}</span>
+                        </div>
+                    </div>
+                    <hr>
                     <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-start align-items-start m-0 p-1">
                         <div class="col-3 d-flex flex-column gap-2 m-0 p-1">
                             <small class="text-dark-emphasis m-0 p-0">Anexo (apenas 1 arquivo)</small>
@@ -78,8 +119,7 @@
                             <div class="fs-5 fw-bold"><span class="m-0 p-0">Informar acompanhante</span></div>
                         </div>
                     </div>
-                    <div
-                        class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-2">
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-2">
                         <div class="col d-flex flex-column justify-content-start m-0 p-2">
                             <small class="text-dark-emphasis m-0 p-0">Nome</small>
                             {{ form.acompanhante }}
@@ -102,16 +142,6 @@
 <script>
     new TomSelect(
         "#id_paciente",
-        {
-            create: false,
-            maxOptions: 10,
-            hideSelected: true,
-            openOnFocus: false,
-        });
-</script>
-<script>
-    new TomSelect(
-        "#id_solicitante",
         {
             create: false,
             maxOptions: 10,

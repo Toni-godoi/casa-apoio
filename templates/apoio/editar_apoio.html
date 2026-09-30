@@ -21,22 +21,47 @@
                         </div>
                     </div>
                     <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
-                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small class="text-dark-emphasis m-0 p-0">Solicitante apoio</small>
-                            {{ form.solicitante }}
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small class="text-dark-emphasis m-0 p-0">Origem de solicitação do apoio</small>
+                            {{apoio.origem}}
                         </div>
-                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small class="text-dark-emphasis m-0 p-0">Duração do apoio</small>
-                            <span class="fw-medium">
-                                {{ form.previsaoFim_tipo }}
-                            </span>
-                        </div>
-                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2"><small class="text-dark-emphasis m-0 p-0">Data prev. encerramento</small>
-                            <span class="fw-medium">{{ form.previsao_fim }}</span></div>
                     </div>
                     <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
                         <div class="col d-flex flex-column justify-content-start m-0 p-2"><small class="text-danger m-0 p-0">Descrição do apoio</small>
                             {{ form.motivo_apoio }}
                         </div>
                     </div>
+                    <hr>
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                        <div class="col-5 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Tratamento</small>
+                            <span class="fw-medium">{{ form.tratamento }}</span>
+                        </div>
+                        <div class="col-4 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Local de Tratamento</small>
+                            <span class="fw-medium">{{ form.local_tratamento }}</span>
+                        </div>
+                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Horário de Tratamento</small>
+                            <span class="fw-medium">{{ form.dataHora_tratamento }}</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                        <span class="fw-medium">Dados de contato de emergência: </span>
+                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Telefone: </small>
+                            <span class="fw-medium">{{ form.contato_telefone }}</span>
+                        </div>
+                        <div class="col-4 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Nome do contato: </small>
+                            <span class="fw-medium">{{ form.contato_nome }}</span>
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Descrição do contato: </small>
+                            <span class="fw-medium">{{ form.contato_descricao }}</span>
+                        </div>
+                    </div>
+                    <hr>
                     <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-start align-items-start m-0 p-1">
                         <div class="col-3 d-flex flex-column gap-2 m-0 p-1">
                             <small class="text-dark-emphasis m-0 p-0">Anexo (apenas 1 arquivo)</small>
@@ -111,7 +136,17 @@
                             <small class="text-dark-emphasis m-0 p-0">Observações para hospedagem</small>
                             {{ form.descHospedagem }}
                         </div>
-                        <div class="col-3 d-flex flex-column justify-content-start m-0 p-2">
+                    </div>
+                    <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Duração do apoio</small>
+                            <span class="fw-medium">{{ form.previsaoFim_tipo }}</span>
+                        </div>
+                        <div class="col-4 d-flex flex-column justify-content-start m-0 p-2">
+                            <small class="text-dark-emphasis m-0 p-0">Data prev. encerramento</small>
+                            <span class="fw-medium">{{ form.previsao_fim }}</span>
+                        </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2">
                             <small class="text-dark-emphasis m-0 p-0">Início hospedagem</small>
                             <span class="fw-medium">{{ form.inicio_alocacao }}</span>
                         </div>
@@ -122,16 +157,6 @@
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
-<script>
-    new TomSelect(
-        "#id_solicitante",
-        {
-            create: false,
-            maxOptions: 10,
-            hideSelected: true,
-            openOnFocus: false,
-        });
-</script>
 <script>
     const inputAnexo = document.getElementById('id_anexo');
     const nomeAnexo = document.getElementById('nome-anexo');

@@ -44,9 +44,9 @@
                         {% for cidade in cidades %}
                         <tbody class="flex-row linha-pesquisa">
                             <tr class="m-0 p-0">
-                                <td class="m-0 p-1">{{ cidade.estado.pais }}</td>
-                                <td class="m-0 p-1">{{ cidade.estado }}</td>
-                                <td class="m-0 p-1">{{ cidade.cidade | default:"-" }}</td>
+                                <td class="m-0 p-1">{{ cidade.estado.pais.nome_pais }}</td>
+                                <td class="m-0 p-1">{{ cidade.estado.nome_estado }}</td>
+                                <td class="m-0 p-1">{{ cidade.nome_cidade | default:"-" }}</td>
                                 <td class="d-flex justify-content-end gap-1 m-0 p-1">
                                     <a href="{% url 'endereco:listar_bairros' cidade.id %}" class="btn btn-dark m-0 p-1" type="submit">Abrir</a>
                                 </td>

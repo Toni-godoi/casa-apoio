@@ -30,7 +30,7 @@ urlpatterns = [
     path('usuario/', include("autenticacao.urls")),
     path('quarto/', include("domain.quarto.urls")),
     path('pessoa/', include("domain.pessoa.urls")),
-    path('solicitacao/', include("domain.solicitacao.urls")),
+    path('solicitante/', include("domain.solicitante.urls")),
     path('endereco/', include("domain.endereco.urls")),
 ]
 

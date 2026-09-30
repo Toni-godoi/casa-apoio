@@ -5,15 +5,23 @@
     <form class="d-flex flex-column w-100" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="container-fluid w-100 vh-100 overflow-auto m-0 p-4" style="background: rgb(242,242,242);">
-        <form class="d-flex flex-column" method="post">
             <div class="row m-0 p-0">
                 <div class="col m-0 p-2"><small class="m-0 p-0">Pessoas &gt; Editar pessoa</small>
                     <h2 class="fw-bold">Editar: {{ pessoa.nome_pessoa}}</h2>
                 </div>
                 <div class="col d-flex flex-row justify-content-end align-items-center gap-2 m-0 p-2">
                     <button class="btn btn-primary bg-success border-0" type="submit">Salvar</button>
-                    <a href="{% url 'pessoa:listar_pessoas' %}" class="btn btn-primary bg-dark border-0" type="button">Cancelar</a>
+                    <a href="{% url 'pessoa:dados_pessoa' pessoa.pk %}" class="btn btn-primary bg-dark border-0" type="button">Cancelar</a>
                 </div>
+            </div>
+            <div class="row m-0 p-0">
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger" style="color: red; background-color: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                    {% for error in form.non_field_errors %}
+                    <p style="margin: 0;">⚠️ {{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
             <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
                 <div class="col border rounded-2 d-flex flex-column m-0 p-0">
@@ -66,6 +74,16 @@
                                     </span>
                                 </div>
                             </div>
+                            <hr>
+                            <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-column justify-content-start align-items-start m-0 p-1">
+                                 <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                                    <span class="fw-medium">Possui algum tipo de deficiência? {{ form.deficiencia }} Sim</span>
+                                </div>
+                                <div class="col d-flex flex-row justify-content-start m-0 p-2">
+                                    {{ form.tipos_deficiencias }}
+                                </div>
+                            </div>
+                            <hr>
                             <div
                                 class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
                                 <div class="col d-flex flex-column justify-content-start m-0 p-2">
@@ -134,6 +152,7 @@
             {{ cidades|json_script:"cidades-data" }}
             {{ bairros|json_script:"bairros-data" }}
             {{ pais_brasil_id|json_script:"pais-brasil-id" }}
+            {{ endereco_inicial|json_script:"endereco-inicial-data" }}
             <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
                 <div class="col border rounded-2 m-0 p-0">
                     <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
@@ -155,13 +174,13 @@
                                 class="text-dark-emphasis m-0 p-0">Estado</small>
                                 {{ form_end.estado }}
                         </div>
+                        <div class="col-1 d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">UF</small>
+                                {{ form_end.uf_estado }}
+                        </div>
                         <div class="col-3 d-flex flex-column justify-content-start m-0 p-2"><small
                                 class="text-dark-emphasis m-0 p-0">Cidade</small>
                                 {{ form_end.cidade }}
-                        </div>
-                        <div class="col-1 d-flex flex-column justify-content-start m-0 p-2"><small
-                                class="text-dark-emphasis m-0 p-0">Número</small>
-                                {{ form_end.numero }}
                         </div>
                     </div>
                     <div
@@ -170,13 +189,17 @@
                                 class="text-dark-emphasis m-0 p-0">Bairro</small>
                                 {{ form_end.bairro }}
                         </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Logradouro</small>
+                                {{ form_end.logradouro }}
+                        </div>
                         <div class="col-2 d-flex flex-column justify-content-start m-0 p-2"><small
                                 class="text-dark-emphasis m-0 p-0">Complemento</small>
                                 {{ form_end.complemento }}
                         </div>
-                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
-                                class="text-dark-emphasis m-0 p-0">Logradouro</small>
-                                {{ form_end.logradouro }}
+                        <div class="col-1 d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Número</small>
+                                {{ form_end.numero }}
                         </div>
                     </div>
                     <div
@@ -189,250 +212,584 @@
                     </div>
                 </div>
             </div>
-        </form>
     </div>
     </form>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 <script>
-    document.getElementById('id_foto').addEventListener('change', function(event) {
+document.addEventListener("DOMContentLoaded", function () {
 
-        const arquivo = event.target.files[0];
-
-        if (arquivo) {
-            const imagem = document.getElementById('preview-foto');
-
-            imagem.src = URL.createObjectURL(arquivo);
-        }
-
-    });
-</script>
-<script>
-
-let streamCamera = null;
-
-async function abrirCamera() {
-
-    try {
-
-        streamCamera = await navigator.mediaDevices.getUserMedia({
-            video: true
-        });
-
-        const video = document.getElementById("camera");
-
-        video.srcObject = streamCamera;
-
-        const container = document.getElementById("camera-container");
-
-        container.classList.remove("d-none");
-        container.classList.add("d-flex");
-
-    } catch (erro) {
-
-        console.error("Erro ao acessar a câmera:", erro);
-
-        alert("Não foi possível acessar a câmera.");
-
-    }
-}
-
-function tirarFoto() {
-
-    const video = document.getElementById("camera");
-    const canvas = document.getElementById("canvas-foto");
-    const preview = document.getElementById("preview-foto");
-    const inputFoto = document.getElementById("id_foto");
-
-    const contexto = canvas.getContext("2d");
-
-    contexto.drawImage(
-        video,
-        0,
-        0,
-        canvas.width,
-        canvas.height
+    const estados = JSON.parse(
+        document.getElementById("estados-data").textContent
     );
 
-    // Atualiza a prévia
-    preview.src = canvas.toDataURL("image/jpeg");
+    const cidades = JSON.parse(
+        document.getElementById("cidades-data").textContent
+    );
 
-    // Transforma o canvas em arquivo
-    canvas.toBlob(function(blob) {
+    const bairros = JSON.parse(
+        document.getElementById("bairros-data").textContent
+    );
 
-        const arquivo = new File(
-            [blob],
-            "foto-camera.jpg",
-            {
-                type: "image/jpeg"
-            }
-        );
+    const enderecoInicial = JSON.parse(
+        document.getElementById("endereco-inicial-data").textContent
+    );
 
-        // Coloca o arquivo no input do Django
-        const dataTransfer = new DataTransfer();
 
-        dataTransfer.items.add(arquivo);
+    const pais = document.getElementById("id_pais");
+    const estado = document.getElementById("id_estado");
+    const cidade = document.getElementById("id_cidade");
+    const bairro = document.getElementById("id_bairro");
 
-        inputFoto.files = dataTransfer.files;
+    const uf = document.getElementById("id_uf_estado");
+    const cep = document.getElementById("id_cep");
+    const logradouro = document.getElementById("id_logradouro");
 
-    }, "image/jpeg");
 
-    fecharCamera();
-}
-
-function fecharCamera() {
-
-    if (streamCamera) {
-
-        streamCamera.getTracks().forEach(track => {
-            track.stop();
-        });
-
-        streamCamera = null;
+    function normalizar(valor) {
+        return String(valor || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toLowerCase();
     }
 
-    const container = document.getElementById("camera-container");
 
-    container.classList.remove("d-flex");
-    container.classList.add("d-none");
-}
-</script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const estados = JSON.parse(document.getElementById('estados-data').textContent);
-    const cidades = JSON.parse(document.getElementById('cidades-data').textContent);
-    const bairros = JSON.parse(document.getElementById('bairros-data').textContent);
+    // ==========================================================
+    // ESTADOS
+    // ==========================================================
 
-    const selPais   = document.getElementById('id_pais');
-    const selEstado = document.getElementById('id_estado');
-    const selCidade = document.getElementById('id_cidade');
-    const selBairro = document.getElementById('id_bairro');
-    const camposTexto = ['id_cep', 'id_logradouro', 'id_numero', 'id_complemento']
-        .map(id => document.getElementById(id));
+    function carregarEstados(nomeSelecionado = "") {
 
-    const valorEstadoInicial = selEstado.value;
-    const valorCidadeInicial = selCidade.value;
-    const valorBairroInicial = selBairro.value;
-    const valoresTextoIniciais = camposTexto.map(el => el.value);
+        estado.innerHTML = "";
 
-    const choicesCidade = new Choices(selCidade, {
-        searchEnabled: true, itemSelectText: '', shouldSort: false,
-        placeholder: true, placeholderValue: 'Digite para buscar...'
-    });
-    const choicesBairro = new Choices(selBairro, {
-        searchEnabled: true, itemSelectText: '', shouldSort: false,
-        placeholder: true, placeholderValue: 'Digite para buscar...'
-    });
-
-    function resetarChoices(instancia, mensagem) {
-        instancia.clearStore();
-        instancia.setChoices(
-            [{ value: '', label: mensagem, selected: true, disabled: false }],
-            'value', 'label', true
+        estado.appendChild(
+            new Option("Selecione", "")
         );
-        instancia.disable();
-    }
 
-    function popularEstados(paisId, selecionar) {
-        selEstado.innerHTML = '<option value="">Selecione</option>';
+
         estados
-            .filter(e => String(e.pais_id) === String(paisId))
+            .filter(e =>
+                String(e.pais_id) === String(pais.value)
+            )
             .forEach(e => {
-                const opt = document.createElement('option');
-                opt.value = e.id;
-                opt.textContent = e.estado;
-                if (selecionar && String(e.id) === String(selecionar)) opt.selected = true;
-                selEstado.appendChild(opt);
+
+                const option = new Option(
+                    e.nome_estado,
+                    e.nome_estado
+                );
+
+                if (
+                    normalizar(e.nome_estado) ===
+                    normalizar(nomeSelecionado)
+                ) {
+                    option.selected = true;
+                    uf.value = e.uf_estado || "";
+                }
+
+                estado.appendChild(option);
             });
-        selEstado.disabled = false;
     }
 
-    function popularCidades(estadoId, selecionar) {
-        const opcoes = [{ value: '', label: 'Selecione', selected: !selecionar, disabled: false }];
-        cidades
-            .filter(c => String(c.estado_id) === String(estadoId))
-            .forEach(c => opcoes.push({
-                value: String(c.id), label: c.cidade,
-                selected: !!selecionar && String(c.id) === String(selecionar)
-            }));
-        choicesCidade.clearStore();
-        choicesCidade.setChoices(opcoes, 'value', 'label', true);
-        choicesCidade.enable();
-    }
 
-    function popularBairros(cidadeId, selecionar) {
-        const opcoes = [{ value: '', label: 'Selecione', selected: !selecionar, disabled: false }];
-        bairros
-            .filter(b => String(b.cidade_id) === String(cidadeId))
-            .forEach(b => opcoes.push({
-                value: String(b.id), label: b.bairro,
-                selected: !!selecionar && String(b.id) === String(selecionar)
-            }));
-        choicesBairro.clearStore();
-        choicesBairro.setChoices(opcoes, 'value', 'label', true);
-        choicesBairro.enable();
-    }
+    // ==========================================================
+    // CIDADES
+    // ==========================================================
 
-    function ehBrasil(paisId) {
-        if (!paisId) return false;
-        const opcaoSelecionada = selPais.querySelector(`option[value="${paisId}"]`);
-        return !!opcaoSelecionada && opcaoSelecionada.textContent.trim().toLowerCase() === 'brasil';
-    }
+    function carregarCidades(
+        nomeEstado,
+        nomeCidade = ""
+    ) {
 
-    function bloquearTudoMenosDescricao() {
-        selEstado.innerHTML = '<option value="">Selecione</option>';
-        selEstado.disabled = true;
-        resetarChoices(choicesCidade, 'Selecione o estado primeiro');
-        resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
-        camposTexto.forEach(el => { el.value = ''; el.disabled = true; });
-    }
+        const estadoEncontrado = estados.find(e =>
+            normalizar(e.nome_estado) ===
+            normalizar(nomeEstado)
+        );
 
-    function atualizarPorPais(restaurar) {
-        const paisId = selPais.value;
 
-        if (!paisId) { bloquearTudoMenosDescricao(); return; }
+        cidade.innerHTML = "";
 
-        if (ehBrasil(paisId)) {
-            popularEstados(paisId, restaurar ? valorEstadoInicial : null);
+        cidade.appendChild(
+            new Option("Selecione", "")
+        );
 
-            camposTexto.forEach((el, i) => {
-                el.disabled = false;
-                el.value = restaurar ? valoresTextoIniciais[i] : '';
-            });
 
-            if (restaurar && valorEstadoInicial) {
-                popularCidades(valorEstadoInicial, valorCidadeInicial);
-                if (valorCidadeInicial) popularBairros(valorCidadeInicial, valorBairroInicial);
-            } else {
-                resetarChoices(choicesCidade, 'Selecione o estado primeiro');
-                resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
+        // Estado não cadastrado
+        if (!estadoEncontrado) {
+
+            if (nomeCidade) {
+
+                cidade.appendChild(
+                    new Option(
+                        nomeCidade,
+                        nomeCidade,
+                        true,
+                        true
+                    )
+                );
+
             }
-        } else {
-            bloquearTudoMenosDescricao();
+
+            cidade.disabled = false;
+
+            return;
+        }
+
+
+        // Cidades cadastradas nesse estado
+        cidades
+            .filter(c =>
+                String(c.estado_id) ===
+                String(estadoEncontrado.id)
+            )
+            .forEach(c => {
+
+                const option = new Option(
+                    c.nome_cidade,
+                    c.nome_cidade
+                );
+
+                if (
+                    normalizar(c.nome_cidade) ===
+                    normalizar(nomeCidade)
+                ) {
+                    option.selected = true;
+                }
+
+                cidade.appendChild(option);
+            });
+
+
+        // ======================================================
+        // SE A CIDADE DO CEP NÃO EXISTIR NO BANCO
+        // ADICIONA E SELECIONA MESMO ASSIM
+        // ======================================================
+
+        const cidadeExiste =
+            cidades.some(c =>
+
+                String(c.estado_id) ===
+                String(estadoEncontrado.id)
+
+                &&
+
+                normalizar(c.nome_cidade) ===
+                normalizar(nomeCidade)
+            );
+
+
+        if (nomeCidade && !cidadeExiste) {
+
+            cidade.appendChild(
+                new Option(
+                    nomeCidade,
+                    nomeCidade,
+                    true,
+                    true
+                )
+            );
+        }
+
+
+        cidade.disabled = false;
+    }
+
+
+    // ==========================================================
+    // BAIRROS
+    // ==========================================================
+
+    function carregarBairros(
+        nomeEstado,
+        nomeCidade,
+        nomeBairro = ""
+    ) {
+
+        const estadoEncontrado = estados.find(e =>
+            normalizar(e.nome_estado) ===
+            normalizar(nomeEstado)
+        );
+
+
+        bairro.innerHTML = "";
+
+        bairro.appendChild(
+            new Option("Selecione", "")
+        );
+
+
+        if (!estadoEncontrado) {
+
+            if (nomeBairro) {
+
+                bairro.appendChild(
+                    new Option(
+                        nomeBairro,
+                        nomeBairro,
+                        true,
+                        true
+                    )
+                );
+
+            }
+
+            bairro.disabled = false;
+
+            return;
+        }
+
+
+        const cidadeEncontrada = cidades.find(c =>
+            String(c.estado_id) ===
+            String(estadoEncontrado.id)
+
+            &&
+
+            normalizar(c.nome_cidade) ===
+            normalizar(nomeCidade)
+        );
+
+
+        // ======================================================
+        // CIDADE NÃO CADASTRADA
+        // ======================================================
+
+        if (!cidadeEncontrada) {
+
+            if (nomeBairro) {
+
+                bairro.appendChild(
+                    new Option(
+                        nomeBairro,
+                        nomeBairro,
+                        true,
+                        true
+                    )
+                );
+
+            }
+
+            bairro.disabled = false;
+
+            return;
+        }
+
+
+        // ======================================================
+        // BAIRROS DA CIDADE
+        // ======================================================
+
+        bairros
+            .filter(b =>
+                String(b.cidade_id) ===
+                String(cidadeEncontrada.id)
+            )
+            .forEach(b => {
+
+                const option = new Option(
+                    b.nome_bairro,
+                    b.nome_bairro
+                );
+
+                if (
+                    normalizar(b.nome_bairro) ===
+                    normalizar(nomeBairro)
+                ) {
+                    option.selected = true;
+                }
+
+                bairro.appendChild(option);
+            });
+
+
+        // ======================================================
+        // BAIRRO NÃO CADASTRADO
+        // ======================================================
+
+        const bairroExiste =
+            bairros.some(b =>
+
+                String(b.cidade_id) ===
+                String(cidadeEncontrada.id)
+
+                &&
+
+                normalizar(b.nome_bairro) ===
+                normalizar(nomeBairro)
+            );
+
+
+        if (nomeBairro && !bairroExiste) {
+
+            bairro.appendChild(
+                new Option(
+                    nomeBairro,
+                    nomeBairro,
+                    true,
+                    true
+                )
+            );
+        }
+
+
+        bairro.disabled = false;
+    }
+
+
+    // ==========================================================
+    // ALTERAÇÃO MANUAL DO ESTADO
+    // ==========================================================
+
+    estado.addEventListener("change", function () {
+
+        const novoEstado = this.value;
+
+
+        if (!novoEstado) {
+
+            uf.value = "";
+
+            cidade.innerHTML =
+                '<option value="">Selecione</option>';
+
+            bairro.innerHTML =
+                '<option value="">Selecione</option>';
+
+            return;
+        }
+
+
+        const estadoEncontrado = estados.find(e =>
+            normalizar(e.nome_estado) ===
+            normalizar(novoEstado)
+        );
+
+
+        if (estadoEncontrado) {
+
+            uf.value =
+                estadoEncontrado.uf_estado || "";
+        }
+
+
+        // Filtra as cidades pelo novo estado
+        carregarCidades(
+            novoEstado
+        );
+
+
+        // Limpa bairro
+        bairro.innerHTML =
+            '<option value="">Selecione</option>';
+
+        bairro.disabled = true;
+
+
+        // O endereço mudou
+        cep.value = "";
+        logradouro.value = "";
+    });
+
+
+    // ==========================================================
+    // ALTERAÇÃO MANUAL DA CIDADE
+    // ==========================================================
+
+    cidade.addEventListener("change", function () {
+
+        const novaCidade = this.value;
+
+
+        if (!novaCidade) {
+
+            bairro.innerHTML =
+                '<option value="">Selecione</option>';
+
+            bairro.disabled = true;
+
+            return;
+        }
+
+
+        carregarBairros(
+            estado.value,
+            novaCidade
+        );
+
+
+        cep.value = "";
+        logradouro.value = "";
+    });
+
+
+    // ==========================================================
+    // BUSCA POR CEP
+    // ==========================================================
+
+    async function buscarCep() {
+
+        const cepLimpo =
+            cep.value.replace(/\D/g, "");
+
+
+        if (cepLimpo.length !== 8) {
+            return;
+        }
+
+
+        try {
+
+            const resposta = await fetch(
+                `https://viacep.com.br/ws/${cepLimpo}/json/`
+            );
+
+
+            if (!resposta.ok) {
+                throw new Error(
+                    "Erro ao consultar o CEP."
+                );
+            }
+
+
+            const dados =
+                await resposta.json();
+
+
+            if (dados.erro) {
+
+                alert("CEP não encontrado.");
+
+                return;
+            }
+
+
+            // ==================================================
+            // LOGRADOURO
+            // ==================================================
+
+            logradouro.value =
+                dados.logradouro || "";
+
+
+            // ==================================================
+            // UF
+            // ==================================================
+
+            uf.value =
+                dados.uf || "";
+
+
+            // ==================================================
+            // ESTADO
+            // ==================================================
+
+            const estadoEncontrado =
+                estados.find(e =>
+                    normalizar(e.uf_estado) ===
+                    normalizar(dados.uf)
+                );
+
+
+            if (estadoEncontrado) {
+
+                carregarEstados(
+                    estadoEncontrado.nome_estado
+                );
+
+            } else {
+
+                estado.innerHTML = "";
+
+                estado.appendChild(
+                    new Option(
+                        dados.estado,
+                        dados.estado,
+                        true,
+                        true
+                    )
+                );
+            }
+
+
+            const nomeEstado =
+                estadoEncontrado
+                    ? estadoEncontrado.nome_estado
+                    : dados.estado;
+
+
+            // ==================================================
+            // CIDADE
+            // ==================================================
+
+            carregarCidades(
+                nomeEstado,
+                dados.localidade
+            );
+
+
+            // ==================================================
+            // BAIRRO
+            // ==================================================
+
+            carregarBairros(
+                nomeEstado,
+                dados.localidade,
+                dados.bairro
+            );
+
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao consultar CEP:",
+                erro
+            );
         }
     }
 
-    selPais.addEventListener('change', () => atualizarPorPais(false));
 
-    selEstado.addEventListener('change', function () {
-        if (this.value) popularCidades(this.value, null);
-        else resetarChoices(choicesCidade, 'Selecione o estado primeiro');
-        resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
+    // ==========================================================
+    // CEP DIGITADO
+    // ==========================================================
+
+    cep.addEventListener("input", function () {
+
+        const valor =
+            this.value.replace(/\D/g, "");
+
+
+        if (valor.length === 8) {
+
+            buscarCep();
+        }
     });
 
-    selCidade.addEventListener('change', function () {
-        const cidadeId = choicesCidade.getValue(true);
-        if (cidadeId) popularBairros(cidadeId, null);
-        else resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
-    });
 
-    bloquearTudoMenosDescricao();
+    // ==========================================================
+    // CARREGAR ENDEREÇO ATUAL
+    // ==========================================================
 
-    if (selPais.value) {
-        atualizarPorPais(true);
-    }
+    carregarEstados(
+        enderecoInicial.estado
+    );
+
+
+    uf.value =
+        enderecoInicial.uf_estado || "";
+
+
+    carregarCidades(
+        enderecoInicial.estado,
+        enderecoInicial.cidade
+    );
+
+
+    carregarBairros(
+        enderecoInicial.estado,
+        enderecoInicial.cidade,
+        enderecoInicial.bairro
+    );
+
 });
 </script>
 {% endblock %}

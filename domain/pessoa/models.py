@@ -4,22 +4,23 @@ from django.db import models
 import os
 from uuid import uuid4
 from django.forms import ValidationError
-from domain.endereco.models import Endereco
+from domain.endereco.models import Endereco, Pais
 
 # Create your models here.
 class Pessoa(models.Model):
     SEXO_CHOICES = [('M', 'Masculino'), ('F', 'Feminino')]
-    PAIS_CHOICES = [('BR','Brasil'), ('PY', 'Paraguai')]
     nome_pessoa = models.CharField(max_length=30)
     cpf_pessoa = models.CharField(max_length=11, unique=True)
     sexo_pessoa = models.CharField(max_length=1, choices=SEXO_CHOICES)
     dataNasc_pessoa = models.DateField()
-    nacionalidade_pessoa = models.CharField(max_length=20, choices=PAIS_CHOICES, default='BR')
-    telefone_pessoa = models.CharField(max_length=11)
-    email_pessoa = models.EmailField(max_length=80)
+    nacionalidade_pessoa = models.CharField(max_length=20, default='Brasil')
+    telefone_pessoa = models.CharField(max_length=11, unique=True)
+    email_pessoa = models.EmailField(max_length=80, unique=True, null=True, blank=True)
     dataCadastro = models.DateField()
     descricao_pessoa = models.CharField(max_length=50, blank=True)
-    endereco = models.ForeignKey(Endereco, on_delete=models.CASCADE, blank=False, null=False)
+    cartao_sus = models.CharField(max_length=15, blank=True, null=True, unique=True)
+    deficiencia = models.BooleanField(default=False)
+    endereco = models.ForeignKey(Endereco, on_delete=models.PROTECT, blank=False, null=False)
 
     #def clean(self):
     #def save(self, *args, **kwargs):
@@ -46,7 +47,17 @@ class Pessoa(models.Model):
     
     def __str__(self):
         return self.nome_pessoa
+
+class Deficiencia(models.Model):
+    nome = models.CharField(max_length=50)
     
+    def __str__(self):
+        return self.nome
+    
+class DeficienciaPessoa(models.Model):
+    pessoa = models.ForeignKey(Pessoa, on_delete=models.CASCADE, related_name='pessoa_deficienciaPessoa')
+    deficiencia = models.ForeignKey(Deficiencia, on_delete=models.PROTECT, related_name='deficiencia_deficienciaPessoa', blank=True, null=True)
+
 class PessoaEditada(models.Model):
     pessoa = models.ForeignKey(Pessoa, on_delete=models.CASCADE, null=False, related_name="edicao")
     dataEdicao = models.DateTimeField()

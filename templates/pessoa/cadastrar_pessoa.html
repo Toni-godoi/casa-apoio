@@ -15,6 +15,15 @@
                     <a href="{% url 'pessoa:listar_pessoas' %}" class="btn btn-primary bg-dark border-0" type="button">Cancelar</a>
                 </div>
             </div>
+            <div class="row m-0 p-0">
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger" style="color: red; background-color: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                    {% for error in form.non_field_errors %}
+                    <p style="margin: 0;">⚠️ {{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
             <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3">
                 <div class="col border rounded-2 d-flex flex-column m-0 p-0">
                     <div class="row bg-dark-subtle border rounded-2 m-0 p-1">
@@ -24,8 +33,7 @@
                     </div>
                     <div class="d-flex flex-row m-0 p-0">
                         <div class="col m-0 p-0">
-                            <div
-                                class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
+                            <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
                                 <div class="col d-flex flex-column justify-content-start m-0 p-2">
                                     <small class="text-dark-emphasis m-0 p-0">Nome completo:</small>
                                     {{ form.nome_pessoa }}
@@ -66,6 +74,16 @@
                                     </span>
                                 </div>
                             </div>
+                            <hr>
+                            <div class="row rounded-1 border-1 border-secondary-subtle d-flex flex-column justify-content-start align-items-start m-0 p-1">
+                                 <div class="col d-flex flex-column justify-content-start m-0 p-2">
+                                    <span class="fw-medium">Possui algum tipo de deficiência? {{ form.deficiencia }} Sim</span>
+                                </div>
+                                <div class="col d-flex flex-row justify-content-start m-0 p-2">
+                                    {{ form.tipos_deficiencias }}
+                                </div>
+                            </div>
+                            <hr>
                             <div
                                 class="row rounded-1 border-1 border-secondary-subtle d-flex flex-row justify-content-center align-items-start m-0 p-1">
                                 <div class="col d-flex flex-column justify-content-start m-0 p-2">
@@ -100,7 +118,7 @@
                                         Câmera
                                     </button>
                                 </div>
-                                <div id="camera-container" class="d-none flex-row align-items-center gap-2 mt-2">
+                                <div id="camera-container" class="d-none flex-column align-items-center gap-2 mt-2">
                                     <video
                                         id="camera"
                                         width="150"
@@ -154,13 +172,13 @@
                                 class="text-dark-emphasis m-0 p-0">Estado</small>
                                 {{ form_end.estado }}
                         </div>
+                        <div class="col-1 d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">UF</small>
+                                {{ form_end.uf_estado }}
+                        </div>
                         <div class="col-3 d-flex flex-column justify-content-start m-0 p-2"><small
                                 class="text-dark-emphasis m-0 p-0">Cidade</small>
                                 {{ form_end.cidade }}
-                        </div>
-                        <div class="col-1 d-flex flex-column justify-content-start m-0 p-2"><small
-                                class="text-dark-emphasis m-0 p-0">Número</small>
-                                {{ form_end.numero }}
                         </div>
                     </div>
                     <div
@@ -169,13 +187,17 @@
                                 class="text-dark-emphasis m-0 p-0">Bairro</small>
                                 {{ form_end.bairro }}
                         </div>
+                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Logradouro</small>
+                                {{ form_end.logradouro }}
+                        </div>
                         <div class="col-2 d-flex flex-column justify-content-start m-0 p-2"><small
                                 class="text-dark-emphasis m-0 p-0">Complemento</small>
                                 {{ form_end.complemento }}
                         </div>
-                        <div class="col d-flex flex-column justify-content-start m-0 p-2"><small
-                                class="text-dark-emphasis m-0 p-0">Logradouro</small>
-                                {{ form_end.logradouro }}
+                        <div class="col-1 d-flex flex-column justify-content-start m-0 p-2"><small
+                                class="text-dark-emphasis m-0 p-0">Número</small>
+                                {{ form_end.numero }}
                         </div>
                     </div>
                     <div
@@ -300,136 +322,818 @@ function fecharCamera() {
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const paises  = JSON.parse(document.getElementById('paises-data').textContent);
-    const estados = JSON.parse(document.getElementById('estados-data').textContent);
-    const cidades = JSON.parse(document.getElementById('cidades-data').textContent);
-    const bairros = JSON.parse(document.getElementById('bairros-data').textContent);
 
-    const selPais    = document.getElementById('id_pais');
-    const selEstado  = document.getElementById('id_estado');
-    const selCidade  = document.getElementById('id_cidade');
-    const selBairro  = document.getElementById('id_bairro');
-    const camposTexto = ['id_cep', 'id_logradouro', 'id_numero', 'id_complemento']
-        .map(id => document.getElementById(id));
+    const paises = JSON.parse(
+        document.getElementById('paises-data').textContent
+    );
 
-    // Guarda seleção prévia (caso a página recarregue por erro de validação)
+    const estados = JSON.parse(
+        document.getElementById('estados-data').textContent
+    );
+
+    const cidades = JSON.parse(
+        document.getElementById('cidades-data').textContent
+    );
+
+    const bairros = JSON.parse(
+        document.getElementById('bairros-data').textContent
+    );
+
+
+    // ==========================================================
+    // CAMPOS
+    // ==========================================================
+
+    const selPais = document.getElementById('id_pais');
+    const selEstado = document.getElementById('id_estado');
+    const selCidade = document.getElementById('id_cidade');
+    const selBairro = document.getElementById('id_bairro');
+
+    const ufEstado = document.getElementById('id_uf_estado');
+
+    const cep = document.getElementById('id_cep');
+    const logradouro = document.getElementById('id_logradouro');
+
+    const camposTexto = [
+        'id_cep',
+        'id_logradouro',
+        'id_numero',
+        'id_complemento'
+    ]
+        .map(id => document.getElementById(id))
+        .filter(el => el !== null);
+
+
+    // ==========================================================
+    // VALORES INICIAIS
+    // ==========================================================
+
     const valorEstadoInicial = selEstado.value;
     const valorCidadeInicial = selCidade.value;
     const valorBairroInicial = selBairro.value;
 
+
+    // ==========================================================
+    // CHOICES
+    // ==========================================================
+
     const choicesCidade = new Choices(selCidade, {
-        searchEnabled: true, itemSelectText: '', shouldSort: false,
-        placeholder: true, placeholderValue: 'Digite para buscar...'
-    });
-    const choicesBairro = new Choices(selBairro, {
-        searchEnabled: true, itemSelectText: '', shouldSort: false,
-        placeholder: true, placeholderValue: 'Digite para buscar...'
+        searchEnabled: true,
+        itemSelectText: '',
+        shouldSort: false,
+        placeholder: true,
+        placeholderValue: 'Digite para buscar...'
     });
 
+    const choicesBairro = new Choices(selBairro, {
+        searchEnabled: true,
+        itemSelectText: '',
+        shouldSort: false,
+        placeholder: true,
+        placeholderValue: 'Digite para buscar...'
+    });
+
+
+    // ==========================================================
+    // NORMALIZAR TEXTO
+    // ==========================================================
+
+    function normalizar(texto) {
+
+        return String(texto || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLowerCase();
+
+    }
+
+
+    // ==========================================================
+    // RESET CHOICES
+    // ==========================================================
+
     function resetarChoices(instancia, mensagem) {
+
         instancia.clearStore();
+
         instancia.setChoices(
-            [{ value: '', label: mensagem, selected: true, disabled: false }],
-            'value', 'label', true
+            [
+                {
+                    value: '',
+                    label: mensagem,
+                    selected: true,
+                    disabled: false
+                }
+            ],
+            'value',
+            'label',
+            true
         );
+
         instancia.disable();
     }
 
+
+    // ==========================================================
+    // POPULAR ESTADOS
+    // ==========================================================
+
     function popularEstados(paisId, selecionar) {
-        selEstado.innerHTML = '<option value="">Selecione</option>';
+
+        selEstado.innerHTML =
+            '<option value="">Selecione</option>';
+
         estados
-            .filter(e => String(e.pais_id) === String(paisId))
+            .filter(e =>
+                String(e.pais_id) === String(paisId)
+            )
             .forEach(e => {
-                const opt = document.createElement('option');
+
+                const opt =
+                    document.createElement('option');
+
                 opt.value = e.id;
-                opt.textContent = e.estado;
-                if (selecionar && String(e.id) === String(selecionar)) opt.selected = true;
+                opt.textContent = e.nome_estado;
+
+                if (
+                    selecionar &&
+                    String(e.id) === String(selecionar)
+                ) {
+                    opt.selected = true;
+                }
+
                 selEstado.appendChild(opt);
             });
+
         selEstado.disabled = false;
     }
 
+
+    // ==========================================================
+    // ADICIONAR ESTADO QUE NÃO EXISTE NO BANCO
+    // ==========================================================
+
+    function adicionarEstadoTemporario(
+        nomeEstado,
+        uf
+    ) {
+
+        selEstado.innerHTML = '';
+
+        const opt =
+            document.createElement('option');
+
+        /*
+         * O value será o NOME.
+         *
+         * O backend receberá:
+         *
+         * estado = "Mato Grosso"
+         * uf_estado = "MT"
+         */
+
+        opt.value = nomeEstado;
+        opt.textContent = nomeEstado;
+        opt.selected = true;
+
+        selEstado.appendChild(opt);
+
+        selEstado.disabled = false;
+
+        if (ufEstado) {
+            ufEstado.value = uf || '';
+        }
+    }
+
+
+    // ==========================================================
+    // POPULAR CIDADES
+    // ==========================================================
+
     function popularCidades(estadoId, selecionar) {
-        const opcoes = [{ value: '', label: 'Selecione', selected: !selecionar, disabled: false }];
+
+        const opcoes = [
+            {
+                value: '',
+                label: 'Selecione',
+                selected: !selecionar,
+                disabled: false
+            }
+        ];
+
         cidades
-            .filter(c => String(c.estado_id) === String(estadoId))
-            .forEach(c => opcoes.push({
-                value: String(c.id), label: c.cidade,
-                selected: selecionar && String(c.id) === String(selecionar)
-            }));
+            .filter(c =>
+                String(c.estado_id) === String(estadoId)
+            )
+            .forEach(c => {
+
+                opcoes.push({
+                    value: String(c.id),
+                    label: c.nome_cidade,
+                    selected:
+                        selecionar &&
+                        String(c.id) === String(selecionar)
+                });
+
+            });
+
         choicesCidade.clearStore();
-        choicesCidade.setChoices(opcoes, 'value', 'label', true);
+
+        choicesCidade.setChoices(
+            opcoes,
+            'value',
+            'label',
+            true
+        );
+
         choicesCidade.enable();
     }
 
+
+    // ==========================================================
+    // ADICIONAR CIDADE QUE NÃO EXISTE
+    // ==========================================================
+
+    function adicionarCidadeTemporaria(nomeCidade) {
+
+        choicesCidade.clearStore();
+
+        choicesCidade.setChoices(
+            [
+                {
+                    value: nomeCidade,
+                    label: nomeCidade,
+                    selected: true
+                }
+            ],
+            'value',
+            'label',
+            true
+        );
+
+        choicesCidade.enable();
+    }
+
+
+    // ==========================================================
+    // POPULAR BAIRROS
+    // ==========================================================
+
     function popularBairros(cidadeId, selecionar) {
-        const opcoes = [{ value: '', label: 'Selecione', selected: !selecionar, disabled: false }];
+
+        const opcoes = [
+            {
+                value: '',
+                label: 'Selecione',
+                selected: !selecionar,
+                disabled: false
+            }
+        ];
+
         bairros
-            .filter(b => String(b.cidade_id) === String(cidadeId))
-            .forEach(b => opcoes.push({
-                value: String(b.id), label: b.bairro,
-                selected: selecionar && String(b.id) === String(selecionar)
-            }));
+            .filter(b =>
+                String(b.cidade_id) === String(cidadeId)
+            )
+            .forEach(b => {
+
+                opcoes.push({
+                    value: String(b.id),
+                    label: b.nome_bairro,
+                    selected:
+                        selecionar &&
+                        String(b.id) === String(selecionar)
+                });
+
+            });
+
         choicesBairro.clearStore();
-        choicesBairro.setChoices(opcoes, 'value', 'label', true);
+
+        choicesBairro.setChoices(
+            opcoes,
+            'value',
+            'label',
+            true
+        );
+
         choicesBairro.enable();
     }
 
+
+    // ==========================================================
+    // ADICIONAR BAIRRO QUE NÃO EXISTE
+    // ==========================================================
+
+    function adicionarBairroTemporario(nomeBairro) {
+
+        choicesBairro.clearStore();
+
+        choicesBairro.setChoices(
+            [
+                {
+                    value: nomeBairro,
+                    label: nomeBairro,
+                    selected: true
+                }
+            ],
+            'value',
+            'label',
+            true
+        );
+
+        choicesBairro.enable();
+    }
+
+
+    // ==========================================================
+    // VERIFICAR BRASIL
+    // ==========================================================
+
     function ehBrasil(paisId) {
-        const pais = paises.find(p => String(p.id) === String(paisId));
-        return !!pais && pais.pais.trim().toLowerCase() === 'brasil';
+
+        const pais =
+            paises.find(
+                p => String(p.id) === String(paisId)
+            );
+
+        return (
+            pais &&
+            normalizar(pais.nome_pais) === 'brasil'
+        );
     }
 
-    function bloquearTudoMenosDescricao() {
-        selEstado.innerHTML = '<option value="">Selecione</option>';
-        selEstado.disabled = true;
-        resetarChoices(choicesCidade, 'Selecione o estado primeiro');
-        resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
-        camposTexto.forEach(el => { el.value = ''; el.disabled = true; });
-    }
 
-    function atualizarPorPais(selecionarEstado) {
-        const paisId = selPais.value;
+    // ==========================================================
+    // PAÍS
+    // ==========================================================
 
-        if (!paisId) { bloquearTudoMenosDescricao(); return; }
+    selPais.addEventListener('change', function () {
+
+        const paisId = this.value;
+
+        if (!paisId) {
+
+            selEstado.innerHTML =
+                '<option value="">Selecione</option>';
+
+            selEstado.disabled = true;
+
+            resetarChoices(
+                choicesCidade,
+                'Selecione o estado primeiro'
+            );
+
+            resetarChoices(
+                choicesBairro,
+                'Selecione a cidade primeiro'
+            );
+
+            return;
+        }
+
 
         if (ehBrasil(paisId)) {
-            popularEstados(paisId, selecionarEstado);
-            camposTexto.forEach(el => el.disabled = false);
-            if (!selecionarEstado) {
-                resetarChoices(choicesCidade, 'Selecione o estado primeiro');
-                resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
-            }
-        } else {
-            // Só "Descrição" fica liberado
-            bloquearTudoMenosDescricao();
-        }
-    }
 
-    selPais.addEventListener('change', () => atualizarPorPais(null));
+            popularEstados(paisId, null);
+
+            camposTexto.forEach(el => {
+                el.disabled = false;
+            });
+
+        } else {
+
+            selEstado.innerHTML =
+                '<option value="">Selecione</option>';
+
+            selEstado.disabled = false;
+
+            choicesCidade.enable();
+            choicesBairro.enable();
+
+            camposTexto.forEach(el => {
+                el.disabled = false;
+            });
+        }
+
+    });
+
+
+    // ==========================================================
+    // ESTADO
+    // ==========================================================
 
     selEstado.addEventListener('change', function () {
-        if (this.value) popularCidades(this.value, null);
-        else resetarChoices(choicesCidade, 'Selecione o estado primeiro');
-        resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
+
+        const estadoId = this.value;
+
+        /*
+         * Se o Estado foi preenchido pelo ViaCEP
+         * e ainda não existe no banco, não existe
+         * estadoId numérico para filtrar cidades.
+         */
+
+        if (!estadoId || isNaN(estadoId)) {
+
+            resetarChoices(
+                choicesCidade,
+                'Selecione ou informe a cidade'
+            );
+
+            resetarChoices(
+                choicesBairro,
+                'Selecione ou informe o bairro'
+            );
+
+            return;
+        }
+
+
+        popularCidades(estadoId, null);
+
+        resetarChoices(
+            choicesBairro,
+            'Selecione a cidade primeiro'
+        );
+
     });
+
+
+    // ==========================================================
+    // CIDADE
+    // ==========================================================
 
     selCidade.addEventListener('change', function () {
-        const cidadeId = choicesCidade.getValue(true);
-        if (cidadeId) popularBairros(cidadeId, null);
-        else resetarChoices(choicesBairro, 'Selecione a cidade primeiro');
+
+        const cidadeId =
+            choicesCidade.getValue(true);
+
+        /*
+         * Cidade nova:
+         * ainda não existe ID.
+         */
+
+        if (!cidadeId || isNaN(cidadeId)) {
+            return;
+        }
+
+        popularBairros(cidadeId, null);
+
     });
 
-    // Estado inicial da página
-    bloquearTudoMenosDescricao();
+
+    // ==========================================================
+    // BUSCA CEP
+    // ==========================================================
+
+    async function buscarCep() {
+
+        const cepLimpo =
+            cep.value.replace(/\D/g, '');
+
+        if (cepLimpo.length !== 8) {
+            return;
+        }
+
+
+        try {
+
+            const resposta =
+                await fetch(
+                    `https://viacep.com.br/ws/${cepLimpo}/json/`
+                );
+
+
+            if (!resposta.ok) {
+
+                throw new Error(
+                    'Erro ao consultar o ViaCEP.'
+                );
+            }
+
+
+            const dados =
+                await resposta.json();
+
+
+            if (dados.erro) {
+
+                alert('CEP não encontrado.');
+
+                return;
+            }
+
+
+            console.log(
+                'RETORNO VIACEP:',
+                dados
+            );
+
+
+            // ==================================================
+            // LOGRADOURO
+            // ==================================================
+
+            logradouro.value =
+                dados.logradouro || '';
+
+
+            // ==================================================
+            // UF
+            // ==================================================
+
+            if (ufEstado) {
+
+                ufEstado.value =
+                    dados.uf || '';
+
+            }
+
+
+            // ==================================================
+            // ESTADO
+            // ==================================================
+
+            const estadoEncontrado =
+                estados.find(function (estado) {
+
+                    return (
+                        String(
+                            estado.uf_estado
+                        )
+                        .trim()
+                        .toUpperCase()
+                        ===
+                        String(
+                            dados.uf
+                        )
+                        .trim()
+                        .toUpperCase()
+                    );
+
+                });
+
+
+            if (estadoEncontrado) {
+
+                /*
+                 * Estado já existe.
+                 */
+
+                popularEstados(
+                    selPais.value,
+                    estadoEncontrado.id
+                );
+
+            } else {
+
+                /*
+                 * Estado NÃO existe.
+                 *
+                 * Mesmo assim mostramos
+                 * o Estado retornado pelo ViaCEP.
+                 */
+
+                adicionarEstadoTemporario(
+                    dados.estado,
+                    dados.uf
+                );
+
+            }
+
+
+            // ==================================================
+            // CIDADE
+            // ==================================================
+
+            let cidadeEncontrada = null;
+
+
+            if (estadoEncontrado) {
+
+                cidadeEncontrada =
+                    cidades.find(function (cidade) {
+
+                        return (
+                            String(
+                                cidade.estado_id
+                            ) ===
+                            String(
+                                estadoEncontrado.id
+                            )
+
+                            &&
+
+                            normalizar(
+                                cidade.nome_cidade
+                            ) ===
+                            normalizar(
+                                dados.localidade
+                            )
+                        );
+
+                    });
+
+            }
+
+
+            if (cidadeEncontrada) {
+
+                /*
+                 * Cidade já existe.
+                 */
+
+                popularCidades(
+                    estadoEncontrado.id,
+                    cidadeEncontrada.id
+                );
+
+            } else {
+
+                /*
+                 * Cidade não existe.
+                 *
+                 * Mostra o valor do ViaCEP.
+                 */
+
+                adicionarCidadeTemporaria(
+                    dados.localidade
+                );
+
+            }
+
+
+            // ==================================================
+            // BAIRRO
+            // ==================================================
+
+            if (dados.bairro) {
+
+                let bairroEncontrado = null;
+
+
+                if (cidadeEncontrada) {
+
+                    bairroEncontrado =
+                        bairros.find(function (bairro) {
+
+                            return (
+                                String(
+                                    bairro.cidade_id
+                                ) ===
+                                String(
+                                    cidadeEncontrada.id
+                                )
+
+                                &&
+
+                                normalizar(
+                                    bairro.nome_bairro
+                                ) ===
+                                normalizar(
+                                    dados.bairro
+                                )
+                            );
+
+                        });
+
+                }
+
+
+                if (bairroEncontrado) {
+
+                    /*
+                     * Bairro já existe.
+                     */
+
+                    popularBairros(
+                        cidadeEncontrada.id,
+                        bairroEncontrado.id
+                    );
+
+                } else {
+
+                    /*
+                     * Bairro não existe.
+                     *
+                     * Mostra o valor do ViaCEP.
+                     */
+
+                    adicionarBairroTemporario(
+                        dados.bairro
+                    );
+
+                }
+
+            }
+
+        }
+        catch (erro) {
+
+            console.error(
+                'Erro ao consultar CEP:',
+                erro
+            );
+
+        }
+
+    }
+
+
+    // ==========================================================
+    // EVENTO CEP
+    // ==========================================================
+
+    cep.addEventListener(
+        'input',
+        function () {
+
+            const valor =
+                this.value.replace(/\D/g, '');
+
+            if (valor.length === 8) {
+
+                buscarCep();
+
+            }
+
+        }
+    );
+
+
+    // ==========================================================
+    // ESTADO INICIAL
+    // ==========================================================
 
     if (selPais.value) {
-        atualizarPorPais(valorEstadoInicial);
-        if (valorEstadoInicial) {
-            popularCidades(valorEstadoInicial, valorCidadeInicial);
-            if (valorCidadeInicial) popularBairros(valorCidadeInicial, valorBairroInicial);
+
+        if (ehBrasil(selPais.value)) {
+
+            popularEstados(
+                selPais.value,
+                valorEstadoInicial
+            );
+
+            camposTexto.forEach(el => {
+                el.disabled = false;
+            });
+
         }
+
+
+        if (valorEstadoInicial) {
+
+            popularCidades(
+                valorEstadoInicial,
+                valorCidadeInicial
+            );
+
+
+            if (valorCidadeInicial) {
+
+                popularBairros(
+                    valorCidadeInicial,
+                    valorBairroInicial
+                );
+
+            }
+
+        }
+
     }
+
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const deficiencia = document.getElementById("id_deficiencia");
+
+    const tiposDeficiencias = document.querySelectorAll(
+        'input[name="tipos_deficiencias"]'
+    );
+
+    function controlarTipoDeficiencia() {
+
+        const habilitado = deficiencia.checked;
+
+        tiposDeficiencias.forEach(function (checkbox) {
+            checkbox.disabled = !habilitado;
+
+            if (!habilitado) {
+                checkbox.checked = false;
+            }
+        });
+    }
+
+    // Estado inicial
+    controlarTipoDeficiencia();
+
+    // Quando marcar/desmarcar
+    deficiencia.addEventListener(
+        "change",
+        controlarTipoDeficiencia
+    );
+
 });
 </script>
 {% endblock %}

@@ -7,8 +7,10 @@
             <div class="col m-0 p-2"><small class="m-0 p-0">Quartos &gt; Quartos ativos</small>
                 <h2 class="fw-bold">Quartos ativos</h2>
             </div>
-            <div class="col d-flex justify-content-end align-items-center m-0 p-2"><button
-                    class="btn btn-primary bg-dark border-0" type="button">Ver desativados</button></div>
+            <div class="col d-flex justify-content-end align-items-center gap-2 m-0 p-2">
+                <a href="{% url 'quarto:cadastrar_quarto' %}" class="btn btn-primary bg-primary border-0" type="submit">Cadastrar quarto</a>
+                <button class="btn btn-primary bg-dark border-0" type="button">Ver desativados</button>
+            </div>
         </div>
         <div class="row bg-light rounded-2 border-1 shadow d-flex w-100 justify-content-center m-0 p-0 mt-3 pt-2 pb-2">
             {% for quarto in quartos %}
