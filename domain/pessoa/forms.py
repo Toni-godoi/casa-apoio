@@ -30,12 +30,9 @@ class CadastrarEditarPessoaForm(forms.Form):
     )
 
     nacionalidade_pessoa = forms.ChoiceField(
-    label="Nacionalidade",
-    choices=[
-        (pais.nome_pais, pais.nome_pais)
-        for pais in Pais.objects.all()
-    ],
-    widget=forms.Select(attrs={"class": "form-select"})
+        label="Nacionalidade",
+        choices=[],
+        widget=forms.Select(attrs={"class": "form-select"})
     )
     
     telefone_pessoa = forms.CharField(
@@ -76,6 +73,14 @@ class CadastrarEditarPessoaForm(forms.Form):
             "capture": "environment",
             "class": "d-none",})
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["nacionalidade_pessoa"].choices = [
+            (pais.nome_pais, pais.nome_pais)
+            for pais in Pais.objects.all()
+        ]
 
     def clean(self):
         return super().clean()

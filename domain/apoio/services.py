@@ -168,7 +168,9 @@ def editar_apoio(
         raise ValidationError("Apoio que finaliza no mesmo dia não pode ter quarto")
 
     #atualiza dados simples
-    numero_contato = _valida_telefone(ed_contato_telefone)
+    numero_contato = None
+    if ed_contato_telefone:
+        numero_contato = _valida_telefone(ed_contato_telefone)
 
     apoio.motivo = motivo_apoio
     apoio.previsaoFim_tipo = previsaoFim_tipo
